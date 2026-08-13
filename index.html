@@ -1,10 +1,11 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Лисёнок Пифагор</title>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 <script>
 const firebaseConfig = {
@@ -16,6 +17,7 @@ const firebaseConfig = {
   appId: "1:821442788330:web:d9ae5db133bce0f5115093"
 };
 firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
 const db = firebase.firestore();
 </script>
 <style>
@@ -30,13 +32,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .screen.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-.header { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; margin-bottom: 20px; }
+.header { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; margin-bottom: 20px; position: relative; }
 .logo { display: flex; align-items: center; gap: 10px; font-size: 1.3rem; font-weight: bold; color: var(--text); }
 .logo-icon { font-size: 2rem; }
-.avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--orange); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1rem; cursor: pointer; }
+.header-actions { display: flex; gap: 12px; align-items: center; }
 
-.welcome { font-size: 1.8rem; font-weight: bold; margin-bottom: 24px; color: var(--text); }
-.welcome span { color: var(--orange); }
+.avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--orange); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1rem; cursor: pointer; user-select: none; }
+.notification-bell { font-size: 1.5rem; cursor: pointer; position: relative; }
+.notification-badge { position: absolute; top: -4px; right: -4px; background: var(--red); color: white; font-size: 0.7rem; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
 
 .card { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
 .card-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: var(--text); }
@@ -47,6 +50,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .btn-orange:hover { background: var(--orange-dark); }
 .btn-blue { background: var(--blue); color: white; }
 .btn-grey { background: #E8EDF2; color: var(--text); }
+.btn-red { background: var(--red); color: white; }
 
 .input-group { position: relative; margin-bottom: 16px; }
 .input-group input, .input-group select { width: 100%; padding: 16px 16px 16px 48px; border: 2px solid var(--border); border-radius: 14px; font-size: 1rem; font-family: inherit; background: white; outline: none; transition: border 0.2s; }
@@ -79,8 +83,133 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .consent-label input[type="checkbox"] { width: 20px; height: 20px; margin-top: 2px; cursor: pointer; accent-color: var(--orange); }
 .consent-label a { color: var(--blue); text-decoration: underline; }
 
+/* Выпадающее меню */
+.dropdown-menu { 
+  display: none; 
+  position: absolute; 
+  right: 0; 
+  top: 55px; 
+  background: white; 
+  border-radius: 12px; 
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
+  z-index: 1000; 
+  min-width: 220px; 
+  overflow: hidden; 
+  animation: fadeIn 0.2s;
+}
+.dropdown-menu.show { display: block; }
+.dropdown-header { 
+  padding: 14px 16px; 
+  font-weight: bold; 
+  color: var(--text); 
+  font-size: 0.95rem; 
+  border-bottom: 1px solid var(--border); 
+  background: #f8f9fa;
+}
+.dropdown-role {
+  padding: 4px 16px 12px;
+  font-size: 0.8rem;
+  color: var(--text-light);
+  border-bottom: 1px solid var(--border);
+  background: #f8f9fa;
+}
+.dropdown-item { 
+  padding: 14px 16px; 
+  cursor: pointer; 
+  border-bottom: 1px solid #f0f0f0; 
+  transition: background 0.2s; 
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dropdown-item:hover { background: #f8f9fa; }
+.dropdown-item:last-child { border-bottom: none; }
+.dropdown-item.logout { color: var(--red); font-weight: 600; }
+.dropdown-item .badge { 
+  background: var(--red); 
+  color: white; 
+  font-size: 0.7rem; 
+  padding: 2px 6px; 
+  border-radius: 10px; 
+  margin-left: auto; 
+  font-weight: bold;
+}
+
+/* Словари */
+.dictionary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 500px; margin: 0 auto; }
+.dictionary-card { 
+  background: white; 
+  border-radius: 20px; 
+  padding: 30px 20px; 
+  text-align: center; 
+  cursor: pointer; 
+  transition: all 0.2s;
+  border: 2px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.dictionary-card:active { transform: scale(0.95); }
+.dictionary-card:hover { border-color: var(--orange); box-shadow: 0 4px 16px rgba(255,112,67,0.15); }
+.dictionary-card .dict-emoji { font-size: 3.5rem; margin-bottom: 12px; }
+.dictionary-card .dict-title { font-size: 1.1rem; font-weight: bold; color: var(--text); }
+.dictionary-card .dict-count { font-size: 0.85rem; color: var(--text-light); margin-top: 4px; }
+
+/* Темы словаря */
+.topic-list { max-width: 600px; margin: 0 auto; }
+.topic-item { 
+  background: white; 
+  border-radius: 14px; 
+  padding: 18px 20px; 
+  margin-bottom: 12px; 
+  cursor: pointer; 
+  transition: all 0.2s;
+  border: 2px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.topic-item:active { transform: scale(0.98); }
+.topic-item:hover { border-color: var(--orange); }
+.topic-item .topic-name { font-weight: 600; font-size: 1.05rem; }
+.topic-item .topic-count { color: var(--text-light); font-size: 0.9rem; }
+
+/* Карточка слова */
+.flashcard-container { max-width: 500px; margin: 0 auto; padding: 20px 0; }
+.flashcard { 
+  background: white; 
+  border-radius: 24px; 
+  padding: 40px 30px; 
+  min-height: 280px; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  justify-content: center; 
+  text-align: center; 
+  cursor: pointer; 
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  transition: all 0.3s;
+  border: 3px solid var(--border);
+  position: relative;
+}
+.flashcard.flipped { border-color: var(--orange); background: #FFF8F5; }
+.flashcard .card-term { font-size: 2rem; font-weight: bold; color: var(--text); margin-bottom: 12px; }
+.flashcard .card-hint { font-size: 0.9rem; color: var(--text-light); }
+.flashcard .card-definition { font-size: 1.3rem; color: var(--orange-dark); margin-top: 16px; font-weight: 600; }
+.flashcard .card-example { font-size: 1rem; color: var(--text-light); margin-top: 12px; font-style: italic; }
+
+.flashcard-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; gap: 12px; }
+.flashcard-nav .btn { flex: 1; }
+.flashcard-counter { text-align: center; color: var(--text-light); font-size: 0.95rem; margin-top: 16px; }
+
 .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--text); color: white; padding: 12px 20px; border-radius: 24px; font-size: 0.95rem; opacity: 0; transition: opacity 0.3s; z-index: 2000; max-width: 90%; text-align: center; }
 .toast.show { opacity: 0.95; }
+
+.dashboard-welcome { font-size: 1.5rem; font-weight: bold; margin-bottom: 8px; }
+.dashboard-subtitle { color: var(--text-light); margin-bottom: 24px; }
+.dashboard-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.stat-card { background: white; padding: 16px; border-radius: 14px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.stat-value { font-size: 1.8rem; font-weight: bold; color: var(--orange); }
+.stat-label { font-size: 0.85rem; color: var(--text-light); margin-top: 4px; }
 
 @media (min-width: 768px) {
   .role-grid { grid-template-columns: repeat(3, 1fr); max-width: 600px; }
@@ -96,15 +225,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <div class="subtitle-main">Кто ты?</div>
   
   <div class="role-grid">
-    <div class="role-btn" onclick="showAuth('director')"><div class="emoji"></div><div class="label">Я директор</div></div>
+    <div class="role-btn" onclick="showAuth('director')"><div class="emoji">👔</div><div class="label">Я директор</div></div>
     <div class="role-btn" onclick="showAuth('deputy')"><div class="emoji">📋</div><div class="label">Я завуч</div></div>
     <div class="role-btn" onclick="showAuth('teacher')"><div class="emoji">👨‍</div><div class="label">Я учитель</div></div>
     <div class="role-btn" onclick="showScreen('screen-student')"><div class="emoji">🎒</div><div class="label">Я ученик</div></div>
-    <div class="role-btn full" onclick="showScreen('screen-parent')"><div class="emoji">👨‍👩👧</div><div class="label">Я родитель</div></div>
+    <div class="role-btn full" onclick="showScreen('screen-parent')"><div class="emoji">👨‍👩‍</div><div class="label">Я родитель</div></div>
   </div>
 
   <div style="margin-top: 24px; width: 100%; max-width: 400px;">
-    <button class="btn btn-grey" onclick="showScreen('screen-dictionary')" style="margin-bottom: 8px;">📖 Словари</button>
+    <button class="btn btn-grey" onclick="showScreen('screen-dictionary-list')" style="margin-bottom: 8px;"> Словари</button>
     <button class="btn btn-grey" onclick="showLeaderboard(null)">🏆 Таблица успеха</button>
   </div>
 
@@ -149,16 +278,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
     <input type="text" id="reg-fio" placeholder="ФИО" autocomplete="name">
   </div>
   <div class="input-group">
-    <span class="input-icon">️</span>
+    <span class="input-icon">✉️</span>
     <input type="email" id="reg-email" placeholder="Email" autocomplete="email">
   </div>
   <div class="input-group">
     <span class="input-icon">🔒</span>
-    <input type="password" id="reg-password" placeholder="Пароль" autocomplete="new-password">
+    <input type="password" id="reg-password" placeholder="Пароль (мин. 6 символов)" autocomplete="new-password">
   </div>
-  <div class="input-group" id="reg-school-group">
+  <div class="input-group" id="reg-school-group" style="display: none;">
     <span class="input-icon">🏫</span>
-    <input type="text" id="reg-school-code" placeholder="Код школы (необязательно)" style="text-transform: uppercase;">
+    <input type="text" id="reg-school-code" placeholder="Код школы" style="text-transform: uppercase;">
   </div>
 
   <label class="consent-label">
@@ -191,6 +320,45 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <button class="btn btn-grey" style="margin-top: 24px;" onclick="showScreen('screen-role')">← На главную</button>
 </div>
 
+<!-- ЭКРАН ЛИЧНОГО КАБИНЕТА -->
+<div id="screen-dashboard" class="screen">
+  <div class="header">
+    <div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div>
+    <div class="header-actions">
+      <div class="notification-bell" onclick="showNotifications()">
+        🔔
+        <span class="notification-badge" id="notif-badge" style="display: none;">0</span>
+      </div>
+      <div class="avatar" onclick="toggleDropdown()" id="user-avatar"></div>
+      <div class="dropdown-menu" id="user-dropdown">
+        <div class="dropdown-header" id="dropdown-user-name">Гость</div>
+        <div class="dropdown-role" id="dropdown-user-role">Роль не указана</div>
+        <div class="dropdown-item" onclick="showMyStats()">📊 Моя статистика</div>
+        <div class="dropdown-item" id="menu-classes" style="display: none;" onclick="showMyClasses()">🏫 Мои классы</div>
+        <div class="dropdown-item" id="menu-assignments" style="display: none;" onclick="showMyAssignments()">📝 Мои задания</div>
+        <div class="dropdown-item" onclick="showSupport()">💬 Поддержка</div>
+        <div class="dropdown-item logout" onclick="handleLogout()">🚪 Выйти из аккаунта</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="dashboard-welcome" id="dashboard-welcome">Добро пожаловать!</div>
+  <div class="dashboard-subtitle" id="dashboard-subtitle">Ваш личный кабинет</div>
+
+  <div class="dashboard-stats" id="dashboard-stats">
+    <div class="stat-card">
+      <div class="stat-value" id="stat-1">0</div>
+      <div class="stat-label" id="stat-1-label">Загрузка...</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="stat-2">0</div>
+      <div class="stat-label" id="stat-2-label">Загрузка...</div>
+    </div>
+  </div>
+
+  <div id="dashboard-content"></div>
+</div>
+
 <!-- ЭКРАН УЧЕНИКА -->
 <div id="screen-student" class="screen">
   <div class="header">
@@ -208,7 +376,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <button class="btn btn-orange" id="student-start-btn" style="display: none;" onclick="startClassGame()">▶ Начать!</button>
 
   <div style="margin-top: 32px;">
-    <p style="color: var(--text-light); margin-bottom: 16px;">Нет кода? Играй сам 👇</p>
+    <p style="color: var(--text-light); margin-bottom: 16px;">Нет кода? Играй сам </p>
     <div class="role-grid" style="max-width: 100%;">
       <div class="role-btn" onclick="startSoloGame('math')"><div class="emoji"></div><div class="label">Математика</div></div>
       <div class="role-btn" onclick="startSoloGame('russian')"><div class="emoji">📖</div><div class="label">Русский</div></div>
@@ -219,7 +387,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <div style="margin-top: 24px;">
     <p style="color: var(--text-light); margin-bottom: 12px;">Как тебя зовут?</p>
     <div class="input-group">
-      <span class="input-icon">👤</span>
+      <span class="input-icon"></span>
       <input type="text" id="nickname-input" placeholder="Твоё имя..." maxlength="20">
     </div>
   </div>
@@ -240,7 +408,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
     <input type="text" id="parent-school-code" placeholder="Код школы (необязательно)" style="text-transform: uppercase;">
   </div>
   <div class="input-group">
-    <span class="input-icon"></span>
+    <span class="input-icon">🔑</span>
     <input type="text" id="parent-code-input" placeholder="Код родителя (P-XXXX)" maxlength="8" style="text-transform: uppercase; text-align: center; font-size: 1.2rem; letter-spacing: 2px;">
   </div>
 
@@ -261,7 +429,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <div style="background: #E8EDF2; border-radius: 8px; height: 10px; margin-bottom: 24px; overflow: hidden;">
     <div id="progress-fill" style="background: var(--orange); height: 100%; width: 0%; transition: width 0.5s;"></div>
   </div>
-  <div style="text-align: center; font-size: 4rem; margin-bottom: 16px;" id="game-mascot"></div>
+  <div style="text-align: center; font-size: 4rem; margin-bottom: 16px;" id="game-mascot">🦊</div>
   <div id="question-text" style="font-size: 1.8rem; font-weight: bold; text-align: center; margin-bottom: 32px; min-height: 60px;"></div>
   <div id="input-area" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 500px; margin: 0 auto;"></div>
   <div id="feedback-text" style="text-align: center; font-weight: bold; margin-top: 20px; min-height: 28px; color: var(--orange);"></div>
@@ -311,31 +479,240 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <button class="btn btn-orange" onclick="showScreen('screen-role')">Закрыть</button>
 </div>
 
+<!-- ЭКРАН ВЫБОРА СЛОВАРЯ -->
+<div id="screen-dictionary-list" class="screen">
+  <div class="header">
+    <div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div>
+  </div>
+  <h1 style="font-size: 1.8rem; margin-bottom: 8px;">📖 Словари</h1>
+  <p style="color: var(--text-light); margin-bottom: 24px;">Выбери предмет для изучения</p>
+
+  <div class="dictionary-grid">
+    <div class="dictionary-card" onclick="openDictionary('russian')">
+      <div class="dict-emoji">🇷</div>
+      <div class="dict-title">Русский язык</div>
+      <div class="dict-count">Орфография и пунктуация</div>
+    </div>
+    <div class="dictionary-card" onclick="openDictionary('english')">
+      <div class="dict-emoji">🇬🇧</div>
+      <div class="dict-title">Английский</div>
+      <div class="dict-count">Слова и фразы</div>
+    </div>
+    <div class="dictionary-card" onclick="openDictionary('chemistry')">
+      <div class="dict-emoji">⚗️</div>
+      <div class="dict-title">Химия</div>
+      <div class="dict-count">Элементы и формулы</div>
+    </div>
+    <div class="dictionary-card" onclick="openDictionary('physics')">
+      <div class="dict-emoji">⚛️</div>
+      <div class="dict-title">Физика</div>
+      <div class="dict-count">Законы и величины</div>
+    </div>
+  </div>
+
+  <button class="btn btn-grey" style="margin-top: 32px; max-width: 500px; margin-left: auto; margin-right: auto;" onclick="showScreen('screen-role')">← На главную</button>
+</div>
+
+<!-- ЭКРАН ТЕМ СЛОВАРЯ -->
+<div id="screen-dictionary-topics" class="screen">
+  <div class="header">
+    <div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div>
+  </div>
+  <h1 style="font-size: 1.8rem; margin-bottom: 8px;" id="dict-subject-title">Предмет</h1>
+  <p style="color: var(--text-light); margin-bottom: 24px;">Выбери тему для изучения</p>
+
+  <div class="topic-list" id="topic-list"></div>
+
+  <button class="btn btn-grey" style="margin-top: 24px; max-width: 500px; margin-left: auto; margin-right: auto;" onclick="showScreen('screen-dictionary-list')">← К словарям</button>
+</div>
+
+<!-- ЭКРАН КАРТОЧЕК -->
+<div id="screen-dictionary-cards" class="screen">
+  <div class="header">
+    <div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div>
+  </div>
+  <h1 style="font-size: 1.5rem; margin-bottom: 8px;" id="cards-topic-title">Тема</h1>
+  <p style="color: var(--text-light); margin-bottom: 16px; font-size: 0.95rem;">Нажми на карточку, чтобы увидеть ответ</p>
+
+  <div class="flashcard-container">
+    <div class="flashcard" id="flashcard" onclick="flipCard()">
+      <div class="card-term" id="card-term">Термин</div>
+      <div class="card-hint">👆 Нажми, чтобы увидеть ответ</div>
+      <div class="card-definition" id="card-definition" style="display: none;"></div>
+      <div class="card-example" id="card-example" style="display: none;"></div>
+    </div>
+    
+    <div class="flashcard-counter" id="flashcard-counter">1 / 10</div>
+    
+    <div class="flashcard-nav">
+      <button class="btn btn-grey" onclick="prevCard()">← Назад</button>
+      <button class="btn btn-orange" onclick="nextCard()">Далее →</button>
+    </div>
+  </div>
+
+  <button class="btn btn-grey" style="margin-top: 24px; max-width: 500px; margin-left: auto; margin-right: auto;" onclick="showScreen('screen-dictionary-topics')">← К темам</button>
+</div>
+
 <div id="toast" class="toast"></div>
 
 <script>
 // ===== СОСТОЯНИЕ =====
-const state = { grade: 1, round: 0, maxRounds: 10, score: 0, streak: 0, nickname: '', classCode: '', joinClass: null, currentProblem: null, currentRoundHistory: [], subject: 'math' };
-let currentRole = 'teacher';
+const state = { 
+  grade: 1, round: 0, maxRounds: 10, score: 0, streak: 0, 
+  nickname: '', classCode: '', joinClass: null, 
+  currentProblem: null, currentRoundHistory: [], 
+  subject: 'math',
+  currentUser: null,
+  currentRole: null,
+  // Для словарей
+  currentDictionary: null,
+  currentTopic: null,
+  currentCards: [],
+  currentCardIndex: 0,
+  cardFlipped: false
+};
+let selectedRole = 'teacher';
+
+// ===== БАЗА СЛОВАРЕЙ =====
+const dictionaries = {
+  russian: {
+    title: 'Русский язык',
+    emoji: '🇷',
+    topics: [
+      {
+        name: 'Безударные гласные в корне',
+        cards: [
+          { term: 'В_да', definition: 'Вода', example: 'Проверочное слово: вóды' },
+          { term: 'Л_сной', definition: 'Лесной', example: 'Проверочное слово: лéс' },
+          { term: 'Тр_па', definition: 'Тропа', example: 'Проверочное слово: трóпы' },
+          { term: 'Сн_га', definition: 'Снега', example: 'Проверочное слово: снéг' },
+          { term: 'Цв_ты', definition: 'Цветы', example: 'Проверочное слово: цвéт' }
+        ]
+      },
+      {
+        name: 'Парные согласные',
+        cards: [
+          { term: 'Ду_', definition: 'Дуб', example: 'Проверочное слово: ду́бы' },
+          { term: 'Гла_', definition: 'Глаз', example: 'Проверочное слово: гла́за' },
+          { term: 'Моро_', definition: 'Мороз', example: 'Проверочное слово: моро́зы' },
+          { term: 'Сне_', definition: 'Снег', example: 'Проверочное слово: снега́' }
+        ]
+      },
+      {
+        name: 'Непроизносимые согласные',
+        cards: [
+          { term: 'Со_нце', definition: 'Солнце', example: 'Проверочное слово: со́лнышко' },
+          { term: 'Сер_це', definition: 'Сердце', example: 'Проверочное слово: серде́чко' },
+          { term: 'Мес_ный', definition: 'Местный', example: 'Проверочное слово: ме́сто' }
+        ]
+      }
+    ]
+  },
+  english: {
+    title: 'Английский язык',
+    emoji: '🇬🇧',
+    topics: [
+      {
+        name: 'Базовые слова (A1)',
+        cards: [
+          { term: 'Hello', definition: 'Привет', example: 'Hello, how are you?' },
+          { term: 'Goodbye', definition: 'До свидания', example: 'Goodbye, see you tomorrow!' },
+          { term: 'Thank you', definition: 'Спасибо', example: 'Thank you very much!' },
+          { term: 'Please', definition: 'Пожалуйста', example: 'Please, help me.' },
+          { term: 'Sorry', definition: 'Извини', example: 'Sorry, I am late.' }
+        ]
+      },
+      {
+        name: 'Семья (Family)',
+        cards: [
+          { term: 'Mother', definition: 'Мама', example: 'My mother is a teacher.' },
+          { term: 'Father', definition: 'Папа', example: 'My father works in an office.' },
+          { term: 'Sister', definition: 'Сестра', example: 'I have one sister.' },
+          { term: 'Brother', definition: 'Брат', example: 'My brother is older than me.' }
+        ]
+      },
+      {
+        name: 'Цвета (Colors)',
+        cards: [
+          { term: 'Red', definition: 'Красный', example: 'The apple is red.' },
+          { term: 'Blue', definition: 'Синий', example: 'The sky is blue.' },
+          { term: 'Green', definition: 'Зелёный', example: 'The grass is green.' },
+          { term: 'Yellow', definition: 'Жёлтый', example: 'The sun is yellow.' }
+        ]
+      }
+    ]
+  },
+  chemistry: {
+    title: 'Химия',
+    emoji: '⚗️',
+    topics: [
+      {
+        name: 'Химические элементы',
+        cards: [
+          { term: 'H', definition: 'Водород (Hydrogen)', example: 'Самый лёгкий элемент' },
+          { term: 'O', definition: 'Кислород (Oxygen)', example: 'Необходим для дыхания' },
+          { term: 'C', definition: 'Углерод (Carbon)', example: 'Основа органической химии' },
+          { term: 'N', definition: 'Азот (Nitrogen)', example: '78% атмосферы' },
+          { term: 'Fe', definition: 'Железо (Ferrum)', example: 'Металл, основа стали' }
+        ]
+      },
+      {
+        name: 'Формулы веществ',
+        cards: [
+          { term: 'H₂O', definition: 'Вода', example: 'Универсальный растворитель' },
+          { term: 'CO₂', definition: 'Углекислый газ', example: 'Продукт дыхания' },
+          { term: 'NaCl', definition: 'Поваренная соль', example: 'Хлорид натрия' },
+          { term: 'H₂SO₄', definition: 'Серная кислота', example: 'Сильная кислота' }
+        ]
+      }
+    ]
+  },
+  physics: {
+    title: 'Физика',
+    emoji: '⚛️',
+    topics: [
+      {
+        name: 'Физические величины',
+        cards: [
+          { term: 'Скорость (v)', definition: 'м/с', example: 'v = S / t' },
+          { term: 'Масса (m)', definition: 'кг', example: 'Мера инертности тела' },
+          { term: 'Сила (F)', definition: 'Н (Ньютон)', example: 'F = m × a' },
+          { term: 'Энергия (E)', definition: 'Дж (Джоуль)', example: 'E = m × c²' }
+        ]
+      },
+      {
+        name: 'Законы Ньютона',
+        cards: [
+          { term: '1-й закон Ньютона', definition: 'Закон инерции', example: 'Тело сохраняет покой или равномерное движение, если на него не действуют силы' },
+          { term: '2-й закон Ньютона', definition: 'F = m × a', example: 'Сила равна произведению массы на ускорение' },
+          { term: '3-й закон Ньютона', definition: 'Действие = Противодействие', example: 'Силы всегда парны и равны по модулю' }
+        ]
+      }
+    ]
+  }
+};
 
 // ===== НАВИГАЦИЯ =====
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0, 0);
+  const menu = document.getElementById('user-dropdown');
+  if (menu) menu.classList.remove('show');
 }
 
 function showAuth(role) {
-  currentRole = role;
+  selectedRole = role;
   const titles = { director: 'Вход директора', deputy: 'Вход завуча', teacher: 'Вход учителя' };
   document.getElementById('auth-title').textContent = titles[role] || 'Вход';
   
   const schoolGroup = document.getElementById('reg-school-group');
+  const schoolInput = document.getElementById('reg-school-code');
   if (role === 'deputy') {
-    schoolGroup.querySelector('input').placeholder = 'Код школы (ОБЯЗАТЕЛЬНО)';
+    schoolInput.placeholder = 'Код школы (ОБЯЗАТЕЛЬНО)';
     schoolGroup.style.display = 'block';
   } else if (role === 'teacher') {
-    schoolGroup.querySelector('input').placeholder = 'Код школы (необязательно)';
+    schoolInput.placeholder = 'Код школы (необязательно)';
     schoolGroup.style.display = 'block';
   } else {
     schoolGroup.style.display = 'none';
@@ -351,21 +728,307 @@ function showToast(msg) {
   t._to = setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-// ===== ЗАГЛУШКИ АУТЕНТИФИКАЦИИ =====
-function handleLogin() {
-  // TODO: Здесь будет Firebase Authentication
-  showToast('Вход... (пока в разработке)');
+// ===== ВЫПАДАЮЩЕЕ МЕНЮ =====
+function toggleDropdown() {
+  const menu = document.getElementById('user-dropdown');
+  menu.classList.toggle('show');
+  document.onclick = function(event) {
+    if (!event.target.matches('.avatar') && !event.target.closest('.dropdown-menu')) {
+      menu.classList.remove('show');
+    }
+  }
 }
 
+function handleLogout() {
+  if (confirm('Вы точно хотите выйти из аккаунта?')) {
+    auth.signOut().then(() => {
+      showToast('Вы успешно вышли из аккаунта');
+      document.getElementById('user-dropdown').classList.remove('show');
+      state.currentUser = null;
+      state.currentRole = null;
+      showScreen('screen-role');
+    }).catch((error) => {
+      showToast('Ошибка при выходе: ' + error.message);
+    });
+  }
+}
+
+function showSupport() {
+  const subject = encodeURIComponent('Вопрос по Лисёнку Пифагору');
+  const body = encodeURIComponent('Здравствуйте! У меня вопрос: ');
+  window.location.href = `mailto:iosif.marketing@yandex.ru?subject=${subject}&body=${body}`;
+  document.getElementById('user-dropdown').classList.remove('show');
+}
+
+function showMyStats() {
+  showToast('📊 Раздел статистики в разработке');
+  document.getElementById('user-dropdown').classList.remove('show');
+}
+
+function showMyClasses() {
+  showToast('🏫 Раздел "Мои классы" в разработке');
+  document.getElementById('user-dropdown').classList.remove('show');
+}
+
+function showMyAssignments() {
+  showToast('📝 Раздел "Мои задания" в разработке');
+  document.getElementById('user-dropdown').classList.remove('show');
+}
+
+function showNotifications() {
+  showToast('🔔 У вас нет новых уведомлений');
+}
+
+// ===== СЛОВАРИ =====
+function openDictionary(subjectKey) {
+  const dict = dictionaries[subjectKey];
+  if (!dict) {
+    showToast('Словарь не найден');
+    return;
+  }
+  
+  state.currentDictionary = subjectKey;
+  document.getElementById('dict-subject-title').textContent = dict.emoji + ' ' + dict.title;
+  
+  const list = document.getElementById('topic-list');
+  list.innerHTML = '';
+  
+  dict.topics.forEach((topic, index) => {
+    const item = document.createElement('div');
+    item.className = 'topic-item';
+    item.onclick = () => openTopic(subjectKey, index);
+    item.innerHTML = `
+      <div class="topic-name">${topic.name}</div>
+      <div class="topic-count">${topic.cards.length} карточек</div>
+    `;
+    list.appendChild(item);
+  });
+  
+  showScreen('screen-dictionary-topics');
+}
+
+function openTopic(subjectKey, topicIndex) {
+  const dict = dictionaries[subjectKey];
+  const topic = dict.topics[topicIndex];
+  
+  state.currentTopic = topic;
+  state.currentCards = topic.cards;
+  state.currentCardIndex = 0;
+  state.cardFlipped = false;
+  
+  document.getElementById('cards-topic-title').textContent = topic.name;
+  
+  showCard();
+  showScreen('screen-dictionary-cards');
+}
+
+function showCard() {
+  const card = state.currentCards[state.currentCardIndex];
+  const flashcard = document.getElementById('flashcard');
+  const termEl = document.getElementById('card-term');
+  const defEl = document.getElementById('card-definition');
+  const exEl = document.getElementById('card-example');
+  const counterEl = document.getElementById('flashcard-counter');
+  
+  // Сброс состояния
+  flashcard.classList.remove('flipped');
+  defEl.style.display = 'none';
+  exEl.style.display = 'none';
+  state.cardFlipped = false;
+  
+  termEl.textContent = card.term;
+  defEl.textContent = card.definition;
+  exEl.textContent = card.example ? '📝 ' + card.example : '';
+  counterEl.textContent = `${state.currentCardIndex + 1} / ${state.currentCards.length}`;
+}
+
+function flipCard() {
+  const flashcard = document.getElementById('flashcard');
+  const defEl = document.getElementById('card-definition');
+  const exEl = document.getElementById('card-example');
+  
+  state.cardFlipped = !state.cardFlipped;
+  
+  if (state.cardFlipped) {
+    flashcard.classList.add('flipped');
+    defEl.style.display = 'block';
+    if (state.currentCards[state.currentCardIndex].example) {
+      exEl.style.display = 'block';
+    }
+  } else {
+    flashcard.classList.remove('flipped');
+    defEl.style.display = 'none';
+    exEl.style.display = 'none';
+  }
+}
+
+function nextCard() {
+  if (state.currentCardIndex < state.currentCards.length - 1) {
+    state.currentCardIndex++;
+    showCard();
+  } else {
+    showToast('🎉 Ты прошёл все карточки!');
+  }
+}
+
+function prevCard() {
+  if (state.currentCardIndex > 0) {
+    state.currentCardIndex--;
+    showCard();
+  }
+}
+
+// ===== АУТЕНТИФИКАЦИЯ =====
 function handleRegister() {
-  // TODO: Здесь будет Firebase Authentication + запись в Firestore
-  showToast('Регистрация... (пока в разработке)');
+  const fio = document.getElementById('reg-fio').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const schoolCode = document.getElementById('reg-school-code').value.trim().toUpperCase();
+  const consent = document.getElementById('reg-consent').checked;
+  
+  if (!fio || !email || !password) { showToast('Заполни ФИО, Email и Пароль'); return; }
+  if (!consent) { showToast('Поставь галочку согласия с документами'); return; }
+  if (selectedRole === 'deputy' && !schoolCode) { showToast('Для завуча код школы ОБЯЗАТЕЛЕН'); return; }
+  if (password.length < 6) { showToast('Пароль должен быть не менее 6 символов'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('Неверный формат Email'); return; }
+
+  showToast('Регистрация...');
+  
+  auth.createUserWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      return db.collection('users').doc(user.uid).set({
+        fio: fio, email: email, role: selectedRole,
+        schoolCode: schoolCode || null,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => user);
+    })
+    .then((user) => {
+      showToast('Регистрация успешна! Добро пожаловать, ' + fio);
+      user.sendEmailVerification().catch(() => {});
+      loadUserData(user.uid);
+    })
+    .catch((error) => {
+      console.error(error);
+      if (error.code === 'auth/email-already-in-use') showToast('Этот Email уже зарегистрирован');
+      else if (error.code === 'auth/invalid-email') showToast('Неверный формат Email');
+      else if (error.code === 'auth/weak-password') showToast('Пароль слишком слабый');
+      else showToast('Ошибка: ' + error.message);
+    });
+}
+
+function handleLogin() {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  
+  if (!email || !password) { showToast('Введи Email и Пароль'); return; }
+
+  showToast('Вход...');
+  
+  auth.signInWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      showToast('Вы успешно вошли!');
+      loadUserData(userCredential.user.uid);
+    })
+    .catch((error) => {
+      console.error(error);
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        showToast('Неверный Email или пароль');
+      } else if (error.code === 'auth/too-many-requests') {
+        showToast('Слишком много попыток. Попробуй позже');
+      } else {
+        showToast('Ошибка входа: ' + error.message);
+      }
+    });
 }
 
 function handleForgot() {
-  // TODO: Здесь будет отправка письма для сброса пароля
-  showToast('Восстановление пароля... (пока в разработке)');
+  const email = document.getElementById('forgot-email').value.trim();
+  if (!email) { showToast('Введи Email'); return; }
+
+  showToast('Отправляем письмо...');
+  
+  auth.sendPasswordResetEmail(email)
+    .then(() => {
+      showToast('✅ Ссылка для сброса пароля отправлена на ' + email);
+      showScreen('screen-auth');
+    })
+    .catch((error) => {
+      console.error(error);
+      if (error.code === 'auth/user-not-found') showToast('Пользователь с таким Email не найден');
+      else showToast('Ошибка: ' + error.message);
+    });
 }
+
+function loadUserData(uid) {
+  db.collection('users').doc(uid).get().then((doc) => {
+    if (doc.exists) {
+      const data = doc.data();
+      state.currentUser = { uid, ...data };
+      state.currentRole = data.role;
+      
+      const nameEl = document.getElementById('dropdown-user-name');
+      const roleEl = document.getElementById('dropdown-user-role');
+      const avatarEl = document.getElementById('user-avatar');
+      
+      if (nameEl) nameEl.textContent = data.fio || data.email;
+      if (avatarEl) avatarEl.textContent = (data.fio || '').charAt(0).toUpperCase();
+      
+      const roleNames = { director: '👔 Директор', deputy: '📋 Завуч', teacher: '👨‍🏫 Учитель' };
+      if (roleEl) roleEl.textContent = roleNames[data.role] || 'Пользователь';
+      
+      const menuClasses = document.getElementById('menu-classes');
+      const menuAssignments = document.getElementById('menu-assignments');
+      
+      if (data.role === 'teacher' || data.role === 'deputy' || data.role === 'director') {
+        if (menuClasses) menuClasses.style.display = 'flex';
+        if (menuAssignments) menuAssignments.style.display = 'flex';
+      } else {
+        if (menuClasses) menuClasses.style.display = 'none';
+        if (menuAssignments) menuAssignments.style.display = 'none';
+      }
+      
+      updateDashboard(data);
+      showScreen('screen-dashboard');
+    } else {
+      showToast('Ошибка: данные пользователя не найдены');
+      showScreen('screen-role');
+    }
+  }).catch((error) => {
+    console.error(error);
+    showToast('Ошибка загрузки данных');
+  });
+}
+
+function updateDashboard(data) {
+  const welcomeEl = document.getElementById('dashboard-welcome');
+  const subtitleEl = document.getElementById('dashboard-subtitle');
+  const stat1Label = document.getElementById('stat-1-label');
+  const stat2Label = document.getElementById('stat-2-label');
+  
+  const roleConfig = {
+    director: { welcome: 'Добро пожаловать, директор!', subtitle: 'Управление школой', stat1Label: 'Учителей', stat2Label: 'Учеников' },
+    deputy: { welcome: 'Добро пожаловать, завуч!', subtitle: 'Управление учебным процессом', stat1Label: 'Классов', stat2Label: 'Учителей' },
+    teacher: { welcome: 'Добро пожаловать, ' + (data.fio ? data.fio.split(' ')[0] : 'учитель') + '!', subtitle: 'Ваш личный кабинет', stat1Label: 'Моих классов', stat2Label: 'Заданий' }
+  };
+  
+  const config = roleConfig[data.role] || roleConfig.teacher;
+  if (welcomeEl) welcomeEl.textContent = config.welcome;
+  if (subtitleEl) subtitleEl.textContent = config.subtitle;
+  if (stat1Label) stat1Label.textContent = config.stat1Label;
+  if (stat2Label) stat2Label.textContent = config.stat2Label;
+}
+
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    console.log("Пользователь залогинен:", user.email);
+    if (!state.currentUser) loadUserData(user.uid);
+  } else {
+    console.log("Пользователь не залогинен");
+    state.currentUser = null;
+    state.currentRole = null;
+  }
+});
 
 // ===== УЧЕНИК И ИГРА =====
 function onStudentCodeInput() {
@@ -487,7 +1150,7 @@ function checkAnswer(userVal) {
     state.streak = 0;
     document.getElementById('feedback-text').textContent = `❌ Правильно: ${correct}`;
     document.getElementById('feedback-text').style.color = 'var(--red)';
-    document.getElementById('game-mascot').textContent = '😢';
+    document.getElementById('game-mascot').textContent = '';
   }
   
   document.getElementById('score-display').textContent = state.score;
@@ -501,7 +1164,7 @@ function endGame() {
   document.getElementById('final-score').textContent = state.score;
   document.getElementById('result-total').textContent = state.maxRounds;
   
-  const comment = state.score >= 9 ? 'Великолепно! ' : state.score >= 7 ? 'Отлично! 👍' : state.score >= 5 ? 'Неплохо! 💪' : 'Попробуй ещё! 🦊';
+  const comment = state.score >= 9 ? 'Великолепно! 🏆' : state.score >= 7 ? 'Отлично! 👍' : state.score >= 5 ? 'Неплохо! 💪' : 'Попробуй ещё! 🦊';
   document.getElementById('result-comment').textContent = comment;
   
   saveResultToFirebase(name, state.score, state.grade, state.classCode, state.currentRoundHistory, state.maxRounds);
@@ -618,49 +1281,4 @@ async function showLeaderboard(classCode) {
 }
 </script>
 </body>
-      </html>
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    </html> 
