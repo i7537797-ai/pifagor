@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>eruda.init();</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Лисёнок Пифагор</title>
@@ -21,1052 +19,648 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 </script>
 <style>
-:root { --font-main:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif; }
-* { box-sizing:border-box; user-select:none; -webkit-tap-highlight-color:transparent; }
-body { margin:0; display:flex; justify-content:center; align-items:center; min-height:100vh; overflow:hidden; }
-body.theme-junior { background:#E0F7FA; color:#37474F; font-family:'Comic Sans MS','Chalkboard SE',sans-serif; }
-body.theme-middle { background:#263238; color:#ECEFF1; font-family:var(--font-main); }
-body.theme-senior { background:#121212; color:#E0E0E0; font-family:'Courier New',monospace; }
-.screen { display:none; width:100%; max-width:640px; padding:20px; flex-direction:column; align-items:center; text-align:center; animation:fadeIn .4s; overflow-y:auto; max-height:100vh; }
-.screen.active { display:flex; }
-@keyframes fadeIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
-h1 { margin-bottom:8px; font-size:2rem; }
-.subtitle { font-size:1.05rem; margin-bottom:16px; opacity:.8; }
-.mascot-container { height:105px; margin-bottom:6px; }
-.fox-svg { width:90px; height:90px; }
-.fox-happy { animation:jump .5s ease infinite; }
-.fox-sad { animation:shake .5s ease; filter:grayscale(.5); }
-@keyframes jump { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-18px);} }
-@keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-5px);} 75%{transform:translateX(5px);} }
-.role-buttons { display:flex; gap:14px; width:100%; max-width:500px; margin-top:22px; flex-wrap:wrap; justify-content:center; }
-.role-btn { flex:1; min-width:130px; padding:28px 10px; border:none; border-radius:24px; font-size:1.2rem; font-weight:bold; cursor:pointer; font-family:inherit; line-height:1.5; transition:.15s; }
-.role-btn.teacher { background:linear-gradient(145deg,#81D4FA,#4FC3F7); color:#01579B; box-shadow:0 6px 0 #0288D1,0 10px 18px rgba(0,0,0,.15); }
-.role-btn.student { background:linear-gradient(145deg,#FFB74D,#FF9800); color:#fff; box-shadow:0 6px 0 #E65100,0 10px 18px rgba(0,0,0,.15); }
-.role-btn.parent { background:linear-gradient(145deg,#CE93D8,#AB47BC); color:#fff; box-shadow:0 6px 0 #7B1FA2,0 10px 18px rgba(0,0,0,.15); }
-.role-btn:hover { transform:translateY(-4px) scale(1.03); }
-.role-btn:active { transform:translateY(2px); }
-.subject-toggle { display:flex; gap:10px; margin-bottom:12px; flex-wrap:wrap; justify-content:center; }
-.subject-btn { border:2px solid #B3E5FC; background:rgba(255,255,255,.7); color:#37474F; padding:10px 16px; border-radius:20px; font-size:1rem; cursor:pointer; font-family:inherit; transition:.15s; }
-.subject-btn.active { background:#4FC3F7; color:#fff; border-color:#4FC3F7; box-shadow:0 3px 8px rgba(79,195,247,.4); }
-.player-chips { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; width:100%; max-width:500px; margin-bottom:12px; }
-.player-chip { background:rgba(255,255,255,.75); border:2px solid #B3E5FC; color:#37474F; padding:9px 16px; border-radius:22px; font-size:1rem; cursor:pointer; font-family:inherit; transition:.15s; }
-.player-chip:hover { transform:translateY(-2px); }
-.player-chip.active { background:#FF9800; color:#fff; border-color:#FF9800; box-shadow:0 3px 10px rgba(255,152,0,.45); }
-.player-chip.add-new { border-style:dashed; opacity:.85; }
-.nickname-input, .parent-code-input { width:100%; max-width:420px; padding:13px; font-size:1.15rem; border-radius:16px; border:2px solid #FFB74D; margin-bottom:16px; text-align:center; font-family:inherit; outline:none; background:rgba(255,255,255,.7); color:#37474F; }
-.parent-code-input { border-color:#AB47BC; font-size:1.5rem; letter-spacing:4px; text-transform:uppercase; }
-.nickname-input:focus { border-color:#FF9800; box-shadow:0 0 0 3px rgba(255,152,0,.2); }
-.parent-code-input:focus { border-color:#CE93D8; box-shadow:0 0 0 3px rgba(171,71,188,.2); }
-.code-input { width:100%; max-width:420px; padding:14px; font-size:1.5rem; letter-spacing:4px; text-transform:uppercase; text-align:center; border-radius:16px; border:2px solid #B3E5FC; margin-bottom:8px; font-family:inherit; outline:none; background:rgba(255,255,255,.7); color:#37474F; }
-.code-input:focus { border-color:#4FC3F7; box-shadow:0 0 0 3px rgba(79,195,247,.2); }
-.class-info { min-height:26px; font-weight:bold; color:#00897B; margin-bottom:12px; font-size:1.05rem; }
-.class-info.error { color:#E53935; }
-.class-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; width:100%; max-width:480px; margin-top:4px; }
-.class-btn { background:linear-gradient(145deg,#FFB74D,#FF9800); color:#fff; border:none; padding:20px 8px; border-radius:20px; font-size:1.2rem; font-weight:bold; cursor:pointer; font-family:inherit; box-shadow:0 6px 0 #E65100,0 10px 18px rgba(0,0,0,.18); text-shadow:1px 1px 2px rgba(0,0,0,.25); transition:transform .15s,box-shadow .15s; }
-.class-btn:hover { transform:translateY(-4px) scale(1.05); }
-.class-btn:active { transform:translateY(3px); box-shadow:0 2px 0 #E65100; }
-.teacher-form { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; align-items:center; width:100%; max-width:560px; margin-bottom:20px; }
-.teacher-form input, .teacher-form select { padding:12px; border-radius:12px; border:2px solid #B3E5FC; font-size:1rem; font-family:inherit; background:#fff; color:#37474F; outline:none; }
-.teacher-form input { flex:1; min-width:150px; }
-.class-card { background:rgba(255,255,255,.85); border-radius:16px; padding:14px 16px; margin-bottom:12px; width:100%; max-width:480px; box-shadow:0 2px 6px rgba(0,0,0,.08); text-align:left; }
-.class-card-head { display:flex; justify-content:space-between; align-items:center; font-size:1.15rem; flex-wrap:wrap; gap:6px; }
-.class-card-grade { opacity:.6; font-size:.9rem; }
-.class-card-code { margin:8px 0; font-size:1rem; }
-.class-card-code b { letter-spacing:2px; padding:2px 8px; background:rgba(79,195,247,.15); border-radius:8px; }
-.class-card-code .parent-code { background:rgba(171,71,188,.15); }
-.class-card-actions { display:flex; flex-wrap:wrap; gap:8px; }
-.btn-mini { border:none; padding:8px 12px; border-radius:14px; font-size:.9rem; cursor:pointer; font-family:inherit; background:#B3E5FC; color:#01579B; }
-.btn-mini:hover { filter:brightness(.95); }
-.btn-mini.btn-trophy { background:#FFE082; color:#7a5b00; }
-.btn-mini.btn-del { background:#FFCDD2; color:#b71c1c; }
-.btn-mini.btn-parent { background:#E1BEE7; color:#6A1B9A; }
-.custom-form { display:flex; flex-direction:column; gap:10px; width:100%; max-width:500px; margin-bottom:20px; }
-.custom-form input { padding:12px; border-radius:12px; border:2px solid #B3E5FC; font-size:1rem; font-family:inherit; background:#fff; color:#37474F; outline:none; }
-.custom-problem-row { display:flex; align-items:center; gap:10px; background:rgba(255,255,255,.85); border-radius:14px; padding:12px 14px; margin-bottom:10px; width:100%; max-width:500px; text-align:left; box-shadow:0 2px 4px rgba(0,0,0,.06); }
-.custom-problem-text { flex:1; }
-.cp-q { font-weight:bold; }
-.cp-a { opacity:.75; font-size:.9rem; margin-top:2px; }
-.theme-junior .btn-answer { border-radius:50%; width:110px; height:110px; font-size:2rem; box-shadow:0 6px 0 rgba(0,0,0,.1); border:none; transition:transform .1s; cursor:pointer; font-family:inherit; display:flex; align-items:center; justify-content:center; }
-.theme-junior .btn-answer-pill { border-radius:26px; min-width:120px; min-height:84px; max-width:280px; padding:16px 16px; font-size:1.25rem; box-shadow:0 6px 0 rgba(0,0,0,.1); border:none; transition:transform .1s; cursor:pointer; font-family:inherit; display:flex; align-items:center; justify-content:center; white-space:normal; word-break:break-word; text-align:center; line-height:1.2; }
-.theme-junior .btn-answer:active,.theme-junior .btn-answer-pill:active { transform:translateY(4px); box-shadow:0 2px 0 rgba(0,0,0,.1); }
-.theme-junior .c-yellow{background:#FFF59D;color:#555;} .theme-junior .c-coral{background:#FFAB91;color:#fff;}
-.theme-junior .c-mint{background:#A5D6A7;color:#333;} .theme-junior .c-blue{background:#90CAF9;color:#333;}
-.theme-middle input, .theme-senior input { background:rgba(255,255,255,.1); border:1px solid #00BCD4; color:#fff; font-size:1.6rem; text-align:center; width:200px; padding:10px; outline:none; border-radius:10px; font-family:inherit; }
-.theme-senior input { border-color:#BB86FC; }
-.progress-bar { width:100%; height:12px; background:rgba(0,0,0,.1); border-radius:6px; margin:10px 0; overflow:hidden; }
-.progress-fill { height:100%; background:#4CAF50; width:0%; transition:width .5s cubic-bezier(.175,.885,.32,1.275); }
-.stats-row { display:flex; justify-content:space-between; width:100%; margin-bottom:12px; font-weight:bold; font-size:1.1rem; }
-.streak-fire { opacity:.3; transition:.3s; }
-.streak-fire.active { opacity:1; transform:scale(1.15); filter:drop-shadow(0 0 5px orange); }
-.question-box { font-size:1.8rem; margin:18px 0; font-weight:bold; min-height:60px; line-height:1.35; max-width:560px; }
-.answers-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; width:100%; justify-items:center; }
-.btn-primary { background:#FF7043; color:#fff; border:none; padding:14px 28px; border-radius:30px; font-size:1.1rem; cursor:pointer; margin:8px; box-shadow:0 4px 6px rgba(0,0,0,.2); transition:.2s; font-family:inherit; }
-.btn-primary:hover { transform:scale(1.05); filter:brightness(1.1); }
-.btn-primary:active { transform:scale(.98); }
-.btn-trophy { background:#FFB300; }
-.btn-grey { background:#78909C; }
-.btn-green { background:#66BB6A; }
-.btn-ru { background:#AB47BC; }
-.btn-physics { background:#26C6DA; }
-.btn-chem { background:#7E57C2; }
-.btn-speak { background:#29B6F6; padding:8px 16px; font-size:1.2rem; }
-.btn-parent-login { background:#AB47BC; }
-.feedback-msg { height:28px; margin-top:12px; font-weight:bold; color:#FF7043; opacity:0; transition:.3s; font-size:1.1rem; }
-.feedback-msg.visible { opacity:1; }
-.timer { display:none; font-size:1.2rem; margin-bottom:8px; font-weight:bold; }
-.theme-senior .timer { display:block; color:#BB86FC; }
-.leader-row { display:flex; align-items:center; gap:10px; padding:12px 14px; border-radius:14px; margin-bottom:10px; font-size:1.05rem; width:100%; max-width:460px; flex-wrap:wrap; }
-.theme-junior .leader-row { background:rgba(255,255,255,.8); box-shadow:0 2px 4px rgba(0,0,0,.08); }
-.theme-middle .leader-row, .theme-senior .leader-row { background:rgba(255,255,255,.08); }
-.leader-rank { width:34px; font-size:1.3rem; }
-.leader-name { flex:1; text-align:left; font-weight:bold; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:80px; }
-.leader-score { font-weight:bold; color:#FF9800; }
-.leader-avg { opacity:.7; font-size:.85rem; }
-.leader-grade { opacity:.6; font-size:.9rem; }
-.leader-details-btn { padding:6px 10px; border-radius:12px; border:none; background:#B3E5FC; color:#01579B; font-size:.85rem; cursor:pointer; font-family:inherit; }
-.leaders-wrap { width:100%; display:flex; flex-direction:column; align-items:center; max-height:60vh; overflow-y:auto; padding:4px; }
-.attempt-card { background:rgba(255,255,255,.85); border-radius:16px; padding:14px; margin-bottom:14px; width:100%; max-width:500px; text-align:left; box-shadow:0 2px 6px rgba(0,0,0,.08); }
-.attempt-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-weight:bold; }
-.attempt-score { font-size:1.1rem; color:#FF9800; }
-.example-row { display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:10px; margin-bottom:6px; font-size:.95rem; flex-wrap:wrap; }
-.example-row.correct { background:rgba(102,187,106,.25); }
-.example-row.wrong { background:rgba(255,235,59,.25); }
-.example-status { width:24px; font-size:1.1rem; }
-.example-q { flex:1; min-width:120px; }
-.example-answer { opacity:.8; font-size:.85rem; }
-.student-summary { background:rgba(255,255,255,.85); border-radius:16px; padding:16px; margin-bottom:16px; width:100%; max-width:500px; text-align:center; }
-.student-summary .big { font-size:1.8rem; font-weight:bold; color:#FF9800; }
-.dict-cats { display:grid; grid-template-columns:1fr 1fr; gap:12px; width:100%; max-width:480px; }
-.dict-cat-btn { background:rgba(255,255,255,.85); border:2px solid #B3E5FC; border-radius:18px; padding:18px 10px; font-size:1.05rem; cursor:pointer; font-family:inherit; color:#37474F; transition:.15s; }
-.dict-cat-btn:hover { transform:translateY(-3px); border-color:#4FC3F7; box-shadow:0 4px 10px rgba(79,195,247,.25); }
-.dict-word { font-size:2.6rem; font-weight:bold; margin:20px 0 8px; line-height:1.2; }
-.dict-trans { font-size:1.7rem; color:#FF7043; min-height:48px; margin-bottom:16px; line-height:1.3; }
-.dict-trans.hidden { visibility:hidden; }
-.dict-nav { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
-.dict-mode-toggle { display:flex; gap:10px; margin-bottom:16px; }
-.dict-list-row { background:rgba(255,255,255,.85); border-radius:12px; padding:12px 16px; margin-bottom:8px; width:100%; max-width:440px; text-align:left; font-size:1.05rem; }
-.quiz-progress { font-size:1.1rem; margin-bottom:10px; opacity:.8; }
-.quiz-input { width:100%; max-width:400px; padding:14px; font-size:1.4rem; border-radius:16px; border:2px solid #B3E5FC; margin:16px 0; text-align:center; font-family:inherit; outline:none; background:rgba(255,255,255,.85); color:#37474F; }
-.quiz-feedback { font-size:1.3rem; font-weight:bold; min-height:40px; margin:10px 0; }
-.quiz-feedback.ok { color:#43A047; }
-.quiz-feedback.bad { color:#E53935; }
-.quiz-result-grade { font-size:5rem; font-weight:bold; margin:10px 0; }
-.quiz-result-grade.grade-5 { color:#43A047; }
-.quiz-result-grade.grade-4 { color:#7CB342; }
-.quiz-result-grade.grade-3 { color:#FB8C00; }
-.quiz-result-grade.grade-2 { color:#E53935; }
-.quiz-answer-row { display:flex; align-items:center; gap:10px; padding:10px 14px; border-radius:12px; margin-bottom:8px; width:100%; max-width:440px; text-align:left; font-size:1rem; }
-.quiz-answer-row.ok { background:rgba(102,187,106,.25); }
-.quiz-answer-row.bad { background:rgba(255,235,59,.3); }
-.parent-dashboard { width:100%; max-width:500px; }
-.parent-child-card { background:rgba(255,255,255,.9); border-radius:20px; padding:20px; margin-bottom:16px; box-shadow:0 4px 12px rgba(0,0,0,.08); }
-.parent-child-avatar { width:80px; height:80px; border-radius:50%; background:linear-gradient(145deg,#FFB74D,#FF9800); display:flex; align-items:center; justify-content:center; font-size:2.5rem; margin:0 auto 10px; }
-.parent-child-name { font-size:1.5rem; font-weight:bold; margin-bottom:4px; }
-.parent-child-class { opacity:.7; font-size:1rem; margin-bottom:16px; }
-.parent-stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:16px; }
-.parent-stat { background:rgba(255,255,255,.7); border-radius:14px; padding:12px 8px; text-align:center; }
-.parent-stat-icon { font-size:1.5rem; margin-bottom:4px; }
-.parent-stat-value { font-size:1.3rem; font-weight:bold; color:#FF9800; }
-.parent-stat-label { font-size:.8rem; opacity:.7; }
-.parent-sections { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
-.parent-section { background:rgba(255,255,255,.85); border-radius:16px; padding:14px; text-align:left; }
-.parent-section-title { font-size:1rem; font-weight:bold; margin-bottom:10px; }
-.parent-section-title.strengths { color:#43A047; }
-.parent-section-title.weaknesses { color:#FB8C00; }
-.topic-badge { display:inline-block; padding:6px 12px; border-radius:14px; font-size:.85rem; margin:3px; font-weight:bold; }
-.topic-badge.strength { background:#C8E6C9; color:#2E7D32; }
-.topic-badge.weakness { background:#FFE0B2; color:#E65100; }
-.parent-chart { background:rgba(255,255,255,.85); border-radius:16px; padding:14px; margin-bottom:16px; }
-.parent-chart-title { font-size:1rem; font-weight:bold; margin-bottom:10px; }
-.chart-container { width:100%; height:150px; position:relative; }
-.chart-container svg { width:100%; height:100%; }
-.parent-no-data { opacity:.6; font-style:italic; padding:20px; }
-.parent-error { color:#E53935; font-weight:bold; margin:10px 0; }
-#toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#37474F; color:#fff; padding:12px 20px; border-radius:24px; font-size:.95rem; opacity:0; transition:.3s; z-index:1000; max-width:90%; word-break:break-all; text-align:center; }
-#toast.show { opacity:.95; }
-#confetti-canvas { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:999; }
-.audio-toggle { position:absolute; top:14px; right:14px; background:rgba(255,255,255,.2); border:none; font-size:1.4rem; cursor:pointer; opacity:.7; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; z-index:10; }
-.audio-toggle:hover { opacity:1; }
+:root {
+  --orange: #FF7043; --orange-dark: #E64A19; --blue: #2196F3; --blue-dark: #1565C0;
+  --green: #4CAF50; --red: #F44336; --bg: #F5F7FA; --card: #FFFFFF;
+  --text: #1A2332; --text-light: #6B7A8D; --border: #E0E6ED;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+.screen { display: none; min-height: 100vh; padding: 20px; animation: fadeIn 0.3s; }
+.screen.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.header { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; margin-bottom: 20px; }
+.logo { display: flex; align-items: center; gap: 10px; font-size: 1.3rem; font-weight: bold; color: var(--text); }
+.logo-icon { font-size: 2rem; }
+.avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--orange); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1rem; cursor: pointer; }
+
+.welcome { font-size: 1.8rem; font-weight: bold; margin-bottom: 24px; color: var(--text); }
+.welcome span { color: var(--orange); }
+
+.card { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.card-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: var(--text); }
+
+.btn { display: block; width: 100%; padding: 16px; border: none; border-radius: 16px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; text-align: center; }
+.btn:active { transform: scale(0.98); }
+.btn-orange { background: var(--orange); color: white; }
+.btn-orange:hover { background: var(--orange-dark); }
+.btn-blue { background: var(--blue); color: white; }
+.btn-grey { background: #E8EDF2; color: var(--text); }
+
+.input-group { position: relative; margin-bottom: 16px; }
+.input-group input, .input-group select { width: 100%; padding: 16px 16px 16px 48px; border: 2px solid var(--border); border-radius: 14px; font-size: 1rem; font-family: inherit; background: white; outline: none; transition: border 0.2s; }
+.input-group input:focus { border-color: var(--orange); }
+.input-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 1.3rem; color: var(--text-light); }
+
+.role-screen { display: flex; flex-direction: column; align-items: center; padding-top: 40px; }
+.mascot-big { font-size: 6rem; margin-bottom: 20px; animation: bounce 2s infinite; }
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.title-main { font-size: 2rem; font-weight: bold; margin-bottom: 8px; color: var(--text); }
+.subtitle-main { font-size: 1.1rem; color: var(--text-light); margin-bottom: 32px; }
+.role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; max-width: 400px; margin-bottom: 16px; }
+.role-btn { background: white; border: 2px solid var(--border); border-radius: 16px; padding: 20px 12px; cursor: pointer; transition: all 0.2s; text-align: center; }
+.role-btn:active { transform: scale(0.95); }
+.role-btn:hover { border-color: var(--orange); box-shadow: 0 4px 12px rgba(255,112,67,0.2); }
+.role-btn .emoji { font-size: 2.5rem; margin-bottom: 8px; }
+.role-btn .label { font-size: 0.95rem; font-weight: 600; color: var(--text); }
+.role-btn.full { grid-column: 1 / -1; }
+
+.auth-screen { max-width: 420px; margin: 0 auto; padding-top: 40px; }
+.auth-mascot { text-align: center; font-size: 5rem; margin-bottom: 20px; }
+.auth-title { text-align: center; font-size: 1.8rem; font-weight: bold; margin-bottom: 24px; }
+.auth-links { text-align: center; margin-top: 16px; }
+.auth-links a { color: var(--blue); text-decoration: none; font-size: 0.95rem; }
+.auth-links a:hover { text-decoration: underline; }
+.auth-footer { text-align: center; margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 0.85rem; color: var(--text-light); }
+.auth-footer a { color: var(--text-light); text-decoration: none; margin: 0 8px; }
+
+.consent-label { display: flex; align-items: flex-start; gap: 10px; margin: 16px 0; font-size: 0.9rem; color: var(--text-light); cursor: pointer; }
+.consent-label input[type="checkbox"] { width: 20px; height: 20px; margin-top: 2px; cursor: pointer; accent-color: var(--orange); }
+.consent-label a { color: var(--blue); text-decoration: underline; }
+
+.toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--text); color: white; padding: 12px 20px; border-radius: 24px; font-size: 0.95rem; opacity: 0; transition: opacity 0.3s; z-index: 2000; max-width: 90%; text-align: center; }
+.toast.show { opacity: 0.95; }
+
+@media (min-width: 768px) {
+  .role-grid { grid-template-columns: repeat(3, 1fr); max-width: 600px; }
+}
 </style>
 </head>
-<body class="theme-junior">
-<canvas id="confetti-canvas"></canvas>
-<button class="audio-toggle" onclick="toggleAudio()">🔇</button>
-<div id="screen-role" class="screen active">
-<div class="mascot-container">
-<svg class="fox-svg" viewBox="0 0 100 100">
-<circle cx="50" cy="50" r="40" fill="#FF7043"/>
-<circle cx="35" cy="40" r="5" fill="#333"/><circle cx="65" cy="40" r="5" fill="#333"/>
-<path d="M 40 60 Q 50 70 60 60" stroke="#333" stroke-width="3" fill="none"/>
-<polygon points="20,20 35,35 10,40" fill="#FF7043"/><polygon points="80,20 65,35 90,40" fill="#FF7043"/>
-<circle cx="33" cy="38" r="2" fill="#fff" opacity=".8"/><circle cx="63" cy="38" r="2" fill="#fff" opacity=".8"/>
-</svg>
+<body>
+
+<!-- ГЛАВНЫЙ ЭКРАН -->
+<div id="screen-role" class="screen role-screen active">
+  <div class="mascot-big">🦊</div>
+  <div class="title-main">Лисёнок Пифагор</div>
+  <div class="subtitle-main">Кто ты?</div>
+  
+  <div class="role-grid">
+    <div class="role-btn" onclick="showAuth('director')"><div class="emoji"></div><div class="label">Я директор</div></div>
+    <div class="role-btn" onclick="showAuth('deputy')"><div class="emoji">📋</div><div class="label">Я завуч</div></div>
+    <div class="role-btn" onclick="showAuth('teacher')"><div class="emoji">👨‍</div><div class="label">Я учитель</div></div>
+    <div class="role-btn" onclick="showScreen('screen-student')"><div class="emoji">🎒</div><div class="label">Я ученик</div></div>
+    <div class="role-btn full" onclick="showScreen('screen-parent')"><div class="emoji">👨‍👩👧</div><div class="label">Я родитель</div></div>
+  </div>
+
+  <div style="margin-top: 24px; width: 100%; max-width: 400px;">
+    <button class="btn btn-grey" onclick="showScreen('screen-dictionary')" style="margin-bottom: 8px;">📖 Словари</button>
+    <button class="btn btn-grey" onclick="showLeaderboard(null)">🏆 Таблица успеха</button>
+  </div>
+
+  <div class="auth-footer" style="margin-top: 32px; border: none;">
+    <a href="#" onclick="showScreen('screen-agreement'); return false;">Пользовательское соглашение</a>
+    <a href="#" onclick="showScreen('screen-privacy'); return false;">Политика конфиденциальности</a>
+  </div>
 </div>
-<h1>Лисёнок Пифагор</h1>
-<p class="subtitle">Кто ты?</p>
-<div class="role-buttons">
-<button class="role-btn teacher" onclick="chooseRole('teacher')"><br>Я учитель</button>
-<button class="role-btn student" onclick="chooseRole('student')">🎒<br>Я ученик</button>
-<button class="role-btn parent" onclick="chooseRole('parent')">👨‍‍👧<br>Я родитель</button>
+
+<!-- ЭКРАН ВХОДА -->
+<div id="screen-auth" class="screen auth-screen">
+  <div class="auth-mascot">🦊</div>
+  <div class="auth-title" id="auth-title">Вход</div>
+  
+  <div class="input-group">
+    <span class="input-icon">✉️</span>
+    <input type="email" id="auth-email" placeholder="Email" autocomplete="email">
+  </div>
+  <div class="input-group">
+    <span class="input-icon">🔒</span>
+    <input type="password" id="auth-password" placeholder="Пароль" autocomplete="current-password">
+  </div>
+
+  <div class="auth-links">
+    <a href="#" onclick="showScreen('screen-forgot'); return false;">Забыли пароль?</a>
+  </div>
+
+  <button class="btn btn-orange" style="margin-top: 24px;" onclick="handleLogin()">Войти</button>
+  <div class="auth-links" style="margin-top: 16px;">
+    Нет аккаунта? <a href="#" onclick="showScreen('screen-register'); return false;">Зарегистрироваться</a>
+  </div>
+  <button class="btn btn-grey" style="margin-top: 24px;" onclick="showScreen('screen-role')">← На главную</button>
 </div>
-<button class="btn-primary btn-ru" style="margin-top:24px" onclick="openDictionary('ru')"> Словарь русского</button>
-<button class="btn-primary btn-green" style="margin-top:6px" onclick="openDictionary('en')">📖 Англо-русский словарь</button>
-<button class="btn-primary btn-chem" style="margin-top:6px" onclick="openDictionary('chem')"> Словарь по химии</button>
-<button class="btn-primary btn-trophy" style="margin-top:6px" onclick="showLeaderboard(null)">🏆 Общая таблица успеха</button>
+
+<!-- ЭКРАН РЕГИСТРАЦИИ -->
+<div id="screen-register" class="screen auth-screen">
+  <div class="auth-mascot">🦊</div>
+  <div class="auth-title">Регистрация</div>
+  
+  <div class="input-group">
+    <span class="input-icon">👤</span>
+    <input type="text" id="reg-fio" placeholder="ФИО" autocomplete="name">
+  </div>
+  <div class="input-group">
+    <span class="input-icon">️</span>
+    <input type="email" id="reg-email" placeholder="Email" autocomplete="email">
+  </div>
+  <div class="input-group">
+    <span class="input-icon">🔒</span>
+    <input type="password" id="reg-password" placeholder="Пароль" autocomplete="new-password">
+  </div>
+  <div class="input-group" id="reg-school-group">
+    <span class="input-icon">🏫</span>
+    <input type="text" id="reg-school-code" placeholder="Код школы (необязательно)" style="text-transform: uppercase;">
+  </div>
+
+  <label class="consent-label">
+    <input type="checkbox" id="reg-consent">
+    <span>Я согласен с <a href="#" onclick="showScreen('screen-agreement'); return false;">Пользовательским соглашением</a> и <a href="#" onclick="showScreen('screen-privacy'); return false;">Политикой конфиденциальности</a></span>
+  </label>
+
+  <button class="btn btn-orange" onclick="handleRegister()">Зарегистрироваться</button>
+  <div class="auth-links" style="margin-top: 16px;">
+    Уже есть аккаунт? <a href="#" onclick="showScreen('screen-auth'); return false;">Войти</a>
+  </div>
+  <button class="btn btn-grey" style="margin-top: 24px;" onclick="showScreen('screen-role')">← На главную</button>
 </div>
-<div id="screen-teacher" class="screen">
-<h1>Кабинет учителя 👨‍🏫</h1>
-<p class="subtitle">Создай класс и передай коды</p>
-<div class="teacher-form">
-<input type="text" id="new-class-name" placeholder="Название (например, 5А)" maxlength="20">
-<select id="new-class-grade"></select>
-<select id="new-class-subject">
-<option value="math">📐 Математика</option>
-<option value="russian">📖 Русский язык</option>
-<option value="english"> Английский</option>
-<option value="physics">⚛️ Физика</option>
-<option value="chemistry">⚗️ Химия</option>
-</select>
-<select id="new-class-mode">
-<option value="auto">📚 Задачи по программе</option>
-<option value="custom">✏️ Мои свои задачи</option>
-</select>
-<button class="btn-primary" onclick="createClass()">Создать</button>
+
+<!-- ЭКРАН "ЗАБЫЛИ ПАРОЛЬ?" -->
+<div id="screen-forgot" class="screen auth-screen">
+  <div class="auth-mascot">❓</div>
+  <div class="auth-title">Забыли пароль?</div>
+  <p style="text-align: center; color: var(--text-light); margin-bottom: 24px;">Введите email, указанный при регистрации. Мы отправим ссылку для сброса.</p>
+  
+  <div class="input-group">
+    <span class="input-icon">✉️</span>
+    <input type="email" id="forgot-email" placeholder="Email" autocomplete="email">
+  </div>
+
+  <button class="btn btn-orange" onclick="handleForgot()">Отправить ссылку</button>
+  <div class="auth-links" style="margin-top: 16px;">
+    <a href="#" onclick="showScreen('screen-auth'); return false;">Вспомнили пароль? Войти</a>
+  </div>
+  <button class="btn btn-grey" style="margin-top: 24px;" onclick="showScreen('screen-role')">← На главную</button>
 </div>
-<div id="teacher-classes" style="width:100%;display:flex;flex-direction:column;align-items:center;"></div>
-<button class="btn-primary btn-grey" style="margin-top:16px" onclick="goHome()">← Назад</button>
-</div>
-<div id="screen-class-problems" class="screen">
-<h1>️ Свои задачи</h1>
-<p class="subtitle" id="custom-class-sub"></p>
-<div class="custom-form">
-<input type="text" id="new-problem-q" placeholder="Вопрос" maxlength="120">
-<input type="text" id="new-problem-a" placeholder="Правильный ответ" maxlength="60">
-<button class="btn-primary" onclick="addCustomProblem()">➕ Добавить задачу</button>
-</div>
-<div id="custom-problems-list" style="width:100%;display:flex;flex-direction:column;align-items:center;"></div>
-<button class="btn-primary btn-grey" style="margin-top:16px" onclick="backToTeacher()">← Назад к классам</button>
-</div>
+
+<!-- ЭКРАН УЧЕНИКА -->
 <div id="screen-student" class="screen">
-<h1>Привет, ученик! 🎒</h1>
-<p class="subtitle">Введи код класса от учителя</p>
-<input type="text" id="student-code" class="code-input" placeholder="КОД" maxlength="6" autocomplete="off" oninput="onStudentCodeInput()">
-<div class="class-info" id="class-info"></div>
-<button class="btn-primary" id="student-start-btn" style="display:none" onclick="startClassGame()">▶ Начать!</button>
-<div id="solo-block">
-<p class="subtitle" style="margin-top:6px">Нет кода? Играй сам 👇</p>
-<div class="subject-toggle">
-<button class="subject-btn active" data-subject="math" onclick="selectSoloSubject('math')">📐 Математика</button>
-<button class="subject-btn" data-subject="russian" onclick="selectSoloSubject('russian')">📖 Русский</button>
-<button class="subject-btn" data-subject="english" onclick="selectSoloSubject('english')">🇬 Английский</button>
-<button class="subject-btn" data-subject="physics" onclick="selectSoloSubject('physics')">⚛️ Физика</button>
-<button class="subject-btn" data-subject="chemistry" onclick="selectSoloSubject('chemistry')">⚗️ Химия</button>
+  <div class="header">
+    <div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div>
+  </div>
+  <h1 style="font-size: 1.8rem; margin-bottom: 8px;">Привет, ученик! 🎒</h1>
+  <p style="color: var(--text-light); margin-bottom: 24px;">Введи код класса от учителя</p>
+
+  <div class="input-group">
+    <span class="input-icon">🏫</span>
+    <input type="text" id="student-code" placeholder="КОД КЛАССА" maxlength="6" style="text-transform: uppercase; text-align: center; font-size: 1.3rem; letter-spacing: 2px;" oninput="onStudentCodeInput()">
+  </div>
+  
+  <div id="class-info" style="text-align: center; font-weight: bold; color: var(--green); margin-bottom: 16px; min-height: 24px;"></div>
+  <button class="btn btn-orange" id="student-start-btn" style="display: none;" onclick="startClassGame()">▶ Начать!</button>
+
+  <div style="margin-top: 32px;">
+    <p style="color: var(--text-light); margin-bottom: 16px;">Нет кода? Играй сам 👇</p>
+    <div class="role-grid" style="max-width: 100%;">
+      <div class="role-btn" onclick="startSoloGame('math')"><div class="emoji"></div><div class="label">Математика</div></div>
+      <div class="role-btn" onclick="startSoloGame('russian')"><div class="emoji">📖</div><div class="label">Русский</div></div>
+      <div class="role-btn" onclick="startSoloGame('english')"><div class="emoji">🇬🇧</div><div class="label">Английский</div></div>
+    </div>
+  </div>
+
+  <div style="margin-top: 24px;">
+    <p style="color: var(--text-light); margin-bottom: 12px;">Как тебя зовут?</p>
+    <div class="input-group">
+      <span class="input-icon">👤</span>
+      <input type="text" id="nickname-input" placeholder="Твоё имя..." maxlength="20">
+    </div>
+  </div>
+  <button class="btn btn-grey" style="margin-top: 16px;" onclick="showScreen('screen-role')">← На главную</button>
 </div>
-<div class="class-grid" id="student-grade-grid"></div>
-</div>
-<p class="subtitle" style="margin-top:20px">Как тебя зовут?</p>
-<div id="student-player-chips" class="player-chips"></div>
-<input type="text" id="nickname-input" class="nickname-input" placeholder="Твоё имя..." maxlength="20" autocomplete="off">
-<button class="btn-primary btn-ru" onclick="openDictionary('ru')"> Учить русский (словарь)</button>
-<button class="btn-primary btn-green" onclick="openDictionary('en')">📖 Учить английские слова</button>
-<button class="btn-primary btn-chem" onclick="openDictionary('chem')">🧪 Учить химию (словарь)</button>
-</div>
+
+<!-- ЭКРАН РОДИТЕЛЯ -->
 <div id="screen-parent" class="screen">
-<h1>👨‍‍👧 Родительский вход</h1>
-<p class="subtitle">Введи персональный код от учителя</p>
-<input type="text" id="parent-code-input" class="parent-code-input" placeholder="P-XXXX" maxlength="8" autocomplete="off">
-<div id="parent-error" class="parent-error" style="display:none"></div>
-<button class="btn-primary btn-parent-login" onclick="parentLogin()">🔍 Найти ребёнка</button>
-<button class="btn-primary btn-grey" style="margin-top:16px" onclick="goHome()">← На главную</button>
+  <div class="header">
+    <div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div>
+  </div>
+  <div class="auth-mascot" style="margin-top: 20px;">🦊👓</div>
+  <h1 style="font-size: 1.8rem; margin-bottom: 8px; text-align: center;">Вход родителя</h1>
+  <p style="color: var(--text-light); margin-bottom: 24px; text-align: center;">Введи персональный код от учителя</p>
+
+  <div class="input-group">
+    <span class="input-icon">🏫</span>
+    <input type="text" id="parent-school-code" placeholder="Код школы (необязательно)" style="text-transform: uppercase;">
+  </div>
+  <div class="input-group">
+    <span class="input-icon"></span>
+    <input type="text" id="parent-code-input" placeholder="Код родителя (P-XXXX)" maxlength="8" style="text-transform: uppercase; text-align: center; font-size: 1.2rem; letter-spacing: 2px;">
+  </div>
+
+  <div id="parent-error" style="text-align: center; color: var(--red); font-weight: bold; margin-bottom: 16px; display: none;"></div>
+  <button class="btn btn-orange" onclick="parentLogin()">🔍 Найти ребёнка</button>
+  <div class="auth-links" style="margin-top: 16px;">
+    <a href="#" onclick="showToast('Узнай код у учителя'); return false;">Нет кода? Узнать у учителя</a>
+  </div>
+  <button class="btn btn-grey" style="margin-top: 24px;" onclick="showScreen('screen-role')">← На главную</button>
 </div>
-<div id="screen-parent-dashboard" class="screen">
-<h1>📊 Дашборд родителя</h1>
-<p class="subtitle" id="parent-dash-subtitle"></p>
-<div class="parent-dashboard" id="parent-dashboard-content">
-<p>Загрузка...</p>
+
+<!-- ЭКРАН ИГРЫ -->
+<div id="screen-game" class="screen" style="padding-bottom: 100px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+    <span style="font-size: 1.2rem; font-weight: bold;">⭐ <span id="score-display">0</span></span>
+    <span style="font-size: 1.1rem;"> <span id="streak-count">0</span></span>
+  </div>
+  <div style="background: #E8EDF2; border-radius: 8px; height: 10px; margin-bottom: 24px; overflow: hidden;">
+    <div id="progress-fill" style="background: var(--orange); height: 100%; width: 0%; transition: width 0.5s;"></div>
+  </div>
+  <div style="text-align: center; font-size: 4rem; margin-bottom: 16px;" id="game-mascot"></div>
+  <div id="question-text" style="font-size: 1.8rem; font-weight: bold; text-align: center; margin-bottom: 32px; min-height: 60px;"></div>
+  <div id="input-area" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 500px; margin: 0 auto;"></div>
+  <div id="feedback-text" style="text-align: center; font-weight: bold; margin-top: 20px; min-height: 28px; color: var(--orange);"></div>
 </div>
-<button class="btn-primary btn-grey" style="margin-top:16px" onclick="chooseRole('parent')">← Назад к входу</button>
+
+<!-- ЭКРАН РЕЗУЛЬТАТА -->
+<div id="screen-result" class="screen" style="text-align: center; padding-top: 60px;">
+  <div style="font-size: 5rem; margin-bottom: 16px;">🎉</div>
+  <h1 style="font-size: 2rem; margin-bottom: 16px;">Раунд завершён!</h1>
+  <p style="font-size: 1.3rem; margin-bottom: 8px;"><span id="result-name">Игрок</span>, ты решил <b id="final-score">0</b> из <b id="result-total">10</b></p>
+  <p id="result-comment" style="color: var(--text-light); margin-bottom: 32px;"></p>
+  <button class="btn btn-orange" style="margin-bottom: 12px;" onclick="restartRound()">🔄 Ещё раз</button>
+  <button class="btn btn-blue" style="margin-bottom: 12px;" onclick="showLeaderboard(state.classCode||null)">🏆 Таблица успеха</button>
+  <button class="btn btn-grey" onclick="showScreen('screen-role')">🏠 Домой</button>
 </div>
-<div id="screen-game" class="screen">
-<div class="stats-row">
-<span>⭐ <span id="score-display">0</span></span>
-<span class="streak-fire" id="streak-icon">🔥 Серия: <span id="streak-count">0</span></span>
-</div>
-<div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-<div class="timer" id="timer-display">00:00</div>
-<div class="mascot-container" id="game-mascot">
-<svg class="fox-svg" id="game-fox-svg" viewBox="0 0 100 100">
-<circle cx="50" cy="50" r="40" fill="#FF7043"/>
-<circle cx="35" cy="40" r="5" fill="#333"/><circle cx="65" cy="40" r="5" fill="#333"/>
-<path d="M 40 60 Q 50 70 60 60" stroke="#333" stroke-width="3" fill="none"/>
-<polygon points="20,20 35,35 10,40" fill="#FF7043"/><polygon points="80,20 65,35 90,40" fill="#FF7043"/>
-<circle cx="33" cy="38" r="2" fill="#fff" opacity=".8"/><circle cx="63" cy="38" r="2" fill="#fff" opacity=".8"/>
-</svg>
-</div>
-<div class="question-box" id="question-text"></div>
-<div id="input-area" class="answers-grid"></div>
-<div class="feedback-msg" id="feedback-text"></div>
-</div>
-<div id="screen-result" class="screen">
-<h1>Раунд завершён!</h1>
-<div style="font-size:5rem; margin:16px;"></div>
-<p style="font-size:1.7rem; margin:8px 0;"><span id="result-name">Игрок</span>, ты решил <b id="final-score">0</b> из <b id="result-total">10</b></p>
-<p id="result-comment" style="font-size:1.15rem; opacity:.9;"></p>
-<p id="leader-note" style="font-size:1rem; color:#FF9800; font-weight:bold;"></p>
-<div style="margin-top:24px; display:flex; flex-wrap:wrap; justify-content:center;">
-<button class="btn-primary" onclick="restartRound()">Ещё раз</button>
-<button class="btn-primary btn-trophy" onclick="showLeaderboard(state.classCode||null)">🏆 Таблица успеха</button>
-<button class="btn-primary btn-grey" onclick="goHome()">Домой</button>
-</div>
-</div>
+
+<!-- ЭКРАН ТАБЛИЦЫ ЛИДЕРОВ -->
 <div id="screen-leaderboard" class="screen">
-<h1 id="leaderboard-title">Таблица успеха 🏆</h1>
-<p class="subtitle" id="leaderboard-sub">Лучшие результаты</p>
-<div class="leaders-wrap" id="leaderboard-list"></div>
-<button class="btn-primary" style="margin-top:16px" onclick="leaderboardBack()">← Назад</button>
+  <div class="header">
+    <div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div>
+  </div>
+  <h1 style="font-size: 1.8rem; margin-bottom: 8px;">🏆 Таблица успеха</h1>
+  <p id="leaderboard-sub" style="color: var(--text-light); margin-bottom: 24px;">Лучшие результаты</p>
+  <div id="leaderboard-list" style="margin-bottom: 80px;"></div>
+  <button class="btn btn-grey" onclick="showScreen('screen-role')">← Назад</button>
 </div>
-<div id="screen-student-details" class="screen">
-<h1 id="student-details-title">📝 История ученика</h1>
-<div id="student-summary" class="student-summary"></div>
-<div id="student-attempts" style="width:100%;display:flex;flex-direction:column;align-items:center;"></div>
-<div style="margin-top:16px; display:flex; flex-wrap:wrap; justify-content:center; gap:8px;">
-<button class="btn-primary" style="background:#EF9A9A;color:#b71c1c" onclick="clearStudentHistory()"> Очистить историю</button>
-<button class="btn-primary btn-grey" onclick="backToLeaderboard()">← Назад</button>
+
+<!-- ЭКРАН СОГЛАШЕНИЯ -->
+<div id="screen-agreement" class="screen" style="background: white; padding: 20px;">
+  <h2 style="margin-bottom: 16px;">📄 Пользовательское соглашение</h2>
+  <div style="line-height: 1.6; color: var(--text); margin-bottom: 24px;">
+    <p>1. Игра "Лисёнок Пифагор" предоставляется бесплатно и носит информационно-развлекательный характер.</p>
+    <p>2. Оператор не несёт ответственности за успеваемость пользователей.</p>
+    <p>3. Контакты: iosif.marketing@yandex.ru</p>
+  </div>
+  <button class="btn btn-orange" onclick="showScreen('screen-role')">Закрыть</button>
 </div>
+
+<!-- ЭКРАН ПОЛИТИКИ -->
+<div id="screen-privacy" class="screen" style="background: white; padding: 20px;">
+  <h2 style="margin-bottom: 16px;">🔒 Политика конфиденциальности</h2>
+  <div style="line-height: 1.6; color: var(--text); margin-bottom: 24px;">
+    <p>1. Мы собираем только имя (никнейм) и результаты игры для отображения прогресса.</p>
+    <p>2. Данные хранятся в защищённой базе Firebase.</p>
+    <p>3. Контакты: iosif.marketing@yandex.ru</p>
+  </div>
+  <button class="btn btn-orange" onclick="showScreen('screen-role')">Закрыть</button>
 </div>
-<div id="screen-dictionary" class="screen">
-<h1 id="dict-main-title">📖 Словарь</h1>
-<p class="subtitle">Выбери тему и учи слова</p>
-<div class="dict-cats" id="dict-cats"></div>
-<button class="btn-primary btn-grey" style="margin-top:18px" onclick="goHome()">← Назад</button>
-</div>
-<div id="screen-dict-words" class="screen">
-<h1 id="dict-cat-title">Тема</h1>
-<div class="dict-mode-toggle">
-<button class="subject-btn active" id="dict-mode-cards" onclick="setDictMode('cards')">🃏 Карточки</button>
-<button class="subject-btn" id="dict-mode-list" onclick="setDictMode('list')">📃 Список</button>
-</div>
-<div id="dict-cards-view">
-<div class="dict-word" id="dict-word-front"></div>
-<button class="btn-primary btn-speak" id="dict-speak-btn" onclick="speakCurrentWord()">🔊 Прослушать</button>
-<div class="dict-trans hidden" id="dict-word-back"></div>
-<div class="dict-nav">
-<button class="btn-primary btn-grey" onclick="dictPrev()">⬅</button>
-<button class="btn-primary" id="dict-reveal-btn" onclick="revealDict()">👁 Показать</button>
-<button class="btn-primary btn-trophy" onclick="dictKnown()">✅ Знал</button>
-<button class="btn-primary btn-grey" onclick="dictNext()">➡</button>
-</div>
-<p class="subtitle" id="dict-counter" style="margin-top:14px"></p>
-<button class="btn-primary btn-green" style="margin-top:14px" onclick="startQuiz()">🎯 Проверить себя</button>
-</div>
-<div id="dict-list-view" style="display:none;width:100%;flex-direction:column;align-items:center;"></div>
-<button class="btn-primary btn-grey" style="margin-top:18px" onclick="openDictionary(dictState.lang)">← К темам</button>
-</div>
-<div id="screen-quiz" class="screen">
-<h1 id="quiz-title"> Проверка</h1>
-<div id="quiz-active-view">
-<p class="quiz-progress" id="quiz-progress"></p>
-<div class="dict-word" id="quiz-front"></div>
-<button class="btn-primary btn-speak" id="quiz-speak-btn" onclick="speakQuizWord()">🔊</button>
-<input type="text" id="quiz-input" class="quiz-input" placeholder="Твой ответ..." autocomplete="off">
-<div class="quiz-feedback" id="quiz-feedback"></div>
-<div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
-<button class="btn-primary" onclick="submitQuizAnswer()">Ответить</button>
-<button class="btn-primary btn-grey" onclick="skipQuizQuestion()">Не знаю</button>
-</div>
-</div>
-<div id="quiz-result-view" style="display:none;">
-<p class="subtitle">Твой результат:</p>
-<div class="quiz-result-grade" id="quiz-grade"></div>
-<p style="font-size:1.3rem; margin-bottom:16px;"><b id="quiz-score-text"></b></p>
-<div id="quiz-answers-list" style="width:100%;display:flex;flex-direction:column;align-items:center;max-height:40vh;overflow-y:auto;"></div>
-<div style="margin-top:16px; display:flex; flex-wrap:wrap; justify-content:center; gap:8px;">
-<button class="btn-primary" onclick="startQuiz()">🔄 Ещё раз</button>
-<button class="btn-primary btn-grey" onclick="openDictionary(dictState.lang)">← К темам</button>
-</div>
-</div>
-</div>
-<div id="toast"></div>
+
+<div id="toast" class="toast"></div>
+
 <script>
-const state = { grade:1, round:0, maxRounds:10, score:0, streak:0, adaptive:0, nickname:'', classCode:'', joinClass:null, viewClass:null, viewStudent:null, editingClassCode:null, currentProblem:null, currentRoundHistory:[], gameProblems:null, isCustom:false, subject:'math', soloSubject:'math', timerInterval:null, startTime:0, audioEnabled:false };
-const themes = { junior:[1,2,3,4], middle:[5,6,7,8], senior:[9,10,11] };
-const dictState = { lang:'ru', cat:null, index:0, revealed:false, mode:'cards', known:0, words:[] };
-const quizState = { words:[], index:0, correct:0, answers:[], current:null };
-let currentParentClass = null;
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-function playSound(type){
-if(!state.audioEnabled) return;
-if(audioCtx.state==='suspended') audioCtx.resume();
-const now=audioCtx.currentTime;
-const mk=(t,f0,f1,dur,vol)=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.type=t;o.frequency.setValueAtTime(f0,now);if(f1)o.frequency.exponentialRampToValueAtTime(f1,now+dur);g.gain.setValueAtTime(vol,now);g.gain.exponentialRampToValueAtTime(.001,now+dur);o.start(now);o.stop(now+dur);};
-if(type==='click') mk('sine',400,600,.1,.1);
-else if(type==='correct') mk('triangle',800,1200,.4,.1);
-else if(type==='wrong') mk('sine',150,100,.3,.2);
-else if(type==='win'){[523,659,784,1046].forEach((f,i)=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.type='square';o.frequency.value=f;g.gain.setValueAtTime(.05,now+i*.1);g.gain.exponentialRampToValueAtTime(.001,now+i*.1+.4);o.start(now+i*.1);o.stop(now+i*.1+.4);});}
+// ===== СОСТОЯНИЕ =====
+const state = { grade: 1, round: 0, maxRounds: 10, score: 0, streak: 0, nickname: '', classCode: '', joinClass: null, currentProblem: null, currentRoundHistory: [], subject: 'math' };
+let currentRole = 'teacher';
+
+// ===== НАВИГАЦИЯ =====
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
 }
-function toggleAudio(){ state.audioEnabled=!state.audioEnabled; document.querySelector('.audio-toggle').textContent=state.audioEnabled?'':'🔇'; if(state.audioEnabled&&audioCtx.state==='suspended')audioCtx.resume(); }
-function rand(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
-function pick(arr){ return arr[rand(0,arr.length-1)]; }
-function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ let j=rand(0,i); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
-function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._to); t._to=setTimeout(()=>t.classList.remove('show'), 2200); }
-function copyText(text){
-if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(()=>showToast('Скопировано: '+text)).catch(()=>showToast(text)); }
-else { let ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); showToast('Скопировано: '+text); }catch(e){ showToast(text); } document.body.removeChild(ta); }
+
+function showAuth(role) {
+  currentRole = role;
+  const titles = { director: 'Вход директора', deputy: 'Вход завуча', teacher: 'Вход учителя' };
+  document.getElementById('auth-title').textContent = titles[role] || 'Вход';
+  
+  const schoolGroup = document.getElementById('reg-school-group');
+  if (role === 'deputy') {
+    schoolGroup.querySelector('input').placeholder = 'Код школы (ОБЯЗАТЕЛЬНО)';
+    schoolGroup.style.display = 'block';
+  } else if (role === 'teacher') {
+    schoolGroup.querySelector('input').placeholder = 'Код школы (необязательно)';
+    schoolGroup.style.display = 'block';
+  } else {
+    schoolGroup.style.display = 'none';
+  }
+  showScreen('screen-auth');
 }
-function getNick(){ return document.getElementById('nickname-input').value.trim()||'Игрок'; }
-function subjLabel(s){ return s==='russian'?'русский':s==='english'?'английский':s==='physics'?'физика':s==='chemistry'?'химия':'математика'; }
-function compareAnswer(userVal, correct){
-let u=String(userVal).trim().toLowerCase().replace(',', '.');
-let c=String(correct).trim().toLowerCase().replace(',', '.');
-if(u===c) return true;
-let un=parseFloat(u), cn=parseFloat(c);
-if(!isNaN(un)&&!isNaN(cn)&&Math.abs(un-cn)<0.0001) return true;
-return false;
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._to);
+  t._to = setTimeout(() => t.classList.remove('show'), 3000);
 }
-function mkOptions(correct, distractors, count){
-count=count||4;
-let set=[correct];
-let pool=shuffle(distractors.filter(d=>d!==correct));
-for(let d of pool){ if(set.length>=count)break; if(!set.includes(d)) set.push(d); }
-return shuffle(set);
+
+// ===== ЗАГЛУШКИ АУТЕНТИФИКАЦИИ =====
+function handleLogin() {
+  // TODO: Здесь будет Firebase Authentication
+  showToast('Вход... (пока в разработке)');
 }
-async function getClasses() {
-try { const snapshot = await db.collection('classes').get(); return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); }
-catch(e) { console.error(e); return []; }
+
+function handleRegister() {
+  // TODO: Здесь будет Firebase Authentication + запись в Firestore
+  showToast('Регистрация... (пока в разработке)');
 }
-async function saveClassToFirebase(classData) {
-try { await db.collection('classes').doc(classData.code).set(classData); } catch(e) { console.error(e); }
+
+function handleForgot() {
+  // TODO: Здесь будет отправка письма для сброса пароля
+  showToast('Восстановление пароля... (пока в разработке)');
 }
-async function updateClassProblems(code, problems) {
-try { await db.collection('classes').doc(code).update({ problems: problems }); } catch(e) { console.error(e); }
+
+// ===== УЧЕНИК И ИГРА =====
+function onStudentCodeInput() {
+  const code = document.getElementById('student-code').value.trim().toUpperCase();
+  const info = document.getElementById('class-info');
+  const btn = document.getElementById('student-start-btn');
+  
+  if (code.length >= 4) {
+    info.textContent = 'Проверка кода...';
+    db.collection('classes').doc(code).get().then(doc => {
+      if (doc.exists) {
+        const cls = doc.data();
+        info.textContent = `✅ ${cls.name} · ${cls.grade} кл.`;
+        info.style.color = 'var(--green)';
+        btn.style.display = 'block';
+        state.joinClass = { code, ...cls };
+      } else {
+        info.textContent = '❌ Код не найден';
+        info.style.color = 'var(--red)';
+        btn.style.display = 'none';
+      }
+    });
+  } else {
+    info.textContent = '';
+    btn.style.display = 'none';
+  }
 }
-async function deleteClassFromFirebase(code) {
-try {
-await db.collection('classes').doc(code).delete();
-const leadersSnapshot = await db.collection('leaders').where('classCode', '==', code).get();
-leadersSnapshot.forEach(async (doc) => { await doc.ref.delete(); });
-} catch(e) { console.error(e); }
+
+function startClassGame() {
+  const nick = document.getElementById('nickname-input').value.trim();
+  if (!nick) { showToast('Напиши своё имя'); return; }
+  state.nickname = nick;
+  state.classCode = state.joinClass.code;
+  startGame(state.joinClass.grade);
 }
-async function getLeaders(classCode = null) {
-try {
-let query = db.collection('leaders');
-if (classCode) query = query.where('classCode', '==', classCode);
-const snapshot = await query.orderBy('score', 'desc').get();
-return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-} catch(e) { console.error(e); return []; }
+
+function startSoloGame(subject) {
+  const nick = document.getElementById('nickname-input').value.trim() || 'Игрок';
+  state.nickname = nick;
+  state.classCode = '';
+  state.subject = subject;
+  startGame(1);
 }
+
+function startGame(grade) {
+  state.grade = grade;
+  state.round = 0;
+  state.score = 0;
+  state.streak = 0;
+  state.currentRoundHistory = [];
+  showScreen('screen-game');
+  nextProblem();
+}
+
+function nextProblem() {
+  if (state.round >= state.maxRounds) { endGame(); return; }
+  state.round++;
+  
+  const diff = state.round < 3 ? 0 : state.round < 7 ? 1 : 2;
+  const problem = generateProblem(state.grade, diff);
+  state.currentProblem = problem;
+  
+  document.getElementById('question-text').textContent = problem.q;
+  document.getElementById('score-display').textContent = state.score;
+  document.getElementById('streak-count').textContent = state.streak;
+  document.getElementById('progress-fill').style.width = (state.round / state.maxRounds * 100) + '%';
+  document.getElementById('feedback-text').textContent = '';
+  document.getElementById('game-mascot').textContent = '🦊';
+  
+  const area = document.getElementById('input-area');
+  area.innerHTML = '';
+  
+  if (state.grade <= 4 && state.subject === 'math') {
+    const opts = mkOptions(problem.a, [problem.a-1, problem.a+1, problem.a+2, problem.a-2].filter(x => x > 0), 4);
+    const colors = ['#FFD54F', '#FF8A65', '#81C784', '#64B5F6'];
+    opts.forEach((opt, i) => {
+      const b = document.createElement('button');
+      b.className = 'btn';
+      b.style.background = colors[i];
+      b.style.color = 'white';
+      b.style.fontSize = '1.8rem';
+      b.style.padding = '30px';
+      b.textContent = opt;
+      b.onclick = () => checkAnswer(opt);
+      area.appendChild(b);
+    });
+  } else {
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.placeholder = 'Твой ответ';
+    inp.style.cssText = 'grid-column: 1/-1; padding: 20px; font-size: 1.3rem; border: 2px solid var(--border); border-radius: 14px; text-align: center;';
+    inp.onkeydown = e => { if (e.key === 'Enter') checkAnswer(inp.value); };
+    area.appendChild(inp);
+    setTimeout(() => inp.focus(), 100);
+    
+    const b = document.createElement('button');
+    b.className = 'btn btn-orange';
+    b.style.gridColumn = '1/-1';
+    b.textContent = 'Ответить';
+    b.onclick = () => checkAnswer(inp.value);
+    area.appendChild(b);
+  }
+}
+
+function checkAnswer(userVal) {
+  if (!userVal) return;
+  const correct = state.currentProblem.a;
+  const isCorrect = compareAnswer(userVal, correct);
+  
+  state.currentRoundHistory.push({ question: state.currentProblem.q, user: userVal, correct, isCorrect });
+  
+  if (isCorrect) {
+    state.score++;
+    state.streak++;
+    document.getElementById('feedback-text').textContent = '✅ Правильно! Молодец!';
+    document.getElementById('feedback-text').style.color = 'var(--green)';
+    document.getElementById('game-mascot').textContent = '🎉';
+  } else {
+    state.streak = 0;
+    document.getElementById('feedback-text').textContent = `❌ Правильно: ${correct}`;
+    document.getElementById('feedback-text').style.color = 'var(--red)';
+    document.getElementById('game-mascot').textContent = '😢';
+  }
+  
+  document.getElementById('score-display').textContent = state.score;
+  document.getElementById('streak-count').textContent = state.streak;
+  setTimeout(nextProblem, isCorrect ? 1000 : 1800);
+}
+
+function endGame() {
+  const name = state.nickname || 'Игрок';
+  document.getElementById('result-name').textContent = name;
+  document.getElementById('final-score').textContent = state.score;
+  document.getElementById('result-total').textContent = state.maxRounds;
+  
+  const comment = state.score >= 9 ? 'Великолепно! ' : state.score >= 7 ? 'Отлично! 👍' : state.score >= 5 ? 'Неплохо! 💪' : 'Попробуй ещё! 🦊';
+  document.getElementById('result-comment').textContent = comment;
+  
+  saveResultToFirebase(name, state.score, state.grade, state.classCode, state.currentRoundHistory, state.maxRounds);
+  showScreen('screen-result');
+}
+
+function restartRound() {
+  state.round = 0; state.score = 0; state.streak = 0;
+  state.currentRoundHistory = [];
+  showScreen('screen-game');
+  nextProblem();
+}
+
+function parentLogin() {
+  showToast('Функция поиска ребёнка по коду родителя (в разработке)');
+}
+
+// ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
+function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function pick(arr) { return arr[rand(0, arr.length - 1)]; }
+function shuffle(arr) { for (let i = arr.length - 1; i > 0; i--) { let j = rand(0, i); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
+
+function compareAnswer(userVal, correct) {
+  let u = String(userVal).trim().toLowerCase().replace(',', '.');
+  let c = String(correct).trim().toLowerCase().replace(',', '.');
+  if (u === c) return true;
+  let un = parseFloat(u), cn = parseFloat(c);
+  if (!isNaN(un) && !isNaN(cn) && Math.abs(un - cn) < 0.0001) return true;
+  return false;
+}
+
+function mkOptions(correct, distractors, count) {
+  count = count || 4;
+  let set = [correct];
+  let pool = shuffle(distractors.filter(d => d !== correct));
+  for (let d of pool) { if (set.length >= count) break; if (!set.includes(d)) set.push(d); }
+  return shuffle(set);
+}
+
+function generateProblem(grade, diff) {
+  let q = "", a = 0;
+  switch (grade) {
+    case 1: { let max = [10, 15, 20][diff]; if (Math.random() > 0.5) { let x = rand(1, Math.floor(max/2)), y = rand(1, Math.floor(max/2)); q = `${x} + ${y}`; a = x + y; } else { a = rand(2, max); let b = rand(1, a - 1); q = `${a} - ${b}`; a = a - b; } } break;
+    case 2: { let max = [40, 70, 100][diff]; if (Math.random() > 0.5) { let x = rand(5, max-10), y = rand(5, 20); q = `${x} + ${y}`; a = x + y; } else { let x = rand(20, max), y = rand(5, 19); q = `${x} - ${y}`; a = x - y; } } break;
+    case 3: { let m = [5, 7, 9][diff]; if (Math.random() > 0.5) { let x = rand(2, m), y = rand(2, m); q = `${x} × ${y}`; a = x * y; } else { let y = rand(2, m), r = rand(2, m); q = `${y*r} ÷ ${y}`; a = r; } } break;
+    case 4: { if (diff === 0) { let x = rand(10, 99), y = rand(10, 99), op = Math.random() > 0.5 ? '+' : '-'; if (op === '-' && x < y) [x, y] = [y, x]; q = `${x} ${op} ${y}`; a = op === '+' ? x + y : x - y; } else { let b = rand(2, 9), c = rand(2, 9), base = rand(10, 50); q = `${base} + ${b} × ${c}`; a = base + b * c; } } break;
+    case 5: { let den = rand(3, [6, 8, 10][diff]); let n1 = rand(1, den-2), n2 = rand(1, den-n1-1); q = `${n1}/${den} + ${n2}/${den}`; a = `${n1+n2}/${den}`; } break;
+    case 6: { let base = rand(2, 20) * 10, perc = [10, 20, 25, 50][rand(0, 3)]; q = `${perc}% от ${base}`; a = base * perc / 100; } break;
+    case 7: { let x = rand(1, 10), c = rand(2, 9); q = `${c}x = ${c*x}. Найди x.`; a = x; } break;
+    case 8: { let r = rand(2, 9); q = `x² = ${r*r}. Найди x.`; a = r; } break;
+    case 9: { let k = rand(2, 5), arg = rand(1, 5); q = `f(x) = ${k}x. Найди f(${arg})`; a = k * arg; } break;
+    case 10: { const tv = [{q:"sin 30°",a:0.5},{q:"cos 60°",a:0.5},{q:"sin 90°",a:1},{q:"tg 45°",a:1}]; let it = pick(tv); q = it.q; a = it.a; } break;
+    case 11: { let n = rand(2, 4); q = `Производная y = x^${n} в точке x=1`; a = n; } break;
+  }
+  if (typeof a === 'number') a = parseFloat(a.toFixed(2));
+  return { q, a };
+}
+
 async function saveResultToFirebase(name, score, grade, classCode, history, total) {
-try {
-const attempt = { score, total: total||10, history: history||[], time: firebase.firestore.FieldValue.serverTimestamp() };
-const snapshot = await db.collection('leaders').where('name', '==', name).where('classCode', '==', classCode||'').get();
-if (!snapshot.empty) {
-const doc = snapshot.docs[0]; const data = doc.data();
-let attempts = data.attempts || []; attempts.push(attempt);
-if (attempts.length > 20) attempts = attempts.slice(-20);
-const newScore = score > data.score ? score : data.score;
-await doc.ref.update({ score: newScore, grade: grade, attempts: attempts });
-} else {
-await db.collection('leaders').add({ name, score, grade, classCode: classCode||'', total: total||10, attempts: [attempt] });
+  try {
+    const attempt = { score, total: total || 10, history: history || [], time: firebase.firestore.FieldValue.serverTimestamp() };
+    const snapshot = await db.collection('leaders').where('name', '==', name).where('classCode', '==', classCode || '').get();
+    if (!snapshot.empty) {
+      const doc = snapshot.docs[0]; const data = doc.data();
+      let attempts = data.attempts || []; attempts.push(attempt);
+      if (attempts.length > 20) attempts = attempts.slice(-20);
+      const newScore = score > data.score ? score : data.score;
+      await doc.ref.update({ score: newScore, grade: grade, attempts: attempts });
+    } else {
+      await db.collection('leaders').add({ name, score, grade, classCode: classCode || '', total: total || 10, attempts: [attempt] });
+    }
+  } catch (e) { console.error(e); }
 }
-} catch(e) { console.error(e); }
+
+async function showLeaderboard(classCode) {
+  showScreen('screen-leaderboard');
+  const list = document.getElementById('leaderboard-list');
+  list.innerHTML = '<p style="text-align: center; color: var(--text-light);">Загрузка...</p>';
+  
+  try {
+    let query = db.collection('leaders');
+    if (classCode) query = query.where('classCode', '==', classCode);
+    const snapshot = await query.orderBy('score', 'desc').get();
+    const leaders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    
+    document.getElementById('leaderboard-sub').textContent = classCode ? 'Лучшие результаты класса' : 'Лучшие из всех';
+    
+    if (!leaders.length) {
+      list.innerHTML = '<p style="text-align: center; color: var(--text-light);">Пока никто не играл. Стань первым! 🦊</p>';
+      return;
+    }
+    
+    list.innerHTML = '';
+    leaders.slice(0, 20).forEach((l, i) => {
+      const row = document.createElement('div');
+      row.className = 'card';
+      row.style.display = 'flex';
+      row.style.alignItems = 'center';
+      row.style.gap = '14px';
+      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
+      row.innerHTML = `
+        <div style="width: 40px; height: 40px; border-radius: 50%; background: ${i < 3 ? '#FFD54F' : '#E8EDF2'}; display: flex; align-items: center; justify-content: center; font-size: ${i < 3 ? '1.2rem' : '1rem'};">${medal}</div>
+        <div style="flex: 1;">
+          <div style="font-weight: bold; font-size: 1.05rem;">${l.name}</div>
+          <div style="color: var(--text-light); font-size: 0.85rem;">${l.grade} класс</div>
+        </div>
+        <div style="font-weight: bold; color: var(--orange); font-size: 1.2rem;">${l.score}/${l.total || 10}</div>
+      `;
+      list.appendChild(row);
+    });
+  } catch (e) {
+    list.innerHTML = '<p style="text-align: center; color: var(--red);">Ошибка загрузки</p>';
+  }
 }
-async function findClassByParentCode(parentCode) {
-try {
-const snapshot = await db.collection('classes').where('parentCode', '==', parentCode.toUpperCase()).get();
-if (snapshot.empty) return null;
-return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
-} catch(e) { console.error(e); return null; }
-}
-function genCode(){ const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let c=""; for(let i=0;i<4;i++) c+=chars[rand(0,chars.length-1)]; return c; }
-function genParentCode(){ const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; let c="P-"; for(let i=0;i<4;i++) c+=chars[rand(0,chars.length-1)]; return c; }
-async function createClass(){
-let name=document.getElementById('new-class-name').value.trim();
-let grade=parseInt(document.getElementById('new-class-grade').value);
-let subject=document.getElementById('new-class-subject').value;
-let mode=document.getElementById('new-class-mode').value;
-if(!name){ showToast('Введи название класса 🙂'); return; }
-let code=genCode();
-let parentCode=genParentCode();
-let existing = await db.collection('classes').doc(code).get();
-if(existing.exists) { createClass(); return; }
-let classData = {name, grade, code, parentCode, mode, subject, problems:[]};
-await saveClassToFirebase(classData);
-document.getElementById('new-class-name').value='';
-renderClasses();
-showToast(`Класс создан! Код ученика: ${code}, Код родителя: ${parentCode}`);
-}
-async function renderClasses(){
-const wrap=document.getElementById('teacher-classes'); wrap.innerHTML='<p>Загрузка...</p>';
-const classes = await getClasses();
-wrap.innerHTML='';
-if(!classes.length){ wrap.innerHTML='<p style="opacity:.7">Пока нет классов. Создай первый!</p>'; return; }
-classes.forEach(cls=>{
-let isCustom=cls.mode==='custom';
-let probCount=(cls.problems||[]).length;
-let card=document.createElement('div'); card.className='class-card';
-card.innerHTML=`
-<div class="class-card-head"><b>${escapeHtml(cls.name)}</b><span class="class-card-grade">${cls.grade} кл. · ${subjLabel(cls.subject)} · ${isCustom?'свои задачи':'по программе'}</span></div>
-<div class="class-card-code">Код ученика: <b>${cls.code}</b> · Код родителя: <b class="parent-code">${cls.parentCode||'—'}</b></div>
-<div class="class-card-actions">
-<button class="btn-mini" onclick="copyText('${cls.code}')">📋 Код ученика</button>
-<button class="btn-mini btn-parent" onclick="copyText('${cls.parentCode||''}')">👨‍👩‍👧 Код родителя</button>
-${isCustom?`<button class="btn-mini btn-trophy" onclick="openClassProblems('${cls.code}')">✏️ Задачи</button>`:''}
-<button class="btn-mini btn-trophy" onclick="openClassResults('${cls.code}')"> Результаты</button>
-<button class="btn-mini btn-del" onclick="deleteClass('${cls.code}')"></button>
-</div>`;
-wrap.appendChild(card);
-});
-}
-async function deleteClass(code){
-if(!confirm('Удалить этот класс? Результаты учеников тоже будут удалены.')) return;
-await deleteClassFromFirebase(code);
-renderClasses();
-}
-function openClassResults(code){ state.viewClass=code; renderLeaderboard(code); switchScreen('screen-leaderboard'); }
-async function openClassProblems(code){
-state.editingClassCode=code;
-const classes = await getClasses();
-let cls = classes.find(c=>c.code===code);
-document.getElementById('custom-class-sub').textContent = cls?`Класс: ${cls.name}`:'';
-renderCustomProblems(cls);
-switchScreen('screen-class-problems');
-}
-function renderCustomProblems(cls){
-const list=document.getElementById('custom-problems-list'); list.innerHTML='';
-if(!cls || !cls.problems || !cls.problems.length){ list.innerHTML='<p style="opacity:.7">Пока нет задач. Добавь первую выше! 👆</p>'; return; }
-cls.problems.forEach((p,i)=>{
-let row=document.createElement('div'); row.className='custom-problem-row';
-row.innerHTML=`<div class="custom-problem-text"><div class="cp-q">${escapeHtml(p.question)}</div><div class="cp-a">Ответ: <b>${escapeHtml(p.answer)}</b></div></div><button class="btn-mini btn-del" onclick="removeCustomProblem(${i}, '${cls.code}')">🗑</button>`;
-list.appendChild(row);
-});
-}
-async function addCustomProblem(){
-let q=document.getElementById('new-problem-q').value.trim();
-let a=document.getElementById('new-problem-a').value.trim();
-if(!q || !a){ showToast('Заполни и вопрос, и ответ 🙂'); return; }
-const classes = await getClasses();
-let cls=classes.find(c=>c.code===state.editingClassCode);
-if(!cls) return;
-if(!cls.problems) cls.problems=[];
-cls.problems.push({question:q, answer:a});
-await updateClassProblems(cls.code, cls.problems);
-document.getElementById('new-problem-q').value=''; document.getElementById('new-problem-a').value='';
-renderCustomProblems(cls);
-showToast('Задача добавлена!');
-}
-async function removeCustomProblem(index, code){
-const classes = await getClasses();
-let cls=classes.find(c=>c.code===code);
-if(!cls) return;
-cls.problems.splice(index,1);
-await updateClassProblems(code, cls.problems);
-renderCustomProblems(cls);
-}
-function backToTeacher(){ renderClasses(); switchScreen('screen-teacher'); }
-function onStudentCodeInput(){
-let code=document.getElementById('student-code').value.trim().toUpperCase();
-document.getElementById('class-info').textContent = code ? 'Проверка кода...' : '';
-}
-async function startClassGame(){
-let code=document.getElementById('student-code').value.trim().toUpperCase();
-let clsDoc = await db.collection('classes').doc(code).get();
-if(clsDoc.exists){
-let cls = clsDoc.data();
-let nick=document.getElementById('nickname-input').value.trim();
-if(!nick){ showToast('Сначала напиши своё имя 🙂'); document.getElementById('nickname-input').focus(); return; }
-state.nickname=nick; state.classCode=cls.code; state.joinClass=cls;
-startGame(cls.grade);
-} else { showToast('Код не найден. Проверь у учителя.'); }
-}
-function selectSoloSubject(s){ state.soloSubject=s; document.querySelectorAll('.subject-btn').forEach(b=>b.classList.toggle('active', b.dataset.subject===s)); }
-function buildStudentGradeGrid(){
-const grid=document.getElementById('student-grade-grid'); grid.innerHTML='';
-for(let i=1;i<=11;i++){
-let b=document.createElement('button'); b.className='class-btn'; b.textContent=`${i} класс`;
-b.onclick=()=>{ state.nickname=getNick(); state.classCode=''; state.subject=state.soloSubject; startGame(i); };
-grid.appendChild(b);
-}
-}
-function chooseRole(role){
-if(role==='teacher'){ renderClasses(); switchScreen('screen-teacher'); }
-else if(role==='parent'){
-document.getElementById('parent-code-input').value='';
-document.getElementById('parent-error').style.display='none';
-switchScreen('screen-parent');
-}
-else {
-state.joinClass=null;
-document.getElementById('student-code').value='';
-document.getElementById('class-info').textContent='';
-document.getElementById('solo-block').style.display='block';
-document.getElementById('student-start-btn').style.display='none';
-switchScreen('screen-student');
-}
-}
-async function parentLogin(){
-const code = document.getElementById('parent-code-input').value.trim().toUpperCase();
-const errorEl = document.getElementById('parent-error');
-if(!code){ errorEl.textContent='Введи код'; errorEl.style.display='block'; return; }
-errorEl.style.display='none';
-const cls = await findClassByParentCode(code);
-if(!cls){ errorEl.textContent='Код не найден. Проверь у учителя.'; errorEl.style.display='block'; return; }
-currentParentClass = cls;
-await renderParentDashboard(cls);
-switchScreen('screen-parent-dashboard');
-}
-function detectTopic(question){
-const q = question.toLowerCase();
-const topics = [
-{keywords:['дроб'], name:'Дроби'},
-{keywords:['умнож','×','*'], name:'Таблица умножения'},
-{keywords:['вероятност','шанс'], name:'Вероятность'},
-{keywords:['площад'], name:'Площади'},
-{keywords:['объём','объем'], name:'Объёмы'},
-{keywords:['уравнен','x²','x =','найди x'], name:'Уравнения'},
-{keywords:['функци','f(x)'], name:'Функции'},
-{keywords:['производн'], name:'Производные'},
-{keywords:['скорост'], name:'Скорость (физика)'},
-{keywords:['плотност'], name:'Плотность (физика)'},
-{keywords:['сил'], name:'Сила (физика)'},
-{keywords:['давлен'], name:'Давление (физика)'},
-{keywords:['ток','напряжен','сопротивлен'], name:'Электричество (физика)'},
-{keywords:['молекул','mr','масс'], name:'Молекулярная масса (химия)'},
-{keywords:['валентност'], name:'Валентности (химия)'},
-{keywords:['реакци'], name:'Типы реакций (химия)'},
-{keywords:['синус','cos','tg','sin'], name:'Тригонометрия'},
-{keywords:['синоним'], name:'Синонимы'},
-{keywords:['антоним'], name:'Антонимы'},
-{keywords:['падеж'], name:'Падежи'},
-{keywords:['ударен'], name:'Ударения'},
-{keywords:['перевод','по-английски'], name:'Английский перевод'},
-{keywords:['моль'], name:'Моли (химия)'},
-{keywords:['алкан','гомолог'], name:'Органическая химия'},
-{keywords:['степень окислен','электронн','тип связи'], name:'Строение вещества'},
-{keywords:['+','-'], name:'Арифметика'},
-];
-for(let t of topics){
-for(let k of t.keywords){
-if(q.includes(k)) return t.name;
-}
-}
-return 'Другое';
-}
-async function renderParentDashboard(cls){
-document.getElementById('parent-dash-subtitle').textContent = `Класс: ${cls.name} · ${cls.grade} кл. · ${subjLabel(cls.subject)}`;
-const content = document.getElementById('parent-dashboard-content');
-content.innerHTML = '<p>Загрузка данных...</p>';
-try {
-const leaders = await getLeaders(cls.code);
-if(!leaders.length){
-content.innerHTML = `
-<div class="parent-child-card">
-<div class="parent-child-avatar">🦊</div>
-<div class="parent-child-name">Пока нет данных</div>
-<div class="parent-child-class">Ученики ещё не решали задачи в этом классе</div>
-</div>
-<p class="parent-no-data">Как только ученик решит хотя бы одну задачу, здесь появится его статистика.</p>
-`;
-return;
-}
-const topStudent = leaders[0];
-const allAttempts = [];
-leaders.forEach(l => { if(l.attempts) allAttempts.push(...l.attempts); });
-const totalGames = allAttempts.length;
-const avgScore = totalGames ? (allAttempts.reduce((s,a)=>s+a.score,0)/totalGames).toFixed(1) : 0;
-const maxScore = Math.max(...leaders.map(l=>l.score));
-const topicStats = {};
-allAttempts.forEach(att => {
-if(att.history){
-att.history.forEach(ex => {
-const topic = detectTopic(ex.question);
-if(!topicStats[topic]) topicStats[topic] = {correct:0, total:0};
-topicStats[topic].total++;
-if(ex.isCorrect) topicStats[topic].correct++;
-});
-}
-});
-const strengths = [];
-const weaknesses = [];
-for(let topic in topicStats){
-const t = topicStats[topic];
-const pct = t.correct/t.total;
-if(t.total >= 2){
-if(pct >= 0.7) strengths.push(topic);
-else if(pct < 0.5) weaknesses.push(topic);
-}
-}
-const recentAttempts = allAttempts.slice(-10);
-const chartData = recentAttempts.map(a => a.score);
-const maxPossible = recentAttempts[0]?.total || 10;
-let chartSvg = `<svg viewBox="0 0 300 150" preserveAspectRatio="none">`;
-for(let i=0;i<=4;i++){
-const y = 10 + i*30;
-chartSvg += `<line x1="0" y1="${y}" x2="300" y2="${y}" stroke="#e0e0e0" stroke-width="1"/>`;
-chartSvg += `<text x="0" y="${y+4}" font-size="8" fill="#999">${Math.round((4-i)*25)}%</text>`;
-}
-if(chartData.length > 1){
-const points = chartData.map((score, i) => {
-const x = (i / (chartData.length-1)) * 280 + 10;
-const y = 130 - (score/maxPossible) * 120;
-return `${x},${y}`;
-});
-chartSvg += `<polyline points="${points.join(' ')}" fill="none" stroke="#AB47BC" stroke-width="3"/>`;
-chartData.forEach((score, i) => {
-const x = (i / (chartData.length-1)) * 280 + 10;
-const y = 130 - (score/maxPossible) * 120;
-chartSvg += `<circle cx="${x}" cy="${y}" r="4" fill="#AB47BC"/>`;
-});
-}
-chartSvg += `</svg>`;
-content.innerHTML = `
-<div class="parent-child-card">
-<div class="parent-child-avatar">🦊</div>
-<div class="parent-child-name">${escapeHtml(topStudent.name)}</div>
-<div class="parent-child-class">${cls.name} · ${cls.grade} класс</div>
-<div class="parent-stats">
-<div class="parent-stat">
-<div class="parent-stat-icon">🏆</div>
-<div class="parent-stat-value">${avgScore}/${maxPossible}</div>
-<div class="parent-stat-label">Средний балл</div>
-</div>
-<div class="parent-stat">
-<div class="parent-stat-icon">🎮</div>
-<div class="parent-stat-value">${totalGames}</div>
-<div class="parent-stat-label">Всего игр</div>
-</div>
-<div class="parent-stat">
-<div class="parent-stat-icon">⭐</div>
-<div class="parent-stat-value">${maxScore}</div>
-<div class="parent-stat-label">Лучший результат</div>
-</div>
-</div>
-</div>
-<div class="parent-sections">
-<div class="parent-section">
-<div class="parent-section-title strengths">✅ Сильные стороны</div>
-${strengths.length ? strengths.map(t=>`<span class="topic-badge strength">${escapeHtml(t)} ✓</span>`).join('') : '<p class="parent-no-data">Пока нет данных</p>'}
-</div>
-<div class="parent-section">
-<div class="parent-section-title weaknesses">⚠️ Нужно повторить</div>
-${weaknesses.length ? weaknesses.map(t=>`<span class="topic-badge weakness">${escapeHtml(t)} </span>`).join('') : '<p class="parent-no-data">Всё отлично!</p>'}
-</div>
-</div>
-<div class="parent-chart">
-<div class="parent-chart-title">📈 Прогресс (последние ${recentAttempts.length} игр)</div>
-<div class="chart-container">${chartSvg}</div>
-</div>
-${leaders.length > 1 ? `
-<div class="parent-section" style="margin-bottom:16px;">
-<div class="parent-section-title"> Все ученики класса</div>
-${leaders.map((l,i)=>`<div style="padding:8px; border-bottom:1px solid #eee; display:flex; justify-content:space-between;">
-<span>${i+1}. ${escapeHtml(l.name)}</span>
-<span style="font-weight:bold; color:#FF9800;">${l.score}/${l.total||10}</span>
-</div>`).join('')}
-</div>` : ''}
-`;
-} catch(e){
-console.error(e);
-content.innerHTML = '<p class="parent-error">Ошибка загрузки данных. Попробуй ещё раз.</p>';
-}
-}
-function currentDifficulty(){ const ramp=state.round<3?0:state.round<7?1:2; return Math.max(0,Math.min(2,ramp+state.adaptive)); }
-function generateProblem(grade, diff){
-let q="", a=0;
-switch(grade){
-case 1:{ let max=[10,15,20][diff]; if(diff===2 && Math.random()>.5){ let x=rand(1,6),y=rand(1,6),z=rand(1,6); q=`${x} + ${y} + ${z}`; a=x+y+z; } else if(Math.random()>.5){ let x=rand(1,Math.floor(max/2)),y=rand(1,Math.floor(max/2)); q=`${x} + ${y}`; a=x+y; } else { a=rand(2,max); let b=rand(1,a-1); q=`${a} - ${b}`; a=a-b; } } break;
-case 2:{ let max=[40,70,100][diff]; if(Math.random()>.5){ let x=rand(5,max-10),y=rand(5,20); q=`${x} + ${y}`; a=x+y; } else { let x=rand(20,max),y=rand(5,19); q=`${x} - ${y}`; a=x-y; } } break;
-case 3:{ let m=[5,7,9][diff]; if(Math.random()>.5){ let x=rand(2,m),y=rand(2,m); q=`${x} × ${y}`; a=x*y; } else { let y=rand(2,m),r=rand(2,m); q=`${y*r} ÷ ${y}`; a=r; } } break;
-case 4:{ if(diff===0){ let x=rand(10,99),y=rand(10,99),op=Math.random()>.5?'+':'-'; if(op==='-'&&x<y)[x,y]=[y,x]; q=`${x} ${op} ${y}`; a=op==='+'?x+y:x-y; } else if(diff===1){ let x=rand(100,999),y=rand(10,99),op=Math.random()>.5?'+':'-'; q=`${x} ${op} ${y}`; a=op==='+'?x+y:x-y; } else { let b=rand(2,9),c=rand(2,9),base=rand(10,50); q=`${base} + ${b} × ${c}`; a=base+b*c; } } break;
-case 5:{ let type=rand(0,2); if(type===0){ let den=rand(3,[6,8,10][diff]); if(diff===0){ let n1=rand(1,den-2),n2=rand(1,den-n1-1); q=`${n1}/${den} + ${n2}/${den}`; a=`${n1+n2}/${den}`; } else if(diff===1){ let n1=rand(2,den-1),n2=rand(1,n1-1); q=`${n1}/${den} - ${n2}/${den}`; a=`${n1-n2}/${den}`; } else { let base=den*rand(2,4),part=rand(1,den-1); q=`${part}/${den} от ${base}`; a=base/den*part; } } else if(type===1){ let red=rand(2,5), blue=rand(2,5), total=red+blue; q=`В мешке ${red} красных и ${blue} синих шаров. Какова вероятность вытащить красный? (ответ: дробь вида ${red}/${total})`; a=`${red}/${total}`; } else { let a1=rand(3,10), b1=rand(3,10); q=`Найди площадь прямоугольника со сторонами ${a1} см и ${b1} см (в см²)`; a=a1*b1; } } break;
-case 6:{ let type=rand(0,2); if(type===0){ let base=rand(2,20)*10, perc=[10,20,25,50][rand(0,3)]; q=`${perc}% от ${base}`; a=base*perc/100; } else if(type===1){ let nums=[]; for(let i=0;i<4;i++) nums.push(rand(1,20)); let sum=nums.reduce((s,n)=>s+n,0); q=`Найди среднее арифметическое чисел: ${nums.join(', ')}`; a=sum/4; } else { let a1=rand(3,8); q=`Найди объём куба с ребром ${a1} см (в см³)`; a=a1*a1*a1; } } break;
-case 7:{ if(diff===0){ let x=rand(1,10),c=rand(2,9); q=`${c}x = ${c*x}. Найди x.`; a=x; } else if(diff===1){ let x=rand(1,10),c=rand(2,9),b=rand(1,20); q=`${c}x + ${b} = ${c*x+b}. Найди x.`; a=x; } else { let x=rand(-10,10),c=rand(2,9),b=rand(-20,20); q=`${c}x + ${b>=0?b:'('+b+')'} = ${c*x+b}. Найди x.`; a=x; } } break;
-case 8:{ if(diff===0){ let r=rand(2,9); q=`x² = ${r*r}. Найди положительный x.`; a=r; } else if(diff===1){ let r=rand(5,15); q=`x² = ${r*r}. Найди положительный x.`; a=r; } else { let r1=rand(1,6),r2=rand(r1,9),b=-(r1+r2),c=r1*r2; let bs=b>=0?`+ ${b}`:`- ${Math.abs(b)}`; q=`x² ${bs}x + ${c} = 0. Найди меньший корень.`; a=r1; } } break;
-case 9:{ if(diff===0){ let k=rand(2,5),arg=rand(1,5); q=`f(x) = ${k}x. Найди f(${arg})`; a=k*arg; } else if(diff===1){ let k=rand(2,5),b=rand(1,10),arg=rand(1,5); q=`f(x) = ${k}x + ${b}. Найди f(${arg})`; a=k*arg+b; } else { let x=rand(1,10),y=rand(1,10); q=`x + y = ${x+y},  x - y = ${x-y}. Найди x.`; a=x; } } break;
-case 10:{ if(diff===0){ const tv=[{q:"sin 30°",a:.5},{q:"cos 60°",a:.5},{q:"sin 90°",a:1},{q:"cos 0°",a:1},{q:"tg 45°",a:1},{q:"sin 0°",a:0},{q:"cos 90°",a:0}]; let it=tv[rand(0,tv.length-1)]; q=it.q; a=it.a; } else if(diff===1){ let ang=[30,45,60][rand(0,2)]; q=`sin ${ang}° = cos ?°. Найди угол.`; a=90-ang; } else { let ang=[0,30,45,60,90][rand(0,4)]; q=`sin²${ang}° + cos²${ang}°`; a=1; } } break;
-case 11:{ if(diff===0){ let n=rand(2,4); q=`Производная y = x^${n} в точке x=1`; a=n; } else if(diff===1){ let n=rand(2,4),k=rand(2,5); q=`Производная y = ${k}x^${n} в точке x=1`; a=k*n; } else { let n=rand(2,4),m=rand(1,5); q=`Производная y = x^${n} + ${m}x в точке x=1`; a=n+m; } } break;
-}
-if(typeof a==='number') a=parseFloat(a.toFixed(2));
-return { q, a };
-}
-function generatePhysicsProblem(grade, diff){
-let q="", a=0;
-switch(grade){
-case 7:{ let type=rand(0,3); if(type===0){ let s=rand(20,200), t=rand(2,20); q=`Тело прошло ${s} м за ${t} с. Найди скорость (м/с).`; a=s/t; } else if(type===1){ let m=rand(50,500), V=rand(10,100); q=`Масса тела ${m} г, объём ${V} см³. Найди плотность (г/см³).`; a=m/V; } else if(type===2){ let m=rand(2,20); q=`Масса тела ${m} кг. Найди силу тяжести (Н, g=10 м/с²).`; a=m*10; } else { let F=rand(50,500), S=rand(1,10); q=`Сила ${F} Н действует на площадь ${S} м². Найди давление (Па).`; a=F/S; } } break;
-case 8:{ let type=rand(0,3); if(type===0){ let m=rand(1,5), dt=rand(5,20); q=`Нагреваем ${m} кг воды на ${dt}°C. c=4200 Дж/(кг·°C). Найди количество теплоты Q (Дж).`; a=4200*m*dt; } else if(type===1){ let U=rand(6,36), R=rand(2,12); q=`Напряжение ${U} В, сопротивление ${R} Ом. Найди силу тока I (А).`; a=U/R; } else if(type===2){ let U=rand(100,250), I=rand(1,5); q=`Напряжение ${U} В, сила тока ${I} А. Найди мощность P (Вт).`; a=U*I; } else { let U=rand(6,36), I=rand(1,6); q=`Напряжение ${U} В, сила тока ${I} А. Найди сопротивление R (Ом).`; a=U/I; } } break;
-case 9:{ let type=rand(0,3); if(type===0){ let v0=rand(0,10), acc=rand(1,5), t=rand(2,10); q=`v₀=${v0} м/с, a=${acc} м/с², t=${t} с. Найди скорость v (м/с).`; a=v0+acc*t; } else if(type===1){ let m=rand(2,20), acc=rand(1,10); q=`m=${m} кг, a=${acc} м/с². Найди силу F (Н).`; a=m*acc; } else if(type===2){ let m=rand(1,10), v=rand(2,20); q=`m=${m} кг, v=${v} м/с. Найди импульс p (кг·м/с).`; a=m*v; } else { let m=rand(1,10), v=rand(2,10); q=`m=${m} кг, v=${v} м/с. Найди кинетическую энергию Eₖ (Дж).`; a=m*v*v/2; } } break;
-case 10:{ let type=rand(0,3); if(type===0){ let t=rand(0,100); q=`Температура ${t}°C. Найди температуру в Кельвинах.`; a=t+273; } else if(type===1){ let p1=rand(100,300), T1=300, T2=rand(400,600); q=`При V=const газ нагрели с ${T1} К до ${T2} К. Давление выросло с ${p1} кПа до ? кПа.`; a=p1*T2/T1; } else if(type===2){ let charge=rand(1,10), E=rand(100,1000); q=`Заряд ${charge} мкКл в поле ${E} В/м. Найди силу F (мкН).`; a=charge*E; } else { let charge=rand(50,200), U=rand(50,200); q=`Заряд ${charge} мкКл, напряжение ${U} В. Найди ёмкость C (мкФ).`; a=charge/U; } } break;
-case 11:{ let type=rand(0,3); if(type===0){ let L=rand(1,4); q=`Длина маятника ${L} м, g=10 м/с², π²≈10. Найди период T (с).`; a=Math.round(2*Math.sqrt(L/10)*Math.PI); } else if(type===1){ let nu=rand(50,200); q=`Частота ${nu} МГц, скорость света c=3·10⁸ м/с. Найди длину волны λ (м).`; a=300/nu; } else if(type===2){ let n=rand(1,3); let m0=Math.pow(2,n)*rand(5,10); let T_half=rand(1,4); let t=n*T_half; q=`Начальная масса ${m0} г, период полураспада ${T_half} ч. Сколько останется через ${t} ч (г)?`; a=m0/Math.pow(2,n); } else { let dm=rand(1,10); q=`Дефект массы ${dm} а.е.м. 1 а.е.м. = 931 МэВ. Найди энергию связи (МэВ).`; a=dm*931; } } break;
-}
-if(typeof a==='number') a=parseFloat(a.toFixed(2));
-return { q, a };
-}
-function generateChemistryProblem(grade, diff){
-switch(grade){
-case 8: return chemGrade8(diff);
-case 9: return chemGrade9(diff);
-case 10: return chemGrade10(diff);
-case 11: return chemGrade11(diff);
-default: return chemGrade8(diff);
-}
-}
-function chemGrade8(diff){
-let type=rand(0,2);
-if(type===0){ let substances=[{name:'H2O', mr:18},{name:'CO2', mr:44},{name:'NaCl', mr:58.5},{name:'H2SO4', mr:98},{name:'CaCO3', mr:100},{name:'Fe2O3', mr:160},{name:'HCl', mr:36.5},{name:'NaOH', mr:40},{name:'KOH', mr:56},{name:'Ca(OH)2', mr:74}]; let item=pick(substances); return {q:`Вычисли относительную молекулярную массу ${item.name}`, a:item.mr}; }
-else if(type===1){ let data=[{el:'Na', val:'I'},{el:'K', val:'I'},{el:'Ca', val:'II'},{el:'Mg', val:'II'},{el:'Al', val:'III'},{el:'Fe', val:'II'},{el:'Cu', val:'II'},{el:'Zn', val:'II'},{el:'O', val:'II'},{el:'H', val:'I'}]; let item=pick(data); return {q:`Какая валентность у ${item.el}?`, a:item.val}; }
-else { let data=[{eq:'2H₂ + O₂ → 2H₂O', type:'соединение'},{eq:'2H₂O → 2H₂ + O₂', type:'разложение'},{eq:'Fe + CuSO₄ → FeSO₄ + Cu', type:'замещение'},{eq:'NaOH + HCl → NaCl + H₂O', type:'обмен'}]; let item=pick(data); return {q:`Определи тип реакции: ${item.eq}`, a:item.type}; }
-}
-function chemGrade9(diff){
-let type=rand(0,2);
-if(type===0){ let data=[{m:36, M:18, n:2, name:'воды'},{m:80, M:40, n:2, name:'NaOH'},{m:49, M:98, n:0.5, name:'H2SO4'},{m:117, M:58.5, n:2, name:'NaCl'}]; let item=pick(data); return {q:`m=${item.m} г ${item.name}, M=${item.M} г/моль. Найди n (моль).`, a:item.n}; }
-else if(type===1){ let n=rand(1,5); let V=n*22.4; return {q:`n=${n} моль газа. Найди объём V при н.у. (л).`, a:V}; }
-else { let n=rand(1,4); let N=n*6.02; return {q:`n=${n} моль. Найди число молекул N (×10²³).`, a:N}; }
-}
-function chemGrade10(diff){
-let type=rand(0,2);
-if(type===0){ let data=[{n:1, name:'метан', formula:'CH4'},{n:2, name:'этан', formula:'C2H6'},{n:3, name:'пропан', formula:'C3H8'},{n:4, name:'бутан', formula:'C4H10'},{n:5, name:'пентан', formula:'C5H12'}]; let item=pick(data); return {q:`Алкан с ${item.n} атомами углерода — это...`, a:item.name}; }
-else if(type===1){ let n=rand(2,6); let formula=`C${n}H${2*n+2}`; return {q:`Формула алкана с ${n} атомами C?`, a:formula}; }
-else { let data=[{name:'метан', hom:'этан'},{name:'этан', hom:'пропан'},{name:'пропан', hom:'бутан'},{name:'бутан', hom:'пентан'}]; let item=pick(data); return {q:`Следующий гомолог ${item.name} — это...`, a:item.hom}; }
-}
-function chemGrade11(diff){
-let type=rand(0,2);
-if(type===0){ let data=[{el:'S', compound:'H2SO4', ox:'+6'},{el:'N', compound:'HNO3', ox:'+5'},{el:'C', compound:'CO2', ox:'+4'},{el:'S', compound:'H2S', ox:'-2'},{el:'N', compound:'NH3', ox:'-3'}]; let item=pick(data); return {q:`Степень окисления ${item.el} в ${item.compound}?`, a:item.ox}; }
-else if(type===1){ let data=[{el:'Na', conf:'2,8,1'},{el:'Mg', conf:'2,8,2'},{el:'Al', conf:'2,8,3'},{el:'Cl', conf:'2,8,7'},{el:'O', conf:'2,6'}]; let item=pick(data); return {q:`Электронная конфигурация ${item.el}?`, a:item.conf}; }
-else { let data=[{compound:'NaCl', type:'ионная'},{compound:'H2O', type:'ковалентная полярная'},{compound:'O2', type:'ковалентная неполярная'},{compound:'Fe', type:'металлическая'}]; let item=pick(data); return {q:`Тип связи в ${item.compound}?`, a:item.type}; }
-}
-function generateRussianProblem(grade, diff){
-switch(grade){
-case 1: return ruGrade1(diff); case 2: return ruGrade2(diff); case 3: return ruGrade3(diff);
-case 4: return ruGrade4(diff); case 5: return ruGrade5(diff); case 6: return ruGrade6(diff);
-case 7: return ruGrade7(diff); case 8: return ruGrade8(diff); case 9: return ruGrade9(diff);
-case 10: return ruGrade10(diff); case 11: return ruGrade11(diff); default: return ruGrade1(diff);
-}
-}
-const RU_SYLLABLES=[{w:'кот',syl:1},{w:'дом',syl:1},{w:'лес',syl:1},{w:'сон',syl:1},{w:'день',syl:1},{w:'мама',syl:2,stress:1},{w:'папа',syl:2,stress:1},{w:'книга',syl:2,stress:1},{w:'рука',syl:2,stress:2},{w:'вода',syl:2,stress:2},{w:'зима',syl:2,stress:1},{w:'лето',syl:2,stress:1},{w:'осень',syl:2,stress:1},{w:'школа',syl:2,stress:1},{w:'парта',syl:2,stress:1},{w:'машина',syl:3,stress:2},{w:'карандаш',syl:3,stress:3},{w:'воробей',syl:3,stress:3},{w:'молоко',syl:3,stress:3},{w:'собака',syl:3,stress:2},{w:'дерево',syl:3,stress:1},{w:'ученик',syl:4,stress:3}];
-const RU_VOWELS=['а','е','ё','и','о','у','ы','э','ю','я'];
-const RU_CONSONANTS=['б','в','г','д','ж','з','к','л','м','н','п','р','с','т','ф','х','ц','ч','ш','щ'];
-const RU_STRESS=[{word:'звонит',a:'и'},{word:'торты',a:'о'},{word:'каталог',a:'о'},{word:'жалюзи',a:'и'},{word:'щавель',a:'е'},{word:'свёкла',a:'ё'},{word:'красивее',a:'и'},{word:'договор',a:'о'},{word:'банты',a:'а'},{word:'шарфы',a:'а'},{word:'начал',a:'а'},{word:'понял',a:'о'}];
-function ruGrade1(diff){ let type=rand(0,diff); if(type===0){ let pool = diff===0 ? RU_SYLLABLES.filter(x=>x.syl<=2) : RU_SYLLABLES; let item=pick(pool); return {q:`Сколько слогов в слове «${item.w}»?`, a:item.syl, options:mkOptions(item.syl,[1,2,3,4],4)}; } else if(type===1){ if(Math.random()>.5){ let v=pick(RU_VOWELS); let cons=shuffle([...RU_CONSONANTS]).slice(0,3); return {q:'Какая буква гласная?', a:v, options:shuffle([v,...cons])}; } else { let c=pick(RU_CONSONANTS); let vows=shuffle([...RU_VOWELS]).slice(0,3); return {q:'Какая буква согласная?', a:c, options:shuffle([c,...vows])}; } } else { let item=pick(RU_SYLLABLES.filter(x=>x.stress)); return {q:`На какой слог падает ударение в слове «${item.w}»?`, a:item.stress, options:mkOptions(item.stress,[1,2,3,4],3)}; } }
-function ruGrade2(diff){ let type=rand(0,diff); if(type===0){ let data=[{blank:'ж_раф',ans:'и'},{blank:'маш_на',ans:'и'},{blank:'ш_шка',ans:'и'},{blank:'ж_знь',ans:'и'},{blank:'ч_сы',ans:'а'},{blank:'рощ_',ans:'а'},{blank:'ч_до',ans:'у'},{blank:'щ_ка',ans:'у'},{blank:'ч_лок',ans:'у'}]; let item=pick(data); return {q:`Вставь букву: ${item.blank}`, a:item.ans, options:shuffle([item.ans,...shuffle(['а','о','у','ы','и','е'].filter(x=>x!==item.ans)).slice(0,3)])}; } else if(type===1){ let data=[{blank:'м_локо',ans:'о'},{blank:'к_рова',ans:'о'},{blank:'в_да',ans:'о'},{blank:'тр_ва',ans:'а'},{blank:'з_мля',ans:'е'},{blank:'л_сной',ans:'е'},{blank:'ст_на',ans:'е'}]; let item=pick(data); return {q:`Вставь безударную гласную: ${item.blank}`, a:item.ans, options:shuffle([item.ans,...shuffle(['а','о','е','и','у'].filter(x=>x!==item.ans)).slice(0,3)])}; } else { let data=[{blank:'ду_',ans:'б'},{blank:'зу_',ans:'б'},{blank:'моро_',ans:'з'},{blank:'гла_',ans:'з'},{blank:'сне_',ans:'г'},{blank:'дру_',ans:'г'},{blank:'хле_',ans:'б'}]; let item=pick(data); return {q:`Вставь парную согласную: ${item.blank}`, a:item.ans, options:shuffle([item.ans,...shuffle(['б','п','д','т','з','с','г','к'].filter(x=>x!==item.ans)).slice(0,3)])}; } }
-function ruGrade3(diff){ let type=rand(0,diff); if(type===0){ let data=[{blank:'со_нце',ans:'л'},{blank:'звёз_ный',ans:'д'},{blank:'радос_ный',ans:'т'},{blank:'чес_ный',ans:'т'},{blank:'лес_ница',ans:'т'}]; let item=pick(data); return {q:`Вставь непроизносимую согласную: ${item.blank}`, a:item.ans, options:shuffle([item.ans,...shuffle(['л','д','т','в','н'].filter(x=>x!==item.ans)).slice(0,3)])}; } else if(type===1){ let data=[{w:'бежать',pos:'глагол'},{w:'красивый',pos:'прилагательное'},{w:'стол',pos:'существительное'},{w:'он',pos:'местоимение'},{w:'читать',pos:'глагол'},{w:'синий',pos:'прилагательное'},{w:'книга',pos:'существительное'},{w:'она',pos:'местоимение'},{w:'прыгать',pos:'глагол'},{w:'весёлый',pos:'прилагательное'},{w:'солнце',pos:'существительное'},{w:'я',pos:'местоимение'}]; let item=pick(data); return {q:`Определи часть речи: «${item.w}»`, a:item.pos, options:shuffle(['существительное','прилагательное','глагол','местоимение'])}; } else { if(Math.random()>.5){ let data=[{blank:'в_юга',ans:'ъ'},{blank:'сем_я',ans:'ь'},{blank:'под_езд',ans:'ъ'},{blank:'плать_е',ans:'ь'},{blank:'дерев_я',ans:'ь'}]; let item=pick(data); return {q:`Вставь ъ или ь: ${item.blank}`, a:item.ans, options:['ъ','ь']}; } else { let qs=[{q:'Как называется главная часть слова?',a:'корень'},{q:'Какая часть слова изменяется?',a:'окончание'},{q:'Какая часть слова стоит перед корнем?',a:'приставка'}]; let item=pick(qs); return {q:item.q, a:item.a, options:shuffle(['корень','приставка','суффикс','окончание'])}; } } }
-function ruGrade4(diff){ let type=rand(0,diff); if(type===0){ let data=[{qs:'кто? что?',a:'именительный'},{qs:'кого? чего?',a:'родительный'},{qs:'кому? чему?',a:'дательный'},{qs:'кем? чем?',a:'творительный'},{qs:'о ком? о чём?',a:'предложный'}]; let item=pick(data); let all6=['именительный','родительный','дательный','винительный','творительный','предложный']; let others=all6.filter(x=>x!==item.a); return {q:`Какой падеж отвечает на вопросы «${item.qs}»?`, a:item.a, options:shuffle([item.a,...shuffle(others).slice(0,3)])}; } else if(type===1){ let data=[{w:'читать',c:'I'},{w:'писать',c:'I'},{w:'жить',c:'I'},{w:'работать',c:'I'},{w:'знать',c:'I'},{w:'говорить',c:'II'},{w:'смотреть',c:'II'},{w:'дышать',c:'II'},{w:'видеть',c:'II'},{w:'молчать',c:'II'}]; let item=pick(data); return {q:`Какого спряжения глагол «${item.w}»?`, a:item.c, options:['I','II']}; } else { return {q:'Как пишется НЕ с глаголами?', a:'раздельно', options:['раздельно','слитно']}; } }
-function ruGrade5(diff){ let type=rand(0,diff); if(type===0){ let data=[{q:'Он учит_ся (что делает?)',a:'-тся'},{q:'Надо учит_ся (что делать?)',a:'-ться'},{q:'Она улыбае_ся',a:'-тся'},{q:'Хочет купа_ся',a:'-ться'}]; let item=pick(data); return {q:`Вставь -тся или -ться: ${item.q}`, a:item.a}; } else if(type===1){ if(Math.random()>.5){ let data=[{blank:'ж_лтый',ans:'ё'},{blank:'ш_пот',ans:'ё'},{blank:'ш_рох',ans:'о'},{blank:'капюш_н',ans:'о'}]; let item=pick(data); return {q:`Вставь о/ё: ${item.blank}`, a:item.ans}; } else { let data=[{blank:'ц_рк',ans:'и'},{blank:'ц_фра',ans:'и'},{blank:'улиц_',ans:'ы'},{blank:'огурц_',ans:'ы'}]; let item=pick(data); return {q:`Вставь и/ы: ${item.blank}`, a:item.ans}; } } else { if(Math.random()>.5){ let data=[{w:'смелый',a:'храбрый'},{w:'большой',a:'огромный'},{w:'красивый',a:'прекрасный'},{w:'быстрый',a:'стремительный'}]; let item=pick(data); return {q:`Подбери синоним к слову «${item.w}»`, a:item.a}; } else { let data=[{w:'день',a:'ночь'},{w:'горячий',a:'холодный'},{w:'высокий',a:'низкий'},{w:'весёлый',a:'грустный'}]; let item=pick(data); return {q:`Подбери антоним к слову «${item.w}»`, a:item.a}; } } }
-function ruGrade6(diff){ let type=rand(0,diff); if(type===0){ let data=[{w:'он',a:'личное'},{w:'мой',a:'притяжательное'},{w:'этот',a:'указательное'},{w:'себя',a:'возвратное'},{w:'я',a:'личное'},{w:'наш',a:'притяжательное'},{w:'тот',a:'указательное'}]; let item=pick(data); return {q:`Определи разряд местоимения «${item.w}»`, a:item.a}; } else if(type===1){ let data=[{blank:'кожа_ый',ans:'н'},{blank:'серебря_ый',ans:'н'},{blank:'глиня_ый',ans:'н'},{blank:'стекля_ый',ans:'нн'},{blank:'оловя_ый',ans:'нн'},{blank:'деревя_ый',ans:'нн'}]; let item=pick(data); return {q:`Вставь Н или НН: ${item.blank}`, a:item.ans}; } else { return {q:'Как пишутся местоимения с Кое-, -то, -либо, -нибудь?', a:'через дефис'}; } }
-function ruGrade7(diff){ let type=rand(0,diff); if(type===0){ let data=[{w:'читающий',a:'причастие'},{w:'бегущий',a:'причастие'},{w:'написанный',a:'причастие'},{w:'читая',a:'деепричастие'},{w:'бегая',a:'деепричастие'},{w:'написав',a:'деепричастие'}]; let item=pick(data); return {q:`Определи: «${item.w}»`, a:item.a}; } else if(type===1){ let data=[{blank:'написа_ый',ans:'нн'},{blank:'связа_ый',ans:'нн'},{blank:'реше_ая задача',ans:'нн'},{blank:'вяза_ый',ans:'н'},{blank:'жаре_ый',ans:'н'},{blank:'кова_ый',ans:'н'}]; let item=pick(data); return {q:`Вставь Н или НН: ${item.blank}`, a:item.ans}; } else { let data=[{q:'не_прочитанная книга',a:'раздельно'},{q:'не_годующий',a:'слитно'},{q:'не_выученное правило',a:'раздельно'}]; let item=pick(data); return {q:`Слитно или раздельно: ${item.q}`, a:item.a}; } }
-function ruGrade8(diff){ let type=rand(0,diff); if(type===0){ let data=[{s:'Книга — лучший подарок',a:'нужно'},{s:'Москва — столица',a:'нужно'},{s:'Небо как море',a:'не нужно'},{s:'Он врач',a:'не нужно'}]; let item=pick(data); return {q:`Нужно ли тире: «${item.s}»?`, a:item.a}; } else if(type===1){ let data=[{s:'Мама, я дома',a:'Мама'},{s:'Ребята, идёмте сюда',a:'Ребята'},{s:'Друзья, послушайте меня',a:'Друзья'}]; let item=pick(data); return {q:`Найди обращение: «${item.s}»`, a:item.a}; } else { let data=[{s:'К счастью, дождя не было',a:'к счастью'},{s:'Кажется, будет снег',a:'кажется'},{s:'Конечно, я приду',a:'конечно'}]; let item=pick(data); return {q:`Найди вводное слово: «${item.s}»`, a:item.a}; } }
-function ruGrade9(diff){ let type=rand(0,diff); if(type===0){ return {q:'Перед союзом «что» в сложноподчинённом предложении запятая…', a:'ставится'}; } else if(type===1){ let data=[{p:'золотая осень',a:'эпитет'},{p:'горькая правда',a:'эпитет'},{p:'золото волос',a:'метафора'},{p:'горит костёр рябины',a:'метафора'},{p:'белый как снег',a:'сравнение'},{p:'река словно лента',a:'сравнение'},{p:'ветер воет',a:'олицетворение'},{p:'лес уснул',a:'олицетворение'}]; let item=pick(data); return {q:`Какое средство выразительности: «${item.p}»?`, a:item.a}; } else { let data=[{s:'Светит солнце, и птицы поют',a:'сложносочинённое'},{s:'Я знаю, что ты придёшь',a:'сложноподчинённое'}]; let item=pick(data); return {q:`Определи вид предложения: «${item.s}»`, a:item.a}; } }
-function ruGrade10(diff){ let item=pick(RU_STRESS); return {q:`На какую букву падает ударение в слове «${item.word}»?`, a:item.a}; }
-function ruGrade11(diff){ let type=rand(0,diff); if(type===0){ let item=pick(RU_STRESS); return {q:`На какую букву падает ударение в слове «${item.word}»?`, a:item.a}; } else { let data=[{blank:'пр_красный',ans:'е'},{blank:'пр_ехать',ans:'и'},{blank:'пр_морский',ans:'и'},{blank:'пр_града',ans:'е'},{blank:'пр_открыть',ans:'и'},{blank:'пр_мудрый',ans:'е'}]; let item=pick(data); return {q:`Вставь Е или И: ${item.blank}`, a:item.ans}; } }
-function generateEnglishProblem(grade, diff){
-switch(grade){
-case 1: return enGrade1(diff); case 2: return enGrade2(diff); case 3: return enGrade3(diff);
-case 4: return enGrade4(diff); case 5: return enGrade5(diff); case 6: return enGrade6(diff);
-case 7: return enGrade7(diff); case 8: return enGrade8(diff); case 9: return enGrade9(diff);
-case 10: return enGrade10(diff); case 11: return enGrade11(diff); default: return enGrade1(diff);
-}
-}
-const EN_ART=[{s:'_ apple',a:'an'},{s:'_ cat',a:'a'},{s:'_ egg',a:'an'},{s:'_ dog',a:'a'},{s:'_ orange',a:'an'},{s:'_ book',a:'a'},{s:'_ ice cream',a:'an'}];
-const EN_TOBE=[{s:'I _ a student',a:'am'},{s:'He _ a doctor',a:'is'},{s:'She _ happy',a:'is'},{s:'It _ a cat',a:'is'},{s:'We _ friends',a:'are'},{s:'They _ at home',a:'are'},{s:'You _ kind',a:'are'}];
-const EN_HAVE=[{s:'I _ a cat',a:'have'},{s:'You _ a dog',a:'have'},{s:'We _ time',a:'have'},{s:'They _ books',a:'have'},{s:'He _ a car',a:'has'},{s:'She _ a ball',a:'has'},{s:'It _ a tail',a:'has'}];
-const EN_PS=[{s:'He _ (play) football',a:'plays'},{s:'She _ (go) to school',a:'goes'},{s:'It _ (run) fast',a:'runs'},{s:'They _ (play) tennis',a:'play'},{s:'I _ (like) milk',a:'like'},{s:'We _ (walk) daily',a:'walk'}];
-const EN_PLURAL=[{s:'child',a:'children'},{s:'man',a:'men'},{s:'woman',a:'women'},{s:'foot',a:'feet'},{s:'mouse',a:'mice'},{s:'tooth',a:'teeth'},{s:'goose',a:'geese'},{s:'person',a:'people'},{s:'leaf',a:'leaves'},{s:'knife',a:'knives'},{s:'shelf',a:'shelves'},{s:'wolf',a:'wolves'},{s:'life',a:'lives'}];
-const EN_WAS=[{s:'I _ at home yesterday',a:'was'},{s:'He _ sad',a:'was'},{s:'She _ here',a:'was'},{s:'It _ cold',a:'was'},{s:'We _ happy',a:'were'},{s:'They _ at school',a:'were'},{s:'You _ kind',a:'were'}];
-const EN_SOME=[{s:'I have _ apples',a:'some'},{s:'There is _ milk',a:'some'},{s:"I don't have _ apples",a:'any'},{s:'Is there _ water?',a:'any'}];
-const EN_PAST=[{s:'go',a:'went'},{s:'see',a:'saw'},{s:'eat',a:'ate'},{s:'take',a:'took'},{s:'come',a:'came'},{s:'make',a:'made'},{s:'get',a:'got'},{s:'give',a:'gave'},{s:'write',a:'wrote'},{s:'run',a:'ran'},{s:'swim',a:'swam'},{s:'sing',a:'sang'},{s:'drink',a:'drank'},{s:'know',a:'knew'},{s:'think',a:'thought'},{s:'buy',a:'bought'},{s:'bring',a:'brought'},{s:'teach',a:'taught'},{s:'catch',a:'caught'},{s:'find',a:'found'},{s:'hear',a:'heard'},{s:'say',a:'said'},{s:'tell',a:'told'},{s:'sleep',a:'slept'},{s:'feel',a:'felt'},{s:'meet',a:'met'},{s:'leave',a:'left'},{s:'lose',a:'lost'}];
-const EN_COMP=[{s:'big',a:'bigger'},{s:'good',a:'better'},{s:'bad',a:'worse'},{s:'happy',a:'happier'},{s:'small',a:'smaller'},{s:'nice',a:'nicer'},{s:'tall',a:'taller'},{s:'fast',a:'faster'},{s:'slow',a:'slower'},{s:'easy',a:'easier'},{s:'heavy',a:'heavier'},{s:'funny',a:'funnier'}];
-const EN_SUP=[{s:'good',a:'best'},{s:'bad',a:'worst'},{s:'big',a:'biggest'},{s:'happy',a:'happiest'},{s:'small',a:'smallest'},{s:'fast',a:'fastest'},{s:'easy',a:'easiest'}];
-const EN_PP=[{s:'I _ done it',a:'have'},{s:'She _ gone',a:'has'},{s:'They _ seen it',a:'have'},{s:'He _ finished',a:'has'}];
-const EN_PASS=[{s:'The house _ built in 1990',a:'was'},{s:'The letters _ sent',a:'were'},{s:'English _ spoken here',a:'is'}];
-const EN_GER=[{s:'I enjoy _ (read)',a:'reading'},{s:'She likes _ (dance)',a:'dancing'},{s:'He finished _ (work)',a:'working'}];
-const EN_INF=[{s:'I want _ (go)',a:'to go'},{s:'She likes _ (read)',a:'to read'},{s:'He decided _ (stay)',a:'to stay'}];
-const EN_THERE=[{s:'_ a cat on the sofa',a:'There is'},{s:'_ two books on the desk',a:'There are'},{s:'_ an apple in the bag',a:'There is'},{s:'_ many children in the park',a:'There are'}];
-const EN_CAN=[{s:'A bird _ fly',a:'can'},{s:'A fish _ fly',a:"can't"},{s:'A dog _ speak',a:"can't"},{s:'I _ read',a:'can'}];
-const EN_MUST=[{s:'You _ do your homework',a:'must'},{s:"You _ be rude",a:"mustn't"},{s:'We _ listen to the teacher',a:'must'},{s:"You _ shout in class",a:"mustn't"}];
-const EN_WF=[{s:'happy → сущ.',a:'happiness'},{s:'teach → кто?',a:'teacher'},{s:'beauty → прил.',a:'beautiful'},{s:'quick → наречие',a:'quickly'},{s:'friend → прил.',a:'friendly'},{s:'kind → сущ.',a:'kindness'},{s:'sad → сущ.',a:'sadness'},{s:'work → кто?',a:'worker'},{s:'care → прил.',a:'careful'},{s:'slow → наречие',a:'slowly'}];
-function oddOneOut(){ let keys=Object.keys(EN_DICT); let catA=pick(keys), catB; do { catB=pick(keys); } while(catB===catA); let wordsA=shuffle([...EN_DICT[catA].words]).slice(0,3).map(w=>w.en); let wordB=pick(EN_DICT[catB].words).en; while(wordsA.includes(wordB)){ wordB=pick(EN_DICT[catB].words).en; } return {q:'Какое слово лишнее?', a:wordB, options:shuffle([...wordsA, wordB])}; }
-function enGrade1(diff){ let type=rand(0,diff); if(type===0){ let item=pick(getAllDictWords()); let others=shuffle(getAllDictWords().filter(w=>w.ru!==item.ru)).slice(0,3).map(w=>w.ru); return {q:`Выбери перевод: ${item.en}`, a:item.ru, options:shuffle([item.ru,...others])}; } else if(type===1){ const V=['a','e','i','o','u']; const C=['b','c','d','f','g','h','k','m','n','p','t']; if(Math.random()>.5){ let v=pick(V); let cons=shuffle([...C]).slice(0,3); return {q:'Какая буква гласная?', a:v, options:shuffle([v,...cons])}; } else { let c=pick(C); let vows=shuffle([...V]).slice(0,3); return {q:'Какая буква согласная?', a:c, options:shuffle([c,...vows])}; } } else { let item=pick(EN_ART); return {q:`Вставь a или an: ${item.s}`, a:item.a, options:['a','an']}; } }
-function enGrade2(diff){ let maxT=diff===0?1:diff===1?2:3; let type=rand(0,maxT); if(type===0){ let item=pick(getAllDictWords()); let others=shuffle(getAllDictWords().filter(w=>w.en!==item.en)).slice(0,3).map(w=>w.en); return {q:`Как по-английски «${item.ru}»?`, a:item.en, options:shuffle([item.en,...others])}; } else if(type===1){ let data=[{s:'cat',a:'cats'},{s:'dog',a:'dogs'},{s:'book',a:'books'},{s:'pen',a:'pens'},{s:'apple',a:'apples'}]; let item=pick(data); return {q:`Множественное число: ${item.s}`, a:item.a, options:mkOptions(item.a,['cats','cat','dogs','dog','books','book','pens','pen'],4)}; } else if(type===2){ let item=pick(EN_ART); return {q:`Вставь a или an: ${item.s}`, a:item.a, options:['a','an']}; } else { return oddOneOut(); } }
-function enGrade3(diff){ let maxT=diff===0?1:diff===1?2:3; let type=rand(0,maxT); if(type===0){ let item=pick(EN_TOBE); return {q:`Вставь am / is / are: ${item.s}`, a:item.a, options:['am','is','are']}; } else if(type===1){ let item=pick(EN_HAVE); return {q:`Вставь have / has: ${item.s}`, a:item.a, options:['have','has']}; } else if(type===2){ return oddOneOut(); } else { let item=pick(EN_THERE); return {q:`Вставь There is / There are: ${item.s}`, a:item.a, options:['There is','There are']}; } }
-function enGrade4(diff){ let maxT=diff===0?1:diff===1?2:3; let type=rand(0,maxT); if(type===0){ let item=pick(EN_PS); return {q:`Выбери форму глагола: ${item.s}`, a:item.a, options:mkOptions(item.a,['play','plays','go','goes','run','runs','like','likes'],4)}; } else if(type===1){ let data=[{s:'_ is your name?',a:'What'},{s:'_ old are you?',a:'How'},{s:'_ do you live?',a:'Where'},{s:'_ is she? — She is my mom',a:'Who'}]; let item=pick(data); return {q:`Вставь вопросительное слово: ${item.s}`, a:item.a, options:shuffle(['What','How','Where','Who'])}; } else if(type===2){ let data=[{s:'The cat is _ the table (на)',a:'on'},{s:'The ball is _ the box (в)',a:'in'},{s:'The book is _ the table (под)',a:'under'}]; let item=pick(data); return {q:`Вставь предлог: ${item.s}`, a:item.a, options:shuffle(['in','on','under'])}; } else { let item=pick(EN_CAN); return {q:`Вставь can / can't: ${item.s}`, a:item.a, options:['can',"can't"]}; } }
-function enGrade5(diff){ let type=rand(0,diff); if(type===0){ let item=pick(EN_PS); return {q:`Вставь форму глагола: ${item.s}`, a:item.a}; } else if(type===1){ let item=pick(EN_PLURAL); return {q:`Множественное число: ${item.s}`, a:item.a}; } else { if(Math.random()>.5){ let data=[{s:'_ sun is bright',a:'the'},{s:'I see _ cat',a:'a'},{s:'She eats _ apple',a:'an'},{s:'_ moon shines at night',a:'the'}]; let item=pick(data); return {q:`Вставь a / an / the: ${item.s}`, a:item.a}; } else { let item=pick(EN_THERE); return {q:`Вставь There is / There are: ${item.s}`, a:item.a}; } } }
-function enGrade6(diff){ let maxT=diff===0?1:diff===1?2:3; let type=rand(0,maxT); if(type===0){ let data=[{s:'Look! She is _ now (read)',a:'reading'},{s:'They are _ now (play)',a:'playing'},{s:'I am _ now (do)',a:'doing'}]; let item=pick(data); return {q:`Вставь: ${item.s}`, a:item.a}; } else if(type===1){ let item=pick(EN_WAS); return {q:`Вставь was / were: ${item.s}`, a:item.a}; } else if(type===2){ let item=pick(EN_SOME); return {q:`Вставь some / any: ${item.s}`, a:item.a}; } else { let item=pick(EN_MUST); return {q:`Вставь must / mustn't: ${item.s}`, a:item.a}; } }
-function enGrade7(diff){ let type=rand(0,diff); if(type===0){ let item=pick(EN_PAST); return {q:`Прошедшее время глагола: ${item.s}`, a:item.a}; } else if(type===1){ let item=pick(EN_COMP); return {q:`Сравнительная степень: ${item.s}`, a:item.a}; } else { return {q:'If it rains, I _ stay home', a:'will'}; } }
-function enGrade8(diff){ let type=rand(0,diff); if(type===0){ let item=pick(EN_PP); return {q:`Вставь have / has: ${item.s}`, a:item.a}; } else if(type===1){ let item=pick(EN_PASS); return {q:`Вставь is/are/was/were: ${item.s}`, a:item.a}; } else { let item=pick(EN_SUP); return {q:`Превосходная степень: ${item.s}`, a:item.a}; } }
-function enGrade9(diff){ let type=rand(0,diff); if(type===0){ let item=pick(EN_PP); return {q:`Present Perfect: ${item.s}`, a:item.a}; } else if(type===1){ return {q:'When I came, he already _ left', a:'had'}; } else { return {q:'If I _ rich, I would travel', a:'were'}; } }
-function enGrade10(diff){ let maxT=diff===0?1:diff===1?2:3; let type=rand(0,maxT); if(type===0){ let item=pick(EN_GER); return {q:`Вставь: ${item.s}`, a:item.a}; } else if(type===1){ let item=pick(EN_INF); return {q:`Вставь: ${item.s}`, a:item.a}; } else if(type===2){ return {q:'He said that he _ tired', a:'was'}; } else { return {q:'If I had known, I _ have come', a:'would'}; } }
-function enGrade11(diff){ let type=rand(0,diff); if(type===0){ let item=pick(EN_WF); return {q:`Словообразование: ${item.s}`, a:item.a}; } else if(type===1){ let data=[{s:'English is _ everywhere (speak)',a:'spoken'},{s:'The letter was _ yesterday (send)',a:'sent'},{s:'The work is _ (do)',a:'done'}]; let item=pick(data); return {q:`Вставь: ${item.s}`, a:item.a}; } else { return {q:'If I had time, I _ come', a:'would'}; } }
-function generateOptions(correct, grade){
-let opts=new Set([correct]);
-while(opts.size<4){ let off=rand(-5,5); if(!off)continue; if(typeof correct==='string'){opts.add(correct);break;} let v=correct+off; if(v>=0||grade>=6)opts.add(v); }
-return Array.from(opts).sort(()=>Math.random()-.5);
-}
-function setTheme(g){ document.body.className=''; document.body.classList.add(themes.junior.includes(g)?'theme-junior':themes.middle.includes(g)?'theme-middle':'theme-senior'); document.querySelectorAll('.mascot-container').forEach(m=>m.style.display=g<=8?'block':'none'); }
-function switchScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-function startGame(grade){
-if(!state.nickname) state.nickname=getNick();
-state.grade=grade; state.score=0; state.streak=0; state.adaptive=0;
-state.currentRoundHistory=[];
-if(state.joinClass && state.joinClass.mode==='custom'){
-let probs=state.joinClass.problems||[];
-if(!probs.length){ showToast('У этого класса пока нет задач 🙂'); switchScreen('screen-student'); return; }
-state.gameProblems=shuffle([...probs]); state.maxRounds=state.gameProblems.length; state.isCustom=true;
-} else {
-state.gameProblems=null; state.maxRounds=10; state.isCustom=false;
-state.subject = (state.joinClass && state.joinClass.subject) ? state.joinClass.subject : (state.soloSubject||'math');
-}
-state.round=0;
-setTheme(grade); updateStats(); switchScreen('screen-game');
-if(grade>=9) startTimer(); else { clearInterval(state.timerInterval); document.getElementById('timer-display').textContent=''; }
-nextQuestion();
-}
-function nextQuestion(){
-if(state.round>=state.maxRounds){ endGame(); return; }
-if(state.isCustom && state.gameProblems && state.gameProblems[state.round]){ let p=state.gameProblems[state.round]; state.currentProblem={q:p.question, a:p.answer}; }
-else if(state.subject==='russian'){ state.currentProblem=generateRussianProblem(state.grade, currentDifficulty()); }
-else if(state.subject==='english'){ state.currentProblem=generateEnglishProblem(state.grade, currentDifficulty()); }
-else if(state.subject==='physics'){ state.currentProblem=generatePhysicsProblem(state.grade, currentDifficulty()); }
-else if(state.subject==='chemistry'){ state.currentProblem=generateChemistryProblem(state.grade, currentDifficulty()); }
-else { state.currentProblem=generateProblem(state.grade, currentDifficulty()); }
-document.getElementById('question-text').textContent=state.currentProblem.q;
-document.getElementById('feedback-text').classList.remove('visible');
-renderInputMethod(); updateProgress();
-}
-function renderInputMethod(){
-const c=document.getElementById('input-area'); c.innerHTML='';
-if(!state.isCustom && state.grade<=4){
-const colors=['c-yellow','c-coral','c-mint','c-blue'];
-let opts = state.currentProblem.options || generateOptions(state.currentProblem.a, state.grade);
-let btnClass = (state.subject==='russian'||state.subject==='english') ? 'btn-answer-pill' : 'btn-answer';
-opts.forEach((opt,i)=>{ let b=document.createElement('button'); b.className=`${btnClass} ${colors[i%4]}`; b.textContent=opt; b.onclick=()=>checkAnswer(opt,b); c.appendChild(b); });
-} else {
-let w=document.createElement('div'); w.style.cssText='width:100%;display:flex;flex-direction:column;align-items:center;';
-let inp=document.createElement('input'); inp.type='text'; inp.placeholder='?'; inp.autocomplete='off';
-inp.addEventListener('keypress', e=>{ if(e.key==='Enter') checkAnswer(inp.value, inp); });
-let s=document.createElement('button'); s.className='btn-primary'; s.textContent='Ответить'; s.style.marginTop='18px'; s.onclick=()=>checkAnswer(inp.value, inp);
-w.appendChild(inp); w.appendChild(s); c.appendChild(w); setTimeout(()=>inp.focus(),100);
-}
-}
-function checkAnswer(userVal, element){
-playSound('click');
-let correct=state.currentProblem.a;
-let ok = compareAnswer(userVal, correct);
-const feedback=document.getElementById('feedback-text'), fox=document.getElementById('game-fox-svg');
-state.currentRoundHistory.push({question:state.currentProblem.q, userAnswer:userVal, correctAnswer:correct, isCorrect:ok});
-if(ok){
-playSound('correct'); state.score++; state.streak++;
-if(state.streak>=3) state.adaptive=1; else state.adaptive=Math.max(0,state.adaptive);
-if(state.streak>=3) playSound('win');
-if(element.tagName==='BUTTON'){ element.style.background='#66BB6A'; element.style.boxShadow='0 0 15px #66BB6A'; } else { element.style.borderColor='#66BB6A'; }
-if(state.grade<=8){ fox.classList.add('fox-happy'); setTimeout(()=>fox.classList.remove('fox-happy'),500); }
-fireConfetti(element.getBoundingClientRect().left+50, element.getBoundingClientRect().top);
-state.round++; updateStats(); setTimeout(nextQuestion, 900);
-} else {
-playSound('wrong'); state.streak=0; state.adaptive=-1; updateStats();
-feedback.textContent=['Почти!','Попробуй ещё','Не сдавайся!','Подумай немного'][rand(0,3)];
-feedback.classList.add('visible');
-if(state.grade<=8){ fox.classList.add('fox-sad'); setTimeout(()=>fox.classList.remove('fox-sad'),500); }
-element.animate([{transform:'translateX(0)'},{transform:'translateX(-5px)'},{transform:'translateX(5px)'},{transform:'translateX(0)'}],{duration:300});
-if(element.tagName==='INPUT') element.value='';
-}
-}
-function updateStats(){ document.getElementById('score-display').textContent=state.score; document.getElementById('streak-count').textContent=state.streak; document.getElementById('streak-icon').classList.toggle('active', state.streak>=3); }
-function updateProgress(){ document.getElementById('progress-fill').style.width=`${(state.round/state.maxRounds)*100}%`; }
-function startTimer(){ state.startTime=Date.now(); clearInterval(state.timerInterval); state.timerInterval=setInterval(()=>{ let d=Math.floor((Date.now()-state.startTime)/1000); document.getElementById('timer-display').textContent=`${String(Math.floor(d/60)).padStart(2,'0')}:${String(d%60).padStart(2,'0')}`; },1000); }
-async function endGame(){
-clearInterval(state.timerInterval);
-await saveResultToFirebase(state.nickname, state.score, state.grade, state.classCode||'', state.currentRoundHistory, state.maxRounds);
-switchScreen('screen-result');
-document.getElementById('result-name').textContent=state.nickname;
-document.getElementById('final-score').textContent=state.score;
-document.getElementById('result-total').textContent=state.maxRounds;
-let pct=state.score/state.maxRounds;
-document.getElementById('leader-note').textContent = state.classCode ? `Результат записан для класса!` : (pct>=0.7?'🎉 Отличный результат!':'');
-const c=document.getElementById('result-comment');
-c.textContent = pct===1 ? 'Идеально! Ты настоящий Пифагор! 🦊' : pct>=0.7 ? 'Отличный результат! Так держать.' : 'Хорошая попытка! Попробуй ещё раз.';
-playSound('win'); fireConfetti(window.innerWidth/2, window.innerHeight/2, true);
-}
-function restartRound(){ startGame(state.grade); }
-function goHome(){ document.body.className='theme-junior'; state.viewClass=null; switchScreen('screen-role'); }
-async function renderLeaderboard(classCode){
-const list=document.getElementById('leaderboard-list');
-const title=document.getElementById('leaderboard-title');
-const sub=document.getElementById('leaderboard-sub');
-list.innerHTML = '<p>Загрузка...</p>';
-let data = await getLeaders(classCode);
-list.innerHTML='';
-if(classCode){ let cls = (await getClasses()).find(c=>c.code===classCode); title.textContent=cls?`Класс ${cls.name} 🏆`:'Результаты'; sub.textContent='Результаты учеников этого класса'; }
-else { title.textContent='Таблица успеха 🏆'; sub.textContent='Лучшие результаты'; }
-if(!data.length){ list.innerHTML='<p style="opacity:.7">Пока пусто. 🦊</p>'; return; }
-const medals=['🥇','🥈',''];
-data.forEach((l,i)=>{
-const row=document.createElement('div'); row.className='leader-row';
-let avg='', count='';
-if(l.attempts && l.attempts.length){ let sum=l.attempts.reduce((s,a)=>s+a.score,0); avg=` · ср. ${(sum/l.attempts.length).toFixed(1)}`; count=` · ${l.attempts.length} игр`; }
-row.innerHTML=`<span class="leader-rank">${medals[i]||i+1}</span><span class="leader-name">${escapeHtml(l.name)}</span><span class="leader-score">⭐ ${l.score}/${l.total||10}</span><span class="leader-avg">${avg}${count}</span><span class="leader-grade">${l.grade} кл.</span>`;
-list.appendChild(row);
-});
-}
-function showLeaderboard(classCode){ state.viewClass=classCode||null; renderLeaderboard(classCode||null); switchScreen('screen-leaderboard'); }
-function leaderboardBack(){ if(state.viewClass){ state.viewClass=null; renderClasses(); switchScreen('screen-teacher'); } else switchScreen('screen-role'); }
-function openStudentDetails(classCode, name){
-state.viewStudent={classCode, name};
-const attempts=getStudentAttempts(classCode, name);
-document.getElementById('student-details-title').textContent=`📝 ${name}`;
-const summary=document.getElementById('student-summary');
-const wrap=document.getElementById('student-attempts'); wrap.innerHTML='';
-if(!attempts.length){ summary.innerHTML=`<p style="opacity:.7">Пока нет попыток</p>`; switchScreen('screen-student-details'); return; }
-let best=Math.max(...attempts.map(a=>a.score));
-let avg=(attempts.reduce((s,a)=>s+a.score,0)/attempts.length).toFixed(1);
-let tot=attempts[attempts.length-1].total||10;
-summary.innerHTML=`<div>Лучший результат: <span class="big">${best}/${tot}</span></div><div style="margin-top:6px;opacity:.8">Средний: <b>${avg}</b> · Попыток: <b>${attempts.length}</b></div>`;
-const shown=attempts.slice(-10).reverse();
-shown.forEach((att,idx)=>{
-const card=document.createElement('div'); card.className='attempt-card';
-const num=attempts.length-idx;
-let head=`<div class="attempt-head"><span>Попытка №${num}</span><span class="attempt-score">⭐ ${att.score}/${att.total||10}</span></div>`;
-let rows='';
-if(att.history && att.history.length){
-att.history.forEach(ex=>{
-const cls=ex.isCorrect?'correct':'wrong';
-const icon=ex.isCorrect?'✅':'💡';
-const ans=ex.isCorrect ? `Ответ: ${escapeHtml(String(ex.userAnswer))}` : `Ответил: ${escapeHtml(String(ex.userAnswer))} · Правильно: ${escapeHtml(String(ex.correctAnswer))}`;
-rows+=`<div class="example-row ${cls}"><span class="example-status">${icon}</span><span class="example-q">${escapeHtml(ex.question)}</span><span class="example-answer">${ans}</span></div>`;
-});
-} else { rows='<p style="opacity:.7;font-size:.9rem">Нет деталей по этой попытке</p>'; }
-card.innerHTML=head+rows; wrap.appendChild(card);
-});
-switchScreen('screen-student-details');
-}
-function clearStudentHistory(){
-if(!state.viewStudent) return;
-if(!confirm(`Очистить всю историю ученика ${state.viewStudent.name}?`)) return;
-let leaders=getLeaders();
-leaders=leaders.filter(l=>!(l.name===state.viewStudent.name && (l.classCode||'')===(state.viewStudent.classCode||'')));
-localStorage.setItem('pythagoras_leaders', JSON.stringify(leaders));
-showToast('История очищена');
-backToLeaderboard();
-}
-function backToLeaderboard(){ if(state.viewClass){ renderLeaderboard(state.viewClass); switchScreen('screen-leaderboard'); } else switchScreen('screen-role'); }
-function getStudentAttempts(classCode, name){
-let l=getLeaders().find(x=>x.name===name && (x.classCode||'')===(classCode||''));
-return l && l.attempts ? l.attempts : [];
-}
-const canvas=document.getElementById('confetti-canvas'), ctx=canvas.getContext('2d'); let particles=[];
-function resizeCanvas(){ canvas.width=window.innerWidth; canvas.height=window.innerHeight; }
-window.addEventListener('resize', resizeCanvas); resizeCanvas();
-function fireConfetti(x,y,big=false){ const count=big?100:20, colors=['#FF7043','#FFF59D','#A5D6A7','#90CAF9','#BB86FC']; for(let i=0;i<count;i++){ particles.push({x,y,vx:(Math.random()-.5)*(big?15:5),vy:(Math.random()-.5)*(big?15:5)-2,life:1,color:colors[Math.floor(Math.random()*colors.length)],size:Math.random()*5+2}); } requestAnimationFrame(updateConfetti); }
-function updateConfetti(){ ctx.clearRect(0,0,canvas.width,canvas.height); for(let p of particles){ p.x+=p.vx; p.y+=p.vy; p.vy+=.2; p.life-=.02; ctx.globalAlpha=p.life; ctx.fillStyle=p.color; ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill(); } particles=particles.filter(p=>p.life>0); if(particles.length>0) requestAnimationFrame(updateConfetti); else ctx.clearRect(0,0,canvas.width,canvas.height); }
-function parseUrlClass(){
-try{ let code=(new URLSearchParams(location.search).get('class')||'').toUpperCase(); if(code && getClassByCode(code)){ chooseRole('student'); document.getElementById('student-code').value=code; onStudentCodeInput(); } }catch(e){}
-}
-function getClassByCode(code){ if(!code) return null; return getClasses().find(c=>c.code===code.toUpperCase())||null; }
-function init(){
-let sel=document.getElementById('new-class-grade');
-for(let i=1;i<=11;i++){ let o=document.createElement('option'); o.value=i; o.textContent=`${i} класс`; sel.appendChild(o); }
-buildStudentGradeGrid();
-parseUrlClass();
-}
-init();
 </script>
 </body>
-</html>
+      </html>
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
