@@ -19,48 +19,38 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
-
-// ===== VK API КЛЮЧ (ВСТАВЛЕН!) =====
-const VK_API_TOKEN = "fbcfaf20fbcfaf20fbcfaf20e8f88d5929ffbcffbcfaf2091b10ad3c9cf0f1bd6cdb9f7"; 
+const VK_API_TOKEN = "fbcfaf20fbcfaf20fbcfaf20e8f88d5929ffbcffbcfaf2091b10ad3c9cf0f1bd6cdb9f7";
 </script>
 <style>
 :root {
   --orange: #FF7043; --orange-dark: #E64A19; --blue: #2196F3; --blue-dark: #1565C0;
   --green: #4CAF50; --red: #F44336; --bg: #F5F7FA; --card: #FFFFFF;
   --text: #1A2332; --text-light: #6B7A8D; --border: #E0E6ED;
-  --vk-blue: #4C75A3; --rutube-red: #00A0E3;
+  --vk-blue: #4C75A3;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
 .screen { display: none; min-height: 100vh; padding: 20px; animation: fadeIn 0.3s; }
 .screen.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
 .header { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; margin-bottom: 20px; position: relative; }
 .logo { display: flex; align-items: center; gap: 10px; font-size: 1.3rem; font-weight: bold; color: var(--text); }
 .logo-icon { font-size: 2rem; }
 .header-actions { display: flex; gap: 12px; align-items: center; }
-
-.avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--orange); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1rem; cursor: pointer; user-select: none; }
+.avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--orange); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1rem; cursor: pointer; }
 .notification-bell { font-size: 1.5rem; cursor: pointer; position: relative; }
 .notification-badge { position: absolute; top: -4px; right: -4px; background: var(--red); color: white; font-size: 0.7rem; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-
 .card { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
 .card-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: var(--text); }
-
 .btn { display: block; width: 100%; padding: 16px; border: none; border-radius: 16px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; text-align: center; }
 .btn:active { transform: scale(0.98); }
 .btn-orange { background: var(--orange); color: white; }
-.btn-orange:hover { background: var(--orange-dark); }
 .btn-blue { background: var(--blue); color: white; }
 .btn-grey { background: #E8EDF2; color: var(--text); }
-.btn-red { background: var(--red); color: white; }
-
 .input-group { position: relative; margin-bottom: 16px; }
 .input-group input, .input-group select { width: 100%; padding: 16px 16px 16px 48px; border: 2px solid var(--border); border-radius: 14px; font-size: 1rem; font-family: inherit; background: white; outline: none; transition: border 0.2s; }
 .input-group input:focus { border-color: var(--orange); }
 .input-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 1.3rem; color: var(--text-light); }
-
 .role-screen { display: flex; flex-direction: column; align-items: center; padding-top: 40px; }
 .mascot-big { font-size: 6rem; margin-bottom: 20px; animation: bounce 2s infinite; }
 @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
@@ -73,20 +63,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .role-btn .emoji { font-size: 2.5rem; margin-bottom: 8px; }
 .role-btn .label { font-size: 0.95rem; font-weight: 600; color: var(--text); }
 .role-btn.full { grid-column: 1 / -1; }
-
 .auth-screen { max-width: 420px; margin: 0 auto; padding-top: 40px; }
 .auth-mascot { text-align: center; font-size: 5rem; margin-bottom: 20px; }
 .auth-title { text-align: center; font-size: 1.8rem; font-weight: bold; margin-bottom: 24px; }
 .auth-links { text-align: center; margin-top: 16px; }
 .auth-links a { color: var(--blue); text-decoration: none; font-size: 0.95rem; }
-.auth-links a:hover { text-decoration: underline; }
 .auth-footer { text-align: center; margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 0.85rem; color: var(--text-light); }
 .auth-footer a { color: var(--text-light); text-decoration: none; margin: 0 8px; }
-
 .consent-label { display: flex; align-items: flex-start; gap: 10px; margin: 16px 0; font-size: 0.9rem; color: var(--text-light); cursor: pointer; }
 .consent-label input[type="checkbox"] { width: 20px; height: 20px; margin-top: 2px; cursor: pointer; accent-color: var(--orange); }
 .consent-label a { color: var(--blue); text-decoration: underline; }
-
 .dropdown-menu { display: none; position: absolute; right: 0; top: 55px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 1000; min-width: 220px; overflow: hidden; animation: fadeIn 0.2s; }
 .dropdown-menu.show { display: block; }
 .dropdown-header { padding: 14px 16px; font-weight: bold; color: var(--text); font-size: 0.95rem; border-bottom: 1px solid var(--border); background: #f8f9fa; }
@@ -95,7 +81,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .dropdown-item:hover { background: #f8f9fa; }
 .dropdown-item:last-child { border-bottom: none; }
 .dropdown-item.logout { color: var(--red); font-weight: 600; }
-
 .dictionary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 500px; margin: 0 auto; }
 .dictionary-card { background: white; border-radius: 20px; padding: 30px 20px; text-align: center; cursor: pointer; transition: all 0.2s; border: 2px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
 .dictionary-card:active { transform: scale(0.95); }
@@ -103,14 +88,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .dictionary-card .dict-emoji { font-size: 3.5rem; margin-bottom: 12px; }
 .dictionary-card .dict-title { font-size: 1.1rem; font-weight: bold; color: var(--text); }
 .dictionary-card .dict-count { font-size: 0.85rem; color: var(--text-light); margin-top: 4px; }
-
 .topic-list { max-width: 600px; margin: 0 auto; }
 .topic-item { background: white; border-radius: 14px; padding: 18px 20px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s; border: 2px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
 .topic-item:active { transform: scale(0.98); }
 .topic-item:hover { border-color: var(--orange); }
 .topic-item .topic-name { font-weight: 600; font-size: 1.05rem; }
 .topic-item .topic-count { color: var(--text-light); font-size: 0.9rem; }
-
 .flashcard-container { max-width: 500px; margin: 0 auto; padding: 20px 0; }
 .flashcard { background: white; border-radius: 24px; padding: 40px 30px; min-height: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: all 0.3s; border: 3px solid var(--border); position: relative; }
 .flashcard.flipped { border-color: var(--orange); background: #FFF8F5; }
@@ -121,29 +104,24 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .flashcard-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; gap: 12px; }
 .flashcard-nav .btn { flex: 1; }
 .flashcard-counter { text-align: center; color: var(--text-light); font-size: 0.95rem; margin-top: 16px; }
-
 .topic-selector { max-width: 600px; margin: 0 auto; }
 .selector-filters { display: flex; gap: 12px; margin-bottom: 24px; }
 .selector-filters select { flex: 1; padding: 14px; border: 2px solid var(--border); border-radius: 12px; font-size: 1rem; background: white; cursor: pointer; }
 .selector-filters select:focus { border-color: var(--orange); outline: none; }
-
 .topic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .topic-card { background: white; border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.2s; border: 2px solid var(--border); text-align: center; }
 .topic-card:active { transform: scale(0.95); }
 .topic-card:hover { border-color: var(--orange); box-shadow: 0 4px 12px rgba(255,112,67,0.15); }
 .topic-card .topic-icon { font-size: 2.5rem; margin-bottom: 8px; }
 .topic-card .topic-name { font-weight: 600; font-size: 0.95rem; color: var(--text); }
-
 .lesson-tabs { display: flex; gap: 0; margin-bottom: 20px; border-bottom: 2px solid var(--border); }
 .lesson-tab { flex: 1; padding: 14px; text-align: center; cursor: pointer; font-weight: 600; color: var(--text-light); transition: all 0.2s; border-bottom: 3px solid transparent; margin-bottom: -2px; }
 .lesson-tab.active { color: var(--orange); border-bottom-color: var(--orange); }
 .lesson-tab:hover { background: #f8f9fa; }
-
 .video-filter { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
 .filter-btn { padding: 8px 14px; border: 2px solid var(--border); border-radius: 20px; background: white; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
 .filter-btn.active { background: var(--orange); color: white; border-color: var(--orange); }
 .filter-btn:hover { border-color: var(--orange); }
-
 .video-list { display: flex; flex-direction: column; gap: 12px; }
 .video-card { background: white; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
 .video-thumbnail { width: 100%; height: 180px; background: #222; display: flex; align-items: center; justify-content: center; font-size: 3rem; cursor: pointer; position: relative; background-size: cover; background-position: center; }
@@ -156,17 +134,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .video-actions button { flex: 1; padding: 8px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
 .btn-watch { background: var(--orange); color: white; }
 .btn-complain { background: #f0f0f0; color: var(--text); }
-
 .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--text); color: white; padding: 12px 20px; border-radius: 24px; font-size: 0.95rem; opacity: 0; transition: opacity 0.3s; z-index: 2000; max-width: 90%; text-align: center; }
 .toast.show { opacity: 0.95; }
-
 .dashboard-welcome { font-size: 1.5rem; font-weight: bold; margin-bottom: 8px; }
 .dashboard-subtitle { color: var(--text-light); margin-bottom: 24px; }
 .dashboard-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
 .stat-card { background: white; padding: 16px; border-radius: 14px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
 .stat-value { font-size: 1.8rem; font-weight: bold; color: var(--orange); }
 .stat-label { font-size: 0.85rem; color: var(--text-light); margin-top: 4px; }
-
 @media (min-width: 768px) {
   .role-grid { grid-template-columns: repeat(3, 1fr); max-width: 600px; }
   .topic-grid { grid-template-columns: repeat(3, 1fr); }
@@ -175,35 +150,30 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 </head>
 <body>
 
-<!-- ГЛАВНЫЙ ЭКРАН -->
 <div id="screen-role" class="screen role-screen active">
-  <div class="mascot-big">🦊</div>
+  <div class="mascot-big"></div>
   <div class="title-main">Лисёнок Пифагор</div>
   <div class="subtitle-main">Кто ты?</div>
-  
   <div class="role-grid">
-    <div class="role-btn" onclick="showAuth('director')"><div class="emoji">🏫</div><div class="label">Я директор</div></div>
+    <div class="role-btn" onclick="showAuth('director')"><div class="emoji"></div><div class="label">Я директор</div></div>
     <div class="role-btn" onclick="showAuth('deputy')"><div class="emoji">📋</div><div class="label">Я завуч</div></div>
-    <div class="role-btn" onclick="showAuth('teacher')"><div class="emoji">👨‍🏫</div><div class="label">Я учитель</div></div>
+    <div class="role-btn" onclick="showAuth('teacher')"><div class="emoji">🧑‍🏫</div><div class="label">Я учитель</div></div>
     <div class="role-btn" onclick="showScreen('screen-student')"><div class="emoji">🎒</div><div class="label">Я ученик</div></div>
-    <div class="role-btn full" onclick="showScreen('screen-parent')"><div class="emoji">👨‍👩‍👧</div><div class="label">Я родитель</div></div>
+    <div class="role-btn full" onclick="showScreen('screen-parent')"><div class="emoji">👪</div><div class="label">Я родитель</div></div>
   </div>
-
   <div style="margin-top: 24px; width: 100%; max-width: 400px;">
     <button class="btn btn-grey" onclick="showScreen('screen-dictionary-list')" style="margin-bottom: 8px;">📖 Словари</button>
     <button class="btn btn-grey" onclick="showScreen('screen-topic-selector')" style="margin-bottom: 8px;">📚 Уроки</button>
     <button class="btn btn-grey" onclick="showLeaderboard(null)">🏆 Таблица успеха</button>
   </div>
-
   <div class="auth-footer" style="margin-top: 32px; border: none;">
     <a href="#" onclick="showScreen('screen-agreement'); return false;">Пользовательское соглашение</a>
     <a href="#" onclick="showScreen('screen-privacy'); return false;">Политика конфиденциальности</a>
   </div>
 </div>
 
-<!-- ЭКРАН ВХОДА -->
 <div id="screen-auth" class="screen auth-screen">
-  <div class="auth-mascot">🦊</div>
+  <div class="auth-mascot"></div>
   <div class="auth-title" id="auth-title">Вход</div>
   <div class="input-group"><span class="input-icon">✉️</span><input type="email" id="auth-email" placeholder="Email"></div>
   <div class="input-group"><span class="input-icon">🔒</span><input type="password" id="auth-password" placeholder="Пароль"></div>
@@ -213,7 +183,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <button class="btn btn-grey" style="margin-top: 24px;" onclick="showScreen('screen-role')">← На главную</button>
 </div>
 
-<!-- ЭКРАН РЕГИСТРАЦИИ -->
 <div id="screen-register" class="screen auth-screen">
   <div class="auth-mascot">🦊</div>
   <div class="auth-title">Регистрация</div>
@@ -226,17 +195,15 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <button class="btn btn-grey" style="margin-top: 24px;" onclick="showScreen('screen-role')">← На главную</button>
 </div>
 
-<!-- ЭКРАН "ЗАБЫЛИ ПАРОЛЬ?" -->
 <div id="screen-forgot" class="screen auth-screen">
   <div class="auth-mascot">❓</div>
   <div class="auth-title">Забыли пароль?</div>
   <p style="text-align: center; color: var(--text-light); margin-bottom: 24px;">Введите email для сброса.</p>
-  <div class="input-group"><span class="input-icon">✉️</span><input type="email" id="forgot-email" placeholder="Email"></div>
+  <div class="input-group"><span class="input-icon">️</span><input type="email" id="forgot-email" placeholder="Email"></div>
   <button class="btn btn-orange" onclick="handleForgot()">Отправить ссылку</button>
   <button class="btn btn-grey" style="margin-top: 24px;" onclick="showScreen('screen-role')">← На главную</button>
 </div>
 
-<!-- ЭКРАН ЛИЧНОГО КАБИНЕТА -->
 <div id="screen-dashboard" class="screen">
   <div class="header">
     <div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div>
@@ -263,7 +230,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <div id="dashboard-content"></div>
 </div>
 
-<!-- ЭКРАН УЧЕНИКА -->
 <div id="screen-student" class="screen">
   <div class="header"><div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div></div>
   <h1 style="font-size: 1.8rem; margin-bottom: 8px;">Привет, ученик! 🎒</h1>
@@ -276,7 +242,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
     <div class="role-grid" style="max-width: 100%;">
       <div class="role-btn" onclick="startSoloGame('math')"><div class="emoji">🔢</div><div class="label">Математика</div></div>
       <div class="role-btn" onclick="startSoloGame('russian')"><div class="emoji">📖</div><div class="label">Русский</div></div>
-      <div class="role-btn" onclick="startSoloGame('english')"><div class="emoji">🇬🇧</div><div class="label">Английский</div></div>
+      <div class="role-btn" onclick="startSoloGame('english')"><div class="emoji">🇧</div><div class="label">Английский</div></div>
     </div>
   </div>
   <div style="margin-top: 24px;">
@@ -286,10 +252,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <button class="btn btn-grey" style="margin-top: 16px;" onclick="showScreen('screen-role')">← На главную</button>
 </div>
 
-<!-- ЭКРАН РОДИТЕЛЯ -->
 <div id="screen-parent" class="screen">
   <div class="header"><div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div></div>
-  <div class="auth-mascot" style="margin-top: 20px;">🦊👓</div>
+  <div class="auth-mascot" style="margin-top: 20px;">🦊</div>
   <h1 style="font-size: 1.8rem; margin-bottom: 8px; text-align: center;">Вход родителя</h1>
   <p style="color: var(--text-light); margin-bottom: 24px; text-align: center;">Введи персональный код</p>
   <div class="input-group"><span class="input-icon">🏫</span><input type="text" id="parent-school-code" placeholder="Код школы (необязательно)" style="text-transform: uppercase;"></div>
@@ -299,7 +264,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <button class="btn btn-grey" style="margin-top: 24px;" onclick="showScreen('screen-role')">← На главную</button>
 </div>
 
-<!-- ЭКРАН ИГРЫ -->
 <div id="screen-game" class="screen" style="padding-bottom: 100px;">
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
     <span style="font-size: 1.2rem; font-weight: bold;">⭐ <span id="score-display">0</span></span>
@@ -312,7 +276,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <div id="feedback-text" style="text-align: center; font-weight: bold; margin-top: 20px; min-height: 28px; color: var(--orange);"></div>
 </div>
 
-<!-- ЭКРАН РЕЗУЛЬТАТА -->
 <div id="screen-result" class="screen" style="text-align: center; padding-top: 60px;">
   <div style="font-size: 5rem; margin-bottom: 16px;">🎉</div>
   <h1 style="font-size: 2rem; margin-bottom: 16px;">Раунд завершён!</h1>
@@ -320,10 +283,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <p id="result-comment" style="color: var(--text-light); margin-bottom: 32px;"></p>
   <button class="btn btn-orange" style="margin-bottom: 12px;" onclick="restartRound()">🔄 Ещё раз</button>
   <button class="btn btn-blue" style="margin-bottom: 12px;" onclick="showLeaderboard(state.classCode||null)">🏆 Таблица успеха</button>
-  <button class="btn btn-grey" onclick="showScreen('screen-role')">🏠 Домой</button>
+  <button class="btn btn-grey" onclick="showScreen('screen-role')"> Домой</button>
 </div>
 
-<!-- ЭКРАН ТАБЛИЦЫ ЛИДЕРОВ -->
 <div id="screen-leaderboard" class="screen">
   <div class="header"><div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div></div>
   <h1 style="font-size: 1.8rem; margin-bottom: 8px;">🏆 Таблица успеха</h1>
@@ -332,7 +294,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <button class="btn btn-grey" onclick="showScreen('screen-role')">← Назад</button>
 </div>
 
-<!-- ЭКРАН СОГЛАШЕНИЯ -->
 <div id="screen-agreement" class="screen" style="background: white; padding: 20px;">
   <h2 style="margin-bottom: 16px;">📜 Пользовательское соглашение</h2>
   <div style="line-height: 1.6; color: var(--text); margin-bottom: 24px;">
@@ -343,7 +304,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <button class="btn btn-orange" onclick="showScreen('screen-role')">Закрыть</button>
 </div>
 
-<!-- ЭКРАН ПОЛИТИКИ -->
 <div id="screen-privacy" class="screen" style="background: white; padding: 20px;">
   <h2 style="margin-bottom: 16px;">🔒 Политика конфиденциальности</h2>
   <div style="line-height: 1.6; color: var(--text); margin-bottom: 24px;">
@@ -354,7 +314,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <button class="btn btn-orange" onclick="showScreen('screen-role')">Закрыть</button>
 </div>
 
-<!-- ЭКРАН СЛОВАРЕЙ -->
 <div id="screen-dictionary-list" class="screen">
   <div class="header"><div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div></div>
   <h1 style="font-size: 1.8rem; margin-bottom: 8px;">📖 Словари</h1>
@@ -368,7 +327,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <button class="btn btn-grey" style="margin-top: 32px; max-width: 500px; margin-left: auto; margin-right: auto;" onclick="showScreen('screen-role')">← На главную</button>
 </div>
 
-<!-- ЭКРАН ТЕМ СЛОВАРЯ -->
 <div id="screen-dictionary-topics" class="screen">
   <div class="header"><div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div></div>
   <h1 style="font-size: 1.8rem; margin-bottom: 8px;" id="dict-subject-title">Предмет</h1>
@@ -377,7 +335,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <button class="btn btn-grey" style="margin-top: 24px; max-width: 500px; margin-left: auto; margin-right: auto;" onclick="showScreen('screen-dictionary-list')">← К словарям</button>
 </div>
 
-<!-- ЭКРАН КАРТОЧЕК -->
 <div id="screen-dictionary-cards" class="screen">
   <div class="header"><div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div></div>
   <h1 style="font-size: 1.5rem; margin-bottom: 8px;" id="cards-topic-title">Тема</h1>
@@ -398,10 +355,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <button class="btn btn-grey" style="margin-top: 24px; max-width: 500px; margin-left: auto; margin-right: auto;" onclick="showScreen('screen-dictionary-topics')">← К темам</button>
 </div>
 
-<!-- ЭКРАН ВЫБОРА ТЕМЫ УРОКА -->
 <div id="screen-topic-selector" class="screen">
   <div class="header"><div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div></div>
-  <h1 style="font-size: 1.8rem; margin-bottom: 8px;">📚 Выбор темы урока</h1>
+  <h1 style="font-size: 1.8rem; margin-bottom: 8px;"> Выбор темы урока</h1>
   <p style="color: var(--text-light); margin-bottom: 24px;">Выбери предмет и класс</p>
   <div class="topic-selector">
     <div class="selector-filters">
@@ -424,23 +380,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <button class="btn btn-grey" style="margin-top: 32px; max-width: 500px; margin-left: auto; margin-right: auto;" onclick="showScreen('screen-role')">← На главную</button>
 </div>
 
-<!-- ЭКРАН УРОКА -->
 <div id="screen-lesson" class="screen">
-  <div class="header"><div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div></div>
+  <div class="header"><div class="logo"><span class="logo-icon"></span> Лисёнок Пифагор</div></div>
   <h1 style="font-size: 1.5rem; margin-bottom: 8px;" id="lesson-title">Тема урока</h1>
   <p style="color: var(--text-light); margin-bottom: 20px;" id="lesson-subtitle">3 класс • Математика</p>
   <div class="lesson-tabs">
-    <div class="lesson-tab active" onclick="switchLessonTab('theory')">🎥 Теория</div>
-    <div class="lesson-tab" onclick="switchLessonTab('practice')">✏️ Практика</div>
+    <div class="lesson-tab active" onclick="switchLessonTab('theory', this)"> Теория</div>
+    <div class="lesson-tab" onclick="switchLessonTab('practice', this)">✏️ Практика</div>
   </div>
   <div id="lesson-theory">
     <div class="video-filter">
-      <div class="filter-btn active" onclick="setVideoFilter(5)">5 мин</div>
-      <div class="filter-btn" onclick="setVideoFilter(15)">15 мин</div>
-      <div class="filter-btn" onclick="setVideoFilter(20)">20 мин</div>
-      <div class="filter-btn" onclick="setVideoFilter(25)">25 мин</div>
-      <div class="filter-btn" onclick="setVideoFilter(30)">30 мин</div>
-      <div class="filter-btn" onclick="setVideoFilter(35)">35 мин</div>
+      <div class="filter-btn active" onclick="setVideoFilter(5, this)">5 мин</div>
+      <div class="filter-btn" onclick="setVideoFilter(15, this)">15 мин</div>
+      <div class="filter-btn" onclick="setVideoFilter(20, this)">20 мин</div>
+      <div class="filter-btn" onclick="setVideoFilter(25, this)">25 мин</div>
+      <div class="filter-btn" onclick="setVideoFilter(30, this)">30 мин</div>
+      <div class="filter-btn" onclick="setVideoFilter(35, this)">35 мин</div>
     </div>
     <div class="video-list" id="video-list"></div>
   </div>
@@ -455,7 +410,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 </div>
 
 <div id="toast" class="toast"></div>
-
 <script>
 // ===== СОСТОЯНИЕ =====
 const state = { 
@@ -480,7 +434,7 @@ const lessonTopics = {
 
 const dictionaries = {
   russian: { title: 'Русский язык', emoji: '🇷🇺', topics: [{ name: 'Безударные гласные', cards: [{ term: 'В_да', definition: 'Вода', example: 'Проверочное: вóды' }, { term: 'Л_сной', definition: 'Лесной', example: 'Проверочное: лéс' }] }] },
-  english: { title: 'Английский язык', emoji: '🇬🇧', topics: [{ name: 'Базовые слова', cards: [{ term: 'Hello', definition: 'Привет', example: 'Hello, how are you?' }] }] },
+  english: { title: 'Английский язык', emoji: '🇬', topics: [{ name: 'Базовые слова', cards: [{ term: 'Hello', definition: 'Привет', example: 'Hello, how are you?' }] }] },
   chemistry: { title: 'Химия', emoji: '⚗️', topics: [{ name: 'Элементы', cards: [{ term: 'H', definition: 'Водород', example: 'Самый лёгкий элемент' }] }] },
   physics: { title: 'Физика', emoji: '⚛️', topics: [{ name: 'Величины', cards: [{ term: 'Скорость (v)', definition: 'м/с', example: 'v = S / t' }] }] }
 };
@@ -528,8 +482,8 @@ function handleLogout() {
   }
 }
 
-function showSupport() { window.location.href = `mailto:iosif.marketing@yandex.ru?subject=Вопрос по Лисёнку Пифагору`; document.getElementById('user-dropdown').classList.remove('show'); }
-function showMyStats() { showToast('📊 Статистика в разработке'); document.getElementById('user-dropdown').classList.remove('show'); }
+function showSupport() { window.location.href = 'mailto:iosif.marketing@yandex.ru?subject=Вопрос по Лисёнку Пифагору'; document.getElementById('user-dropdown').classList.remove('show'); }
+function showMyStats() { showToast(' Статистика в разработке'); document.getElementById('user-dropdown').classList.remove('show'); }
 function showMyClasses() { showToast('🏫 Классы в разработке'); document.getElementById('user-dropdown').classList.remove('show'); }
 function showMyAssignments() { showToast('📝 Задания в разработке'); document.getElementById('user-dropdown').classList.remove('show'); }
 function showNotifications() { showToast('🔔 Нет новых уведомлений'); }
@@ -544,7 +498,7 @@ function openDictionary(subjectKey) {
     const item = document.createElement('div');
     item.className = 'topic-item';
     item.onclick = () => openTopic(subjectKey, index);
-    item.innerHTML = `<div class="topic-name">${topic.name}</div><div class="topic-count">${topic.cards.length} карточек</div>`;
+    item.innerHTML = '<div class="topic-name">' + topic.name + '</div><div class="topic-count">' + topic.cards.length + ' карточек</div>';
     list.appendChild(item);
   });
   showScreen('screen-dictionary-topics');
@@ -571,7 +525,7 @@ function showCard() {
   document.getElementById('card-term').textContent = card.term;
   document.getElementById('card-definition').textContent = card.definition;
   document.getElementById('card-example').textContent = card.example ? '📝 ' + card.example : '';
-  document.getElementById('flashcard-counter').textContent = `${state.currentCardIndex + 1} / ${state.currentCards.length}`;
+  document.getElementById('flashcard-counter').textContent = (state.currentCardIndex + 1) + ' / ' + state.currentCards.length;
 }
 
 function flipCard() {
@@ -600,15 +554,15 @@ function prevCard() {
 function updateTopics() {
   const subject = document.getElementById('subject-select').value;
   const grade = document.getElementById('grade-select').value;
-  const topics = lessonTopics[subject]?.[grade] || ['Тема 1', 'Тема 2'];
+  const topics = lessonTopics[subject] && lessonTopics[subject][grade] ? lessonTopics[subject][grade] : ['Тема 1', 'Тема 2'];
   const grid = document.getElementById('topic-grid');
   grid.innerHTML = '';
-  const icons = { math: '🔢', russian: '📖', english: '🇬🇧', chemistry: '⚗️', physics: '⚛️' };
+  const icons = { math: '🔢', russian: '📖', english: '🇬', chemistry: '⚗️', physics: '⚛️' };
   topics.forEach(topic => {
     const card = document.createElement('div');
     card.className = 'topic-card';
     card.onclick = () => openLesson(subject, grade, topic);
-    card.innerHTML = `<div class="topic-icon">${icons[subject] || '📚'}</div><div class="topic-name">${topic}</div>`;
+    card.innerHTML = '<div class="topic-icon">' + (icons[subject] || '') + '</div><div class="topic-name">' + topic + '</div>';
     grid.appendChild(card);
   });
 }
@@ -619,89 +573,91 @@ function openLesson(subject, grade, topic) {
   state.currentLessonTopic = topic;
   const subjectNames = { math: 'Математика', russian: 'Русский язык', english: 'Английский', chemistry: 'Химия', physics: 'Физика' };
   document.getElementById('lesson-title').textContent = topic;
-  document.getElementById('lesson-subtitle').textContent = `${grade} класс • ${subjectNames[subject]}`;
+  document.getElementById('lesson-subtitle').textContent = grade + ' класс • ' + subjectNames[subject];
   loadVideos();
   showScreen('screen-lesson');
 }
 
-function switchLessonTab(tab) {
+function switchLessonTab(tab, el) {
   state.currentLessonTab = tab;
   document.querySelectorAll('.lesson-tab').forEach(t => t.classList.remove('active'));
-  event.target.classList.add('active');
+  if (el) el.classList.add('active');
   document.getElementById('lesson-theory').style.display = tab === 'theory' ? 'block' : 'none';
   document.getElementById('lesson-practice').style.display = tab === 'practice' ? 'block' : 'none';
 }
 
-function setVideoFilter(minutes) {
+function setVideoFilter(minutes, el) {
   state.videoFilter = minutes;
   document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-  event.target.classList.add('active');
+  if (el) el.classList.add('active');
   loadVideos();
 }
 
-// ===== РЕАЛЬНЫЙ ЗАПРОС К VK API =====
-async function loadVideos() {
+// ===== ЗАПРОС К VK API ЧЕРЕЗ JSONP =====
+function loadVideos() {
   const videoList = document.getElementById('video-list');
   videoList.innerHTML = '<p style="text-align: center; color: var(--text-light);">🔍 Ищем видео ВКонтакте...</p>';
 
-  const query = `${state.currentLessonTopic} ${state.currentLessonGrade} класс`;
+  const query = state.currentLessonTopic + ' ' + state.currentLessonGrade + ' класс';
+  const callbackName = 'vkCallback_' + Date.now();
   
-  try {
-    // Запрос к API ВКонтакте
-    const url = `https://api.vk.com/method/video.search?q=${encodeURIComponent(query)}&access_token=${VK_API_TOKEN}&v=5.131&count=10&safe=1`;
-    const response = await fetch(url);
-    const data = await response.json();
-
+  const script = document.createElement('script');
+  const url = 'https://api.vk.com/method/video.search?q=' + encodeURIComponent(query) + '&access_token=' + VK_API_TOKEN + '&v=5.131&count=10&safe=1&callback=' + callbackName;
+  
+  window[callbackName] = function(data) {
     videoList.innerHTML = '';
-
+    
     if (data.error) {
-      videoList.innerHTML = `<p style="text-align: center; color: var(--red);">Ошибка API: ${data.error.error_msg}</p>`;
+      videoList.innerHTML = '<p style="text-align: center; color: var(--red);">Ошибка VK API: ' + data.error.error_msg + '</p>';
+      console.error('VK API Error:', data.error);
+      delete window[callbackName];
+      if (script.parentNode) document.body.removeChild(script);
       return;
     }
 
-    const videos = data.response.items;
-    if (!videos || videos.length === 0) {
+    const videos = data.response && data.response.items ? data.response.items : [];
+    if (videos.length === 0) {
       videoList.innerHTML = '<p style="text-align: center; color: var(--text-light);">Видео не найдены. Попробуй увеличить фильтр времени.</p>';
+      delete window[callbackName];
+      if (script.parentNode) document.body.removeChild(script);
       return;
     }
 
     videos.forEach(video => {
-      // Фильтр по времени (длительность в секундах)
       if (video.duration > state.videoFilter * 60) return;
 
       const card = document.createElement('div');
       card.className = 'video-card';
       
-      // Берем первую доступную обложку
       const thumbUrl = video.image && video.image.length > 0 ? video.image[0].url : '';
-      const videoUrl = `https://vk.com/video${video.owner_id}_${video.id}`;
+      const videoUrl = 'https://vk.com/video' + video.owner_id + '_' + video.id;
       const mins = Math.floor(video.duration / 60);
       const secs = String(video.duration % 60).padStart(2, '0');
 
-      card.innerHTML = `
-        <div class="video-thumbnail" style="background-image: url('${thumbUrl}');">
-          <div class="play-icon">▶</div>
-        </div>
-        <div class="video-info">
-          <div class="video-title">${video.title}</div>
-          <div class="video-meta">
-            <span style="color: var(--vk-blue); font-weight: 600;">📺 VK Видео ✅</span>
-            <span>⏱ ${mins}:${secs}</span>
-            <span>👁️ ${video.views || 0}</span>
-          </div>
-          <div class="video-actions">
-            <button class="btn-watch" onclick="window.open('${videoUrl}', '_blank')">▶ Смотреть</button>
-            <button class="btn-complain" onclick="complainVideo('${video.id}')">🚩 Жалоба</button>
-          </div>
-        </div>
-      `;
+      card.innerHTML = '<div class="video-thumbnail" style="background-image: url(\'' + thumbUrl + '\');"><div class="play-icon">▶</div></div><div class="video-info"><div class="video-title">' + video.title + '</div><div class="video-meta"><span style="color: var(--vk-blue); font-weight: 600;">📺 VK Видео ✅</span><span>⏱ ' + mins + ':' + secs + '</span><span>👁 ' + (video.views || 0) + '</span></div><div class="video-actions"><button class="btn-watch" onclick="window.open(\'' + videoUrl + '\', \'_blank\')">▶ Смотреть</button><button class="btn-complain" onclick="complainVideo(\'' + video.id + '\')">🚩 Жалоба</button></div></div>';
       videoList.appendChild(card);
     });
 
-  } catch (error) {
-    console.error('VK API Error:', error);
+    delete window[callbackName];
+    if (script.parentNode) document.body.removeChild(script);
+  };
+
+  script.onerror = function() {
     videoList.innerHTML = '<p style="text-align: center; color: var(--red);">Не удалось загрузить видео. Проверь интернет.</p>';
-  }
+    delete window[callbackName];
+    if (script.parentNode) document.body.removeChild(script);
+  };
+
+  script.src = url;
+  document.body.appendChild(script);
+  
+  setTimeout(() => {
+    if (window[callbackName]) {
+      videoList.innerHTML = '<p style="text-align: center; color: var(--red);">Таймаут запроса. Попробуй позже.</p>';
+      delete window[callbackName];
+      if (script.parentNode) document.body.removeChild(script);
+    }
+  }, 10000);
 }
 
 function complainVideo(videoId) {
@@ -730,7 +686,7 @@ function handleRegister() {
   auth.createUserWithEmailAndPassword(email, password)
     .then((uc) => {
       return db.collection('users').doc(uc.user.uid).set({
-        fio, email, role: selectedRole, schoolCode: schoolCode || null,
+        fio: fio, email: email, role: selectedRole, schoolCode: schoolCode || null,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       }).then(() => uc.user);
     })
@@ -764,16 +720,16 @@ function loadUserData(uid) {
   db.collection('users').doc(uid).get().then((doc) => {
     if (doc.exists) {
       const data = doc.data();
-      state.currentUser = { uid, ...data };
+      state.currentUser = { uid: uid, fio: data.fio, email: data.email, role: data.role };
       state.currentRole = data.role;
       
       document.getElementById('dropdown-user-name').textContent = data.fio || data.email;
       document.getElementById('user-avatar').textContent = (data.fio || '').charAt(0).toUpperCase();
       
-      const roleNames = { director: '🏫 Директор', deputy: '📋 Завуч', teacher: '👨‍🏫 Учитель' };
+      const roleNames = { director: '🏫 Директор', deputy: '📋 Завуч', teacher: '🧑‍ Учитель' };
       document.getElementById('dropdown-user-role').textContent = roleNames[data.role] || 'Пользователь';
       
-      const isStaff = ['teacher', 'deputy', 'director'].includes(data.role);
+      const isStaff = ['teacher', 'deputy', 'director'].indexOf(data.role) !== -1;
       document.getElementById('menu-classes').style.display = isStaff ? 'flex' : 'none';
       document.getElementById('menu-assignments').style.display = isStaff ? 'flex' : 'none';
       
@@ -788,7 +744,7 @@ function updateDashboard(data) {
     director: { welcome: 'Добро пожаловать, директор!', subtitle: 'Управление школой', stat1: 'Учителей', stat2: 'Учеников' },
     deputy: { welcome: 'Добро пожаловать, завуч!', subtitle: 'Учебный процесс', stat1: 'Классов', stat2: 'Учителей' },
     teacher: { welcome: 'Привет, ' + (data.fio ? data.fio.split(' ')[0] : 'учитель') + '!', subtitle: 'Личный кабинет', stat1: 'Моих классов', stat2: 'Заданий' }
-  }[data.role] || { welcome: 'Привет!', subtitle: 'Кабин', stat1: '...', stat2: '...' };
+  }[data.role] || { welcome: 'Привет!', subtitle: 'Кабинет', stat1: '...', stat2: '...' };
   
   document.getElementById('dashboard-welcome').textContent = config.welcome;
   document.getElementById('dashboard-subtitle').textContent = config.subtitle;
@@ -810,10 +766,10 @@ function onStudentCodeInput() {
     db.collection('classes').doc(code).get().then(doc => {
       if (doc.exists) {
         const cls = doc.data();
-        info.textContent = `✅ ${cls.name} · ${cls.grade} кл.`;
+        info.textContent = '✅ ' + cls.name + ' · ' + cls.grade + ' кл.';
         info.style.color = 'var(--green)';
         btn.style.display = 'block';
-        state.joinClass = { code, ...cls };
+        state.joinClass = { code: code, name: cls.name, grade: cls.grade };
       } else {
         info.textContent = '❌ Код не найден';
         info.style.color = 'var(--red)';
@@ -888,7 +844,7 @@ function checkAnswer(userVal) {
   if (!userVal) return;
   const correct = state.currentProblem.a;
   const isCorrect = compareAnswer(userVal, correct);
-  state.currentRoundHistory.push({ question: state.currentProblem.q, user: userVal, correct, isCorrect });
+  state.currentRoundHistory.push({ question: state.currentProblem.q, user: userVal, correct: correct, isCorrect: isCorrect });
   
   if (isCorrect) {
     state.score++; state.streak++;
@@ -897,7 +853,7 @@ function checkAnswer(userVal) {
     document.getElementById('game-mascot').textContent = '🎉';
   } else {
     state.streak = 0;
-    document.getElementById('feedback-text').textContent = `❌ Правильно: ${correct}`;
+    document.getElementById('feedback-text').textContent = '❌ Правильно: ' + correct;
     document.getElementById('feedback-text').style.color = 'var(--red)';
     document.getElementById('game-mascot').textContent = '😢';
   }
@@ -910,7 +866,7 @@ function endGame() {
   document.getElementById('result-name').textContent = state.nickname || 'Игрок';
   document.getElementById('final-score').textContent = state.score;
   document.getElementById('result-total').textContent = state.maxRounds;
-  document.getElementById('result-comment').textContent = state.score >= 9 ? 'Великолепно! 🏆' : state.score >= 7 ? 'Отлично! 👍' : 'Попробуй ещё! 💪';
+  document.getElementById('result-comment').textContent = state.score >= 9 ? 'Великолепно! ' : state.score >= 7 ? 'Отлично! 👍' : 'Попробуй ещё! 💪';
   saveResultToFirebase(state.nickname, state.score, state.grade, state.classCode, state.currentRoundHistory, state.maxRounds);
   showScreen('screen-result');
 }
@@ -924,7 +880,7 @@ function parentLogin() { showToast('Поиск ребёнка по коду (в 
 
 function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 function pick(arr) { return arr[rand(0, arr.length - 1)]; }
-function shuffle(arr) { for (let i = arr.length - 1; i > 0; i--) { let j = rand(0, i); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
+function shuffle(arr) { for (let i = arr.length - 1; i > 0; i--) { let j = rand(0, i); let tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp; } return arr; }
 function compareAnswer(u, c) {
   let us = String(u).trim().toLowerCase().replace(',', '.');
   let cs = String(c).trim().toLowerCase().replace(',', '.');
@@ -935,32 +891,30 @@ function compareAnswer(u, c) {
 function mkOptions(correct, distractors, count) {
   let set = [correct];
   let pool = shuffle(distractors.filter(d => d !== correct));
-  for (let d of pool) { if (set.length >= count) break; if (!set.includes(d)) set.push(d); }
+  for (let d of pool) { if (set.length >= count) break; if (set.indexOf(d) === -1) set.push(d); }
   return shuffle(set);
 }
 
 function generateProblem(grade, diff) {
-  let q = "", a = 0;
-  switch (grade) {
-    case 1: { let max = [10, 15, 20][diff]; if (Math.random() > 0.5) { let x = rand(1, Math.floor(max/2)), y = rand(1, Math.floor(max/2)); q = `${x} + ${y}`; a = x + y; } else { a = rand(2, max); let b = rand(1, a - 1); q = `${a} - ${b}`; a = a - b; } } break;
-    case 2: { let max = [40, 70, 100][diff]; if (Math.random() > 0.5) { let x = rand(5, max-10), y = rand(5, 20); q = `${x} + ${y}`; a = x + y; } else { let x = rand(20, max), y = rand(5, 19); q = `${x} - ${y}`; a = x - y; } } break;
-    case 3: { let m = [5, 7, 9][diff]; if (Math.random() > 0.5) { let x = rand(2, m), y = rand(2, m); q = `${x} × ${y}`; a = x * y; } else { let y = rand(2, m), r = rand(2, m); q = `${y*r} ÷ ${y}`; a = r; } } break;
-    case 4: { if (diff === 0) { let x = rand(10, 99), y = rand(10, 99), op = Math.random() > 0.5 ? '+' : '-'; if (op === '-' && x < y) [x, y] = [y, x]; q = `${x} ${op} ${y}`; a = op === '+' ? x + y : x - y; } else { let b = rand(2, 9), c = rand(2, 9), base = rand(10, 50); q = `${base} + ${b} × ${c}`; a = base + b * c; } } break;
-    case 5: { let den = rand(3, [6, 8, 10][diff]); let n1 = rand(1, den-2), n2 = rand(1, den-n1-1); q = `${n1}/${den} + ${n2}/${den}`; a = `${n1+n2}/${den}`; } break;
-    case 6: { let base = rand(2, 20) * 10, perc = [10, 20, 25, 50][rand(0, 3)]; q = `${perc}% от ${base}`; a = base * perc / 100; } break;
-    case 7: { let x = rand(1, 10), c = rand(2, 9); q = `${c}x = ${c*x}. Найди x.`; a = x; } break;
-    case 8: { let r = rand(2, 9); q = `x² = ${r*r}. Найди x.`; a = r; } break;
-    case 9: { let k = rand(2, 5), arg = rand(1, 5); q = `f(x) = ${k}x. Найди f(${arg})`; a = k * arg; } break;
-    case 10: { const tv = [{q:"sin 30°",a:0.5},{q:"cos 60°",a:0.5},{q:"sin 90°",a:1},{q:"tg 45°",a:1}]; let it = pick(tv); q = it.q; a = it.a; } break;
-    case 11: { let n = rand(2, 4); q = `Производная y = x^${n} в точке x=1`; a = n; } break;
-  }
+  let q = '', a = 0;
+  if (grade === 1) { let max = [10, 15, 20][diff]; if (Math.random() > 0.5) { let x = rand(1, Math.floor(max/2)), y = rand(1, Math.floor(max/2)); q = x + ' + ' + y; a = x + y; } else { a = rand(2, max); let b = rand(1, a - 1); q = a + ' - ' + b; a = a - b; } }
+  else if (grade === 2) { let max = [40, 70, 100][diff]; if (Math.random() > 0.5) { let x = rand(5, max-10), y = rand(5, 20); q = x + ' + ' + y; a = x + y; } else { let x = rand(20, max), y = rand(5, 19); q = x + ' - ' + y; a = x - y; } }
+  else if (grade === 3) { let m = [5, 7, 9][diff]; if (Math.random() > 0.5) { let x = rand(2, m), y = rand(2, m); q = x + ' × ' + y; a = x * y; } else { let y = rand(2, m), r = rand(2, m); q = (y*r) + ' ÷ ' + y; a = r; } }
+  else if (grade === 4) { if (diff === 0) { let x = rand(10, 99), y = rand(10, 99), op = Math.random() > 0.5 ? '+' : '-'; if (op === '-' && x < y) { let t = x; x = y; y = t; } q = x + ' ' + op + ' ' + y; a = op === '+' ? x + y : x - y; } else { let b = rand(2, 9), c = rand(2, 9), base = rand(10, 50); q = base + ' + ' + b + ' × ' + c; a = base + b * c; } }
+  else if (grade === 5) { let den = rand(3, [6, 8, 10][diff]); let n1 = rand(1, den-2), n2 = rand(1, den-n1-1); q = n1 + '/' + den + ' + ' + n2 + '/' + den; a = (n1+n2) + '/' + den; }
+  else if (grade === 6) { let base = rand(2, 20) * 10, perc = [10, 20, 25, 50][rand(0, 3)]; q = perc + '% от ' + base; a = base * perc / 100; }
+  else if (grade === 7) { let x = rand(1, 10), c = rand(2, 9); q = c + 'x = ' + (c*x) + '. Найди x.'; a = x; }
+  else if (grade === 8) { let r = rand(2, 9); q = 'x² = ' + (r*r) + '. Найди x.'; a = r; }
+  else if (grade === 9) { let k = rand(2, 5), arg = rand(1, 5); q = 'f(x) = ' + k + 'x. Найди f(' + arg + ')'; a = k * arg; }
+  else if (grade === 10) { const tv = [{q:'sin 30°',a:0.5},{q:'cos 60°',a:0.5},{q:'sin 90°',a:1},{q:'tg 45°',a:1}]; let it = pick(tv); q = it.q; a = it.a; }
+  else if (grade === 11) { let n = rand(2, 4); q = 'Производная y = x^' + n + ' в точке x=1'; a = n; }
   if (typeof a === 'number') a = parseFloat(a.toFixed(2));
-  return { q, a };
+  return { q: q, a: a };
 }
 
 async function saveResultToFirebase(name, score, grade, classCode, history, total) {
   try {
-    const attempt = { score, total: total || 10, history: history || [], time: firebase.firestore.FieldValue.serverTimestamp() };
+    const attempt = { score: score, total: total || 10, history: history || [], time: firebase.firestore.FieldValue.serverTimestamp() };
     const snapshot = await db.collection('leaders').where('name', '==', name).where('classCode', '==', classCode || '').get();
     if (!snapshot.empty) {
       const doc = snapshot.docs[0]; const data = doc.data();
@@ -969,7 +923,7 @@ async function saveResultToFirebase(name, score, grade, classCode, history, tota
       const newScore = score > data.score ? score : data.score;
       await doc.ref.update({ score: newScore, grade: grade, attempts: attempts });
     } else {
-      await db.collection('leaders').add({ name, score, grade, classCode: classCode || '', total: total || 10, attempts: [attempt] });
+      await db.collection('leaders').add({ name: name, score: score, grade: grade, classCode: classCode || '', total: total || 10, attempts: [attempt] });
     }
   } catch (e) { console.error(e); }
 }
@@ -982,19 +936,15 @@ async function showLeaderboard(classCode) {
     let query = db.collection('leaders');
     if (classCode) query = query.where('classCode', '==', classCode);
     const snapshot = await query.orderBy('score', 'desc').get();
-    const leaders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const leaders = snapshot.docs.map(doc => ({ id: doc.id, name: doc.data().name, score: doc.data().score, grade: doc.data().grade, total: doc.data().total }));
     document.getElementById('leaderboard-sub').textContent = classCode ? 'Лучшие результаты класса' : 'Лучшие из всех';
-    if (!leaders.length) { list.innerHTML = '<p style="text-align: center; color: var(--text-light);">Пока никто не играл. Стань первым! 🚀</p>'; return; }
+    if (leaders.length === 0) { list.innerHTML = '<p style="text-align: center; color: var(--text-light);">Пока никто не играл. Стань первым! 🚀</p>'; return; }
     list.innerHTML = '';
     leaders.slice(0, 20).forEach((l, i) => {
       const row = document.createElement('div');
       row.className = 'card'; row.style.display = 'flex'; row.style.alignItems = 'center'; row.style.gap = '14px';
-      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
-      row.innerHTML = `
-        <div style="width: 40px; height: 40px; border-radius: 50%; background: ${i < 3 ? '#FFD54F' : '#E8EDF2'}; display: flex; align-items: center; justify-content: center; font-size: ${i < 3 ? '1.2rem' : '1rem'};">${medal}</div>
-        <div style="flex: 1;"><div style="font-weight: bold; font-size: 1.05rem;">${l.name}</div><div style="color: var(--text-light); font-size: 0.85rem;">${l.grade} класс</div></div>
-        <div style="font-weight: bold; color: var(--orange); font-size: 1.2rem;">${l.score}/${l.total || 10}</div>
-      `;
+      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
+      row.innerHTML = '<div style="width: 40px; height: 40px; border-radius: 50%; background: ' + (i < 3 ? '#FFD54F' : '#E8EDF2') + '; display: flex; align-items: center; justify-content: center; font-size: ' + (i < 3 ? '1.2rem' : '1rem') + ';">' + medal + '</div><div style="flex: 1;"><div style="font-weight: bold; font-size: 1.05rem;">' + l.name + '</div><div style="color: var(--text-light); font-size: 0.85rem;">' + l.grade + ' класс</div></div><div style="font-weight: bold; color: var(--orange); font-size: 1.2rem;">' + l.score + '/' + (l.total || 10) + '</div>';
       list.appendChild(row);
     });
   } catch (e) { list.innerHTML = '<p style="text-align: center; color: var(--red);">Ошибка загрузки</p>'; }
