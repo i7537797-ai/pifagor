@@ -19,167 +19,93 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
-const VK_API_TOKEN = "fbcfaf20fbcfaf20fbcfaf20e8f88d5929ffbcffbcfaf2091b10ad3c9cf0f1bd6cdb9f7";
+const VK_APP_ID = "54720009";
+const VK_USER_TOKEN = "vk1.a.1cqBqoX59ZFLSmzP3poS_ypWyISJkvc2fIyT6uiNR9bhPT8DuC-2dCaNddHop6V3GaZ5muE6bW-ouX5KFXiT9sxAW9FaHnvs2jnaTCL1OZx1hVMOM_S9bycTygVvqk3V_sh8rHEGAWgNEklpwfI7CMS5Pnm9HKenzU6pJJPCSjxSw8wbmfkvdstdF9sf1HB_";
+localStorage.setItem('vk_user_token', VK_USER_TOKEN);
 </script>
 <style>
-:root {
-  --orange: #FF7043; --orange-dark: #E64A19; --blue: #2196F3; --blue-dark: #1565C0;
-  --green: #4CAF50; --red: #F44336; --bg: #F5F7FA; --card: #FFFFFF;
-  --text: #1A2332; --text-light: #6B7A8D; --border: #E0E6ED;
-  --vk-blue: #4C75A3;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+:root { --orange: #FF7043; --blue: #2196F3; --green: #4CAF50; --red: #F44336; --bg: #F5F7FA; --card: #FFF; --text: #1A2332; --text-light: #6B7A8D; --border: #E0E6ED; --vk-blue: #4C75A3; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 .screen { display: none; min-height: 100vh; padding: 20px; animation: fadeIn 0.3s; }
 .screen.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-.header { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; margin-bottom: 20px; position: relative; }
-.logo { display: flex; align-items: center; gap: 10px; font-size: 1.3rem; font-weight: bold; color: var(--text); }
-.logo-icon { font-size: 2rem; }
-.header-actions { display: flex; gap: 12px; align-items: center; }
-.avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--orange); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1rem; cursor: pointer; }
-.notification-bell { font-size: 1.5rem; cursor: pointer; position: relative; }
-.notification-badge { position: absolute; top: -4px; right: -4px; background: var(--red); color: white; font-size: 0.7rem; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.header { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; margin-bottom: 20px; }
+.logo { display: flex; align-items: center; gap: 10px; font-size: 1.3rem; font-weight: bold; }
+.avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--orange); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; overflow: hidden; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
 .card { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
-.card-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 12px; color: var(--text); }
-.btn { display: block; width: 100%; padding: 16px; border: none; border-radius: 16px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; text-align: center; }
+.btn { display: block; width: 100%; padding: 16px; border: none; border-radius: 16px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center; margin-bottom: 8px; }
 .btn:active { transform: scale(0.98); }
 .btn-orange { background: var(--orange); color: white; }
 .btn-blue { background: var(--blue); color: white; }
 .btn-grey { background: #E8EDF2; color: var(--text); }
+.btn-vk { background: #4C75A3; color: white; display: flex; align-items: center; justify-content: center; gap: 10px; }
+.btn-small { padding: 8px 16px; font-size: 0.9rem; width: auto; display: inline-block; margin-bottom: 0; margin-right: 8px; }
 .input-group { position: relative; margin-bottom: 16px; }
-.input-group input, .input-group select { width: 100%; padding: 16px 16px 16px 48px; border: 2px solid var(--border); border-radius: 14px; font-size: 1rem; font-family: inherit; background: white; outline: none; transition: border 0.2s; }
-.input-group input:focus { border-color: var(--orange); }
+.input-group input, .input-group select { width: 100%; padding: 16px 16px 16px 48px; border: 2px solid var(--border); border-radius: 14px; font-size: 1rem; background: white; outline: none; }
 .input-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 1.3rem; color: var(--text-light); }
 .role-screen { display: flex; flex-direction: column; align-items: center; padding-top: 40px; }
-.mascot-big { font-size: 6rem; margin-bottom: 20px; animation: bounce 2s infinite; }
-@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-.title-main { font-size: 2rem; font-weight: bold; margin-bottom: 8px; color: var(--text); }
-.subtitle-main { font-size: 1.1rem; color: var(--text-light); margin-bottom: 32px; }
+.mascot-big { font-size: 6rem; margin-bottom: 20px; }
+.title-main { font-size: 2rem; font-weight: bold; margin-bottom: 8px; }
+.subtitle-main { font-size: 1.1rem; color: var(--text-light); margin-bottom: 32px; text-align: center; }
 .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; max-width: 400px; margin-bottom: 16px; }
-.role-btn { background: white; border: 2px solid var(--border); border-radius: 16px; padding: 20px 12px; cursor: pointer; transition: all 0.2s; text-align: center; }
+.role-btn { background: white; border: 2px solid var(--border); border-radius: 16px; padding: 20px; cursor: pointer; text-align: center; transition: all 0.2s; }
 .role-btn:active { transform: scale(0.95); }
-.role-btn:hover { border-color: var(--orange); box-shadow: 0 4px 12px rgba(255,112,67,0.2); }
 .role-btn .emoji { font-size: 2.5rem; margin-bottom: 8px; }
-.role-btn .label { font-size: 0.95rem; font-weight: 600; color: var(--text); }
 .role-btn.full { grid-column: 1 / -1; }
 .auth-screen { max-width: 420px; margin: 0 auto; padding-top: 40px; }
 .auth-mascot { text-align: center; font-size: 5rem; margin-bottom: 20px; }
 .auth-title { text-align: center; font-size: 1.8rem; font-weight: bold; margin-bottom: 24px; }
-.auth-links { text-align: center; margin-top: 16px; }
-.auth-links a { color: var(--blue); text-decoration: none; font-size: 0.95rem; }
-.auth-footer { text-align: center; margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 0.85rem; color: var(--text-light); }
-.auth-footer a { color: var(--text-light); text-decoration: none; margin: 0 8px; }
 .consent-label { display: flex; align-items: flex-start; gap: 10px; margin: 16px 0; font-size: 0.9rem; color: var(--text-light); cursor: pointer; }
-.consent-label input[type="checkbox"] { width: 20px; height: 20px; margin-top: 2px; cursor: pointer; accent-color: var(--orange); }
+.consent-label input[type="checkbox"] { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--orange); }
 .consent-label a { color: var(--blue); text-decoration: underline; }
-.dropdown-menu { display: none; position: absolute; right: 0; top: 55px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 1000; min-width: 220px; overflow: hidden; animation: fadeIn 0.2s; }
-.dropdown-menu.show { display: block; }
-.dropdown-header { padding: 14px 16px; font-weight: bold; color: var(--text); font-size: 0.95rem; border-bottom: 1px solid var(--border); background: #f8f9fa; }
-.dropdown-role { padding: 4px 16px 12px; font-size: 0.8rem; color: var(--text-light); border-bottom: 1px solid var(--border); background: #f8f9fa; }
-.dropdown-item { padding: 14px 16px; cursor: pointer; border-bottom: 1px solid #f0f0f0; transition: background 0.2s; font-size: 0.95rem; display: flex; align-items: center; gap: 10px; }
-.dropdown-item:hover { background: #f8f9fa; }
-.dropdown-item:last-child { border-bottom: none; }
-.dropdown-item.logout { color: var(--red); font-weight: 600; }
-.dictionary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 500px; margin: 0 auto; }
-.dictionary-card { background: white; border-radius: 20px; padding: 30px 20px; text-align: center; cursor: pointer; transition: all 0.2s; border: 2px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-.dictionary-card:active { transform: scale(0.95); }
-.dictionary-card:hover { border-color: var(--orange); box-shadow: 0 4px 16px rgba(255,112,67,0.15); }
-.dictionary-card .dict-emoji { font-size: 3.5rem; margin-bottom: 12px; }
-.dictionary-card .dict-title { font-size: 1.1rem; font-weight: bold; color: var(--text); }
-.dictionary-card .dict-count { font-size: 0.85rem; color: var(--text-light); margin-top: 4px; }
-.topic-list { max-width: 600px; margin: 0 auto; }
-.topic-item { background: white; border-radius: 14px; padding: 18px 20px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s; border: 2px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-.topic-item:active { transform: scale(0.98); }
-.topic-item:hover { border-color: var(--orange); }
-.topic-item .topic-name { font-weight: 600; font-size: 1.05rem; }
-.topic-item .topic-count { color: var(--text-light); font-size: 0.9rem; }
-.flashcard-container { max-width: 500px; margin: 0 auto; padding: 20px 0; }
-.flashcard { background: white; border-radius: 24px; padding: 40px 30px; min-height: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: all 0.3s; border: 3px solid var(--border); position: relative; }
-.flashcard.flipped { border-color: var(--orange); background: #FFF8F5; }
-.flashcard .card-term { font-size: 2rem; font-weight: bold; color: var(--text); margin-bottom: 12px; }
-.flashcard .card-hint { font-size: 0.9rem; color: var(--text-light); }
-.flashcard .card-definition { font-size: 1.3rem; color: var(--orange-dark); margin-top: 16px; font-weight: 600; }
-.flashcard .card-example { font-size: 1rem; color: var(--text-light); margin-top: 12px; font-style: italic; }
-.flashcard-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; gap: 12px; }
-.flashcard-nav .btn { flex: 1; }
-.flashcard-counter { text-align: center; color: var(--text-light); font-size: 0.95rem; margin-top: 16px; }
-.topic-selector { max-width: 600px; margin: 0 auto; }
-.selector-filters { display: flex; gap: 12px; margin-bottom: 24px; }
-.selector-filters select { flex: 1; padding: 14px; border: 2px solid var(--border); border-radius: 12px; font-size: 1rem; background: white; cursor: pointer; }
-.selector-filters select:focus { border-color: var(--orange); outline: none; }
-.topic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.topic-card { background: white; border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.2s; border: 2px solid var(--border); text-align: center; }
-.topic-card:active { transform: scale(0.95); }
-.topic-card:hover { border-color: var(--orange); box-shadow: 0 4px 12px rgba(255,112,67,0.15); }
-.topic-card .topic-icon { font-size: 2.5rem; margin-bottom: 8px; }
-.topic-card .topic-name { font-weight: 600; font-size: 0.95rem; color: var(--text); }
-.lesson-tabs { display: flex; gap: 0; margin-bottom: 20px; border-bottom: 2px solid var(--border); }
-.lesson-tab { flex: 1; padding: 14px; text-align: center; cursor: pointer; font-weight: 600; color: var(--text-light); transition: all 0.2s; border-bottom: 3px solid transparent; margin-bottom: -2px; }
-.lesson-tab.active { color: var(--orange); border-bottom-color: var(--orange); }
-.lesson-tab:hover { background: #f8f9fa; }
-.video-filter { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
-.filter-btn { padding: 8px 14px; border: 2px solid var(--border); border-radius: 20px; background: white; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
-.filter-btn.active { background: var(--orange); color: white; border-color: var(--orange); }
-.filter-btn:hover { border-color: var(--orange); }
-.video-list { display: flex; flex-direction: column; gap: 12px; }
-.video-card { background: white; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-.video-thumbnail { width: 100%; height: 180px; background: #222; display: flex; align-items: center; justify-content: center; font-size: 3rem; cursor: pointer; position: relative; background-size: cover; background-position: center; }
-.video-thumbnail .play-icon { position: absolute; width: 60px; height: 60px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
-.video-info { padding: 14px; }
-.video-title { font-weight: 600; font-size: 1rem; margin-bottom: 8px; }
-.video-meta { display: flex; gap: 12px; font-size: 0.85rem; color: var(--text-light); margin-bottom: 10px; flex-wrap: wrap; }
-.video-meta span { display: flex; align-items: center; gap: 4px; }
-.video-actions { display: flex; gap: 8px; }
-.video-actions button { flex: 1; padding: 8px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
-.btn-watch { background: var(--orange); color: white; }
-.btn-complain { background: #f0f0f0; color: var(--text); }
-.toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--text); color: white; padding: 12px 20px; border-radius: 24px; font-size: 0.95rem; opacity: 0; transition: opacity 0.3s; z-index: 2000; max-width: 90%; text-align: center; }
+.divider { text-align: center; margin: 20px 0; color: var(--text-light); font-size: 0.9rem; position: relative; }
+.divider::before, .divider::after { content: ''; position: absolute; top: 50%; width: 40%; height: 1px; background: var(--border); }
+.divider::before { left: 0; } .divider::after { right: 0; }
+.child-card { background: white; border-radius: 14px; padding: 16px; margin-bottom: 12px; border: 2px solid var(--border); }
+.child-card.vk-blocked { border-color: var(--red); background: #FFF5F5; }
+.child-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--text); color: white; padding: 12px 20px; border-radius: 24px; opacity: 0; transition: opacity 0.3s; z-index: 2000; }
 .toast.show { opacity: 0.95; }
-.dashboard-welcome { font-size: 1.5rem; font-weight: bold; margin-bottom: 8px; }
-.dashboard-subtitle { color: var(--text-light); margin-bottom: 24px; }
-.dashboard-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-.stat-card { background: white; padding: 16px; border-radius: 14px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-.stat-value { font-size: 1.8rem; font-weight: bold; color: var(--orange); }
-.stat-label { font-size: 0.85rem; color: var(--text-light); margin-top: 4px; }
-@media (min-width: 768px) {
-  .role-grid { grid-template-columns: repeat(3, 1fr); max-width: 600px; }
-  .topic-grid { grid-template-columns: repeat(3, 1fr); }
-}
+.dropdown-menu { display: none; position: absolute; right: 0; top: 60px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); min-width: 220px; z-index: 1000; }
+.dropdown-menu.show { display: block; }
+.dropdown-item { padding: 14px 16px; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
+.dropdown-item.logout { color: var(--red); }
+.video-card { background: white; border-radius: 14px; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); }
 </style>
 </head>
 <body>
 
 <div id="screen-role" class="screen role-screen active">
-  <div class="mascot-big"></div>
+  <div class="mascot-big">🦊</div>
   <div class="title-main">Лисёнок Пифагор</div>
-  <div class="subtitle-main">Кто ты?</div>
+  <div class="subtitle-main">Кто вы?</div>
   <div class="role-grid">
-    <div class="role-btn" onclick="showAuth('director')"><div class="emoji"></div><div class="label">Я директор</div></div>
-    <div class="role-btn" onclick="showAuth('deputy')"><div class="emoji">📋</div><div class="label">Я завуч</div></div>
-    <div class="role-btn" onclick="showAuth('teacher')"><div class="emoji">🧑‍🏫</div><div class="label">Я учитель</div></div>
-    <div class="role-btn" onclick="showScreen('screen-student')"><div class="emoji">🎒</div><div class="label">Я ученик</div></div>
-    <div class="role-btn full" onclick="showScreen('screen-parent')"><div class="emoji">👪</div><div class="label">Я родитель</div></div>
+    <div class="role-btn" onclick="showAuth('director')"><div class="emoji">🏫</div><div>Я директор</div></div>
+    <div class="role-btn" onclick="showAuth('deputy')"><div class="emoji">📋</div><div>Я завуч</div></div>
+    <div class="role-btn" onclick="showAuth('teacher')"><div class="emoji">👨‍🏫</div><div>Я учитель</div></div>
+    <div class="role-btn" onclick="showScreen('screen-student')"><div class="emoji">🎒</div><div>Я ученик</div></div>
+    <div class="role-btn full" onclick="showScreen('screen-parent')"><div class="emoji">👪</div><div>Я родитель</div></div>
   </div>
   <div style="margin-top: 24px; width: 100%; max-width: 400px;">
-    <button class="btn btn-grey" onclick="showScreen('screen-dictionary-list')" style="margin-bottom: 8px;">📖 Словари</button>
-    <button class="btn btn-grey" onclick="showScreen('screen-topic-selector')" style="margin-bottom: 8px;">📚 Уроки</button>
-    <button class="btn btn-grey" onclick="showLeaderboard(null)">🏆 Таблица успеха</button>
+    <button class="btn btn-grey" onclick="showScreen('screen-topic-selector')">📚 Уроки</button>
+    <button class="btn btn-grey" onclick="showLeaderboard()">🏆 Таблица успеха</button>
   </div>
-  <div class="auth-footer" style="margin-top: 32px; border: none;">
-    <a href="#" onclick="showScreen('screen-agreement'); return false;">Пользовательское соглашение</a>
-    <a href="#" onclick="showScreen('screen-privacy'); return false;">Политика конфиденциальности</a>
+  <div style="margin-top: 32px; text-align: center; font-size: 0.85rem; color: var(--text-light);">
+    <a href="#" onclick="showScreen('screen-agreement')">Соглашение</a> | <a href="#" onclick="showScreen('screen-privacy')">Конфиденциальность</a>
   </div>
 </div>
 
 <div id="screen-auth" class="screen auth-screen">
-  <div class="auth-mascot"></div>
+  <div class="auth-mascot">🦊</div>
   <div class="auth-title" id="auth-title">Вход</div>
   <div class="input-group"><span class="input-icon">✉️</span><input type="email" id="auth-email" placeholder="Email"></div>
   <div class="input-group"><span class="input-icon">🔒</span><input type="password" id="auth-password" placeholder="Пароль"></div>
-  <div class="auth-links"><a href="#" onclick="showScreen('screen-forgot'); return false;">Забыли пароль?</a></div>
-  <button class="btn btn-orange" style="margin-top: 24px;" onclick="handleLogin()">Войти</button>
-  <div class="auth-links" style="margin-top: 16px;">Нет аккаунта? <a href="#" onclick="showScreen('screen-register'); return false;">Зарегистрироваться</a></div>
+  <button class="btn btn-orange" onclick="handleLogin()">Войти</button>
+  <div class="divider">или</div>
+  <button class="btn btn-vk" onclick="loginWithVK()"><span style="font-size: 1.3rem;">🔵</span> Войти через VK</button>
+  <div style="text-align: center; margin-top: 16px;"><a href="#" onclick="showScreen('screen-register')" style="color: var(--blue);">Зарегистрироваться</a></div>
   <button class="btn btn-grey" style="margin-top: 24px;" onclick="showScreen('screen-role')">← На главную</button>
 </div>
 
@@ -189,768 +115,427 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <div class="input-group"><span class="input-icon">👤</span><input type="text" id="reg-fio" placeholder="ФИО"></div>
   <div class="input-group"><span class="input-icon">✉️</span><input type="email" id="reg-email" placeholder="Email"></div>
   <div class="input-group"><span class="input-icon">🔒</span><input type="password" id="reg-password" placeholder="Пароль (мин. 6 символов)"></div>
-  <div class="input-group" id="reg-school-group" style="display: none;"><span class="input-icon">🏫</span><input type="text" id="reg-school-code" placeholder="Код школы" style="text-transform: uppercase;"></div>
-  <label class="consent-label"><input type="checkbox" id="reg-consent"><span>Я согласен с <a href="#" onclick="showScreen('screen-agreement'); return false;">соглашением</a> и <a href="#" onclick="showScreen('screen-privacy'); return false;">политикой</a></span></label>
+  <div class="input-group" id="reg-org-group" style="display: none;">
+    <span class="input-icon">🏫</span>
+    <select id="reg-org-type" onchange="updateOrgPreview()">
+      <option value="school">Школа</option>
+      <option value="gymnasium">Гимназия</option>
+      <option value="lyceum">Лицей</option>
+      <option value="other">Другое</option>
+    </select>
+  </div>
+  <div class="input-group" id="reg-org-details" style="display: none;">
+    <input type="text" id="reg-org-number" placeholder="№ (необязательно)" style="margin-bottom: 8px;">
+    <input type="text" id="reg-org-name" placeholder="Название (например: Форватор)">
+  </div>
+  <div id="org-preview" style="text-align: center; padding: 10px; background: #f0f0f0; border-radius: 8px; margin-bottom: 16px; display: none; font-weight: bold; color: var(--orange);"></div>
+  <label class="consent-label"><input type="checkbox" id="reg-consent"><span>Я согласен с <a href="#" onclick="showScreen('screen-agreement')">соглашением</a> и <a href="#" onclick="showScreen('screen-privacy')">политикой</a></span></label>
   <button class="btn btn-orange" onclick="handleRegister()">Зарегистрироваться</button>
   <button class="btn btn-grey" style="margin-top: 24px;" onclick="showScreen('screen-role')">← На главную</button>
 </div>
 
-<div id="screen-forgot" class="screen auth-screen">
-  <div class="auth-mascot">❓</div>
-  <div class="auth-title">Забыли пароль?</div>
-  <p style="text-align: center; color: var(--text-light); margin-bottom: 24px;">Введите email для сброса.</p>
-  <div class="input-group"><span class="input-icon">️</span><input type="email" id="forgot-email" placeholder="Email"></div>
-  <button class="btn btn-orange" onclick="handleForgot()">Отправить ссылку</button>
-  <button class="btn btn-grey" style="margin-top: 24px;" onclick="showScreen('screen-role')">← На главную</button>
-</div>
-
-<div id="screen-dashboard" class="screen">
-  <div class="header">
-    <div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div>
-    <div class="header-actions">
-      <div class="notification-bell" onclick="showNotifications()">🔔<span class="notification-badge" id="notif-badge" style="display: none;">0</span></div>
-      <div class="avatar" onclick="toggleDropdown()" id="user-avatar">👤</div>
-      <div class="dropdown-menu" id="user-dropdown">
-        <div class="dropdown-header" id="dropdown-user-name">Гость</div>
-        <div class="dropdown-role" id="dropdown-user-role">Роль не указана</div>
-        <div class="dropdown-item" onclick="showMyStats()">📊 Моя статистика</div>
-        <div class="dropdown-item" id="menu-classes" style="display: none;" onclick="showMyClasses()">🏫 Мои классы</div>
-        <div class="dropdown-item" id="menu-assignments" style="display: none;" onclick="showMyAssignments()">📝 Мои задания</div>
-        <div class="dropdown-item" onclick="showSupport()">💬 Поддержка</div>
-        <div class="dropdown-item logout" onclick="handleLogout()">🚪 Выйти</div>
-      </div>
-    </div>
-  </div>
-  <div class="dashboard-welcome" id="dashboard-welcome">Добро пожаловать!</div>
-  <div class="dashboard-subtitle" id="dashboard-subtitle">Ваш личный кабинет</div>
-  <div class="dashboard-stats">
-    <div class="stat-card"><div class="stat-value" id="stat-1">0</div><div class="stat-label" id="stat-1-label">Загрузка...</div></div>
-    <div class="stat-card"><div class="stat-value" id="stat-2">0</div><div class="stat-label" id="stat-2-label">Загрузка...</div></div>
-  </div>
-  <div id="dashboard-content"></div>
-</div>
-
 <div id="screen-student" class="screen">
-  <div class="header"><div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div></div>
+  <div class="header"><div class="logo">🦊 Лисёнок Пифагор</div></div>
   <h1 style="font-size: 1.8rem; margin-bottom: 8px;">Привет, ученик! 🎒</h1>
   <p style="color: var(--text-light); margin-bottom: 24px;">Введи код класса от учителя</p>
-  <div class="input-group"><span class="input-icon">🏫</span><input type="text" id="student-code" placeholder="КОД КЛАССА" maxlength="6" style="text-transform: uppercase; text-align: center; font-size: 1.3rem; letter-spacing: 2px;" oninput="onStudentCodeInput()"></div>
+  <div class="input-group"><span class="input-icon">🏫</span><input type="text" id="student-code" placeholder="КОД КЛАССА" maxlength="6" style="text-transform: uppercase; text-align: center; font-size: 1.3rem;" oninput="onStudentCodeInput()"></div>
   <div id="class-info" style="text-align: center; font-weight: bold; color: var(--green); margin-bottom: 16px; min-height: 24px;"></div>
-  <button class="btn btn-orange" id="student-start-btn" style="display: none;" onclick="startClassGame()">▶ Начать!</button>
-  <div style="margin-top: 32px;">
-    <p style="color: var(--text-light); margin-bottom: 16px;">Нет кода? Играй сам 🎮</p>
-    <div class="role-grid" style="max-width: 100%;">
-      <div class="role-btn" onclick="startSoloGame('math')"><div class="emoji">🔢</div><div class="label">Математика</div></div>
-      <div class="role-btn" onclick="startSoloGame('russian')"><div class="emoji">📖</div><div class="label">Русский</div></div>
-      <div class="role-btn" onclick="startSoloGame('english')"><div class="emoji">🇧</div><div class="label">Английский</div></div>
+  <div id="vk-login-section" style="display: none; margin-top: 24px;">
+    <div class="card">
+      <h3 style="margin-bottom: 16px;">Вход через VK ID</h3>
+      <label class="consent-label" style="margin-bottom: 16px;">
+        <input type="checkbox" id="vk-consent-student">
+        <span>Мне есть 14 лет, либо у меня есть <b>согласие родителей</b> на использование VK ID. Родитель получит уведомление о моём входе.</span>
+      </label>
+      <button class="btn btn-vk" id="btn-vk-student" onclick="studentLoginWithVK()" disabled><span style="font-size: 1.3rem;">🔵</span> Войти через VK</button>
     </div>
-  </div>
-  <div style="margin-top: 24px;">
-    <p style="color: var(--text-light); margin-bottom: 12px;">Как тебя зовут?</p>
-    <div class="input-group"><span class="input-icon">👤</span><input type="text" id="nickname-input" placeholder="Твоё имя..." maxlength="20"></div>
   </div>
   <button class="btn btn-grey" style="margin-top: 16px;" onclick="showScreen('screen-role')">← На главную</button>
 </div>
 
 <div id="screen-parent" class="screen">
-  <div class="header"><div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div></div>
+  <div class="header"><div class="logo">🦊 Лисёнок Пифагор</div></div>
   <div class="auth-mascot" style="margin-top: 20px;">🦊</div>
   <h1 style="font-size: 1.8rem; margin-bottom: 8px; text-align: center;">Вход родителя</h1>
-  <p style="color: var(--text-light); margin-bottom: 24px; text-align: center;">Введи персональный код</p>
-  <div class="input-group"><span class="input-icon">🏫</span><input type="text" id="parent-school-code" placeholder="Код школы (необязательно)" style="text-transform: uppercase;"></div>
-  <div class="input-group"><span class="input-icon">🔑</span><input type="text" id="parent-code-input" placeholder="Код родителя (P-XXXX)" maxlength="8" style="text-transform: uppercase; text-align: center; font-size: 1.2rem; letter-spacing: 2px;"></div>
-  <div id="parent-error" style="text-align: center; color: var(--red); font-weight: bold; margin-bottom: 16px; display: none;"></div>
-  <button class="btn btn-orange" onclick="parentLogin()">🔍 Найти ребёнка</button>
+  <div class="input-group"><span class="input-icon">✉️</span><input type="email" id="parent-email" placeholder="Email"></div>
+  <div class="input-group"><span class="input-icon">🔒</span><input type="password" id="parent-password" placeholder="Пароль"></div>
+  <button class="btn btn-orange" onclick="parentLoginWithEmail()">Войти</button>
+  <div class="divider">или</div>
+  <button class="btn btn-vk" onclick="loginWithVK()"><span style="font-size: 1.3rem;">🔵</span> Войти через VK</button>
+  <div id="parent-children-list" style="margin-top: 24px; display: none;">
+    <h3 style="margin-bottom: 16px;">Мои дети</h3>
+    <div id="children-container"></div>
+    <button class="btn btn-blue" style="margin-top: 16px;" onclick="addChild()">+ Добавить ребёнка по коду</button>
+  </div>
   <button class="btn btn-grey" style="margin-top: 24px;" onclick="showScreen('screen-role')">← На главную</button>
 </div>
 
-<div id="screen-game" class="screen" style="padding-bottom: 100px;">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-    <span style="font-size: 1.2rem; font-weight: bold;">⭐ <span id="score-display">0</span></span>
-    <span style="font-size: 1.1rem;">🔥 <span id="streak-count">0</span></span>
+<div id="screen-dashboard" class="screen">
+  <div class="header">
+    <div class="logo">🦊 Лисёнок Пифагор</div>
+    <div style="position: relative;">
+      <div class="avatar" onclick="toggleDropdown()" id="user-avatar">👤</div>
+      <div class="dropdown-menu" id="user-dropdown">
+        <div class="dropdown-item" id="dropdown-user-name" style="font-weight: bold; padding: 14px 16px; border-bottom: 1px solid var(--border);">Гость</div>
+        <div class="dropdown-item" onclick="showMyChildren()">👪 Мои дети</div>
+        <div class="dropdown-item logout" onclick="handleLogout()">🚪 Выйти</div>
+      </div>
+    </div>
   </div>
-  <div style="background: #E8EDF2; border-radius: 8px; height: 10px; margin-bottom: 24px; overflow: hidden;"><div id="progress-fill" style="background: var(--orange); height: 100%; width: 0%; transition: width 0.5s;"></div></div>
-  <div style="text-align: center; font-size: 4rem; margin-bottom: 16px;" id="game-mascot">🦊</div>
-  <div id="question-text" style="font-size: 1.8rem; font-weight: bold; text-align: center; margin-bottom: 32px; min-height: 60px;"></div>
-  <div id="input-area" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 500px; margin: 0 auto;"></div>
-  <div id="feedback-text" style="text-align: center; font-weight: bold; margin-top: 20px; min-height: 28px; color: var(--orange);"></div>
+  <h1 id="dashboard-welcome" style="font-size: 1.5rem; font-weight: bold; margin-bottom: 8px;">Добро пожаловать!</h1>
+  <div id="dashboard-content"></div>
 </div>
 
-<div id="screen-result" class="screen" style="text-align: center; padding-top: 60px;">
-  <div style="font-size: 5rem; margin-bottom: 16px;">🎉</div>
-  <h1 style="font-size: 2rem; margin-bottom: 16px;">Раунд завершён!</h1>
-  <p style="font-size: 1.3rem; margin-bottom: 8px;"><span id="result-name">Игрок</span>, ты решил <b id="final-score">0</b> из <b id="result-total">10</b></p>
-  <p id="result-comment" style="color: var(--text-light); margin-bottom: 32px;"></p>
-  <button class="btn btn-orange" style="margin-bottom: 12px;" onclick="restartRound()">🔄 Ещё раз</button>
-  <button class="btn btn-blue" style="margin-bottom: 12px;" onclick="showLeaderboard(state.classCode||null)">🏆 Таблица успеха</button>
-  <button class="btn btn-grey" onclick="showScreen('screen-role')"> Домой</button>
+<div id="screen-topic-selector" class="screen">
+  <div class="header"><div class="logo">🦊 Лисёнок Пифагор</div></div>
+  <h1 style="font-size: 1.8rem; margin-bottom: 8px;">📚 Выбор темы урока</h1>
+  <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+    <select id="subject-select" onchange="updateTopics()" style="flex: 1; padding: 14px; border: 2px solid var(--border); border-radius: 12px;">
+      <option value="math">🔢 Математика</option><option value="russian">📖 Русский язык</option><option value="english">🇬🇧 Английский</option>
+    </select>
+    <select id="grade-select" onchange="updateTopics()" style="flex: 1; padding: 14px; border: 2px solid var(--border); border-radius: 12px;">
+      <option value="1">1 класс</option><option value="2">2 класс</option><option value="3" selected>3 класс</option><option value="4">4 класс</option><option value="5">5 класс</option>
+    </select>
+  </div>
+  <div id="topic-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;"></div>
+  <button class="btn btn-grey" style="margin-top: 32px;" onclick="showScreen('screen-role')">← На главную</button>
 </div>
 
-<div id="screen-leaderboard" class="screen">
-  <div class="header"><div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div></div>
-  <h1 style="font-size: 1.8rem; margin-bottom: 8px;">🏆 Таблица успеха</h1>
-  <p id="leaderboard-sub" style="color: var(--text-light); margin-bottom: 24px;">Лучшие результаты</p>
-  <div id="leaderboard-list" style="margin-bottom: 80px;"></div>
-  <button class="btn btn-grey" onclick="showScreen('screen-role')">← Назад</button>
+<div id="screen-lesson" class="screen">
+  <div class="header"><div class="logo">🦊 Лисёнок Пифагор</div></div>
+  <h1 id="lesson-title" style="font-size: 1.5rem; margin-bottom: 8px;">Тема урока</h1>
+  <p id="lesson-subtitle" style="color: var(--text-light); margin-bottom: 20px;">3 класс • Математика</p>
+  <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
+    <button class="btn btn-small btn-orange" onclick="setVideoFilter(5, this)">5 мин</button>
+    <button class="btn btn-small btn-grey" onclick="setVideoFilter(15, this)">15 мин</button>
+    <button class="btn btn-small btn-grey" onclick="setVideoFilter(30, this)">30 мин</button>
+  </div>
+  <div id="video-list"></div>
+  <button class="btn btn-grey" style="margin-top: 24px;" onclick="showScreen('screen-topic-selector')">← К темам</button>
 </div>
 
 <div id="screen-agreement" class="screen" style="background: white; padding: 20px;">
   <h2 style="margin-bottom: 16px;">📜 Пользовательское соглашение</h2>
-  <div style="line-height: 1.6; color: var(--text); margin-bottom: 24px;">
-    <p>1. Игра "Лисёнок Пифагор" предоставляется бесплатно.</p>
-    <p>2. Оператор не несёт ответственности за успеваемость.</p>
-    <p>3. Контакты: iosif.marketing@yandex.ru</p>
-  </div>
+  <p style="line-height: 1.6; margin-bottom: 24px;">1. Игра предоставляется бесплатно.<br>2. Оператор не несёт ответственности за успеваемость.<br>3. Контакты: iosif.marketing@yandex.ru</p>
   <button class="btn btn-orange" onclick="showScreen('screen-role')">Закрыть</button>
 </div>
 
 <div id="screen-privacy" class="screen" style="background: white; padding: 20px;">
   <h2 style="margin-bottom: 16px;">🔒 Политика конфиденциальности</h2>
-  <div style="line-height: 1.6; color: var(--text); margin-bottom: 24px;">
-    <p>1. Мы собираем только имя и результаты игры.</p>
-    <p>2. Данные хранятся в защищённой базе Firebase.</p>
-    <p>3. Контакты: iosif.marketing@yandex.ru</p>
-  </div>
+  <p style="line-height: 1.6; margin-bottom: 24px;">
+    <b>1. Данные:</b> При входе через VK мы получаем имя, ID и аватарку (с разрешения).<br>
+    <b>2. Доступ:</b> Учитель видит своих учеников, родитель — только своего ребёнка.<br>
+    <b>3. VK ID для детей:</b> Требуется согласие родителей. Родитель получает уведомление о входе и может заблокировать этот способ входа.<br>
+    <b>4. Контакты:</b> iosif.marketing@yandex.ru
+  </p>
   <button class="btn btn-orange" onclick="showScreen('screen-role')">Закрыть</button>
 </div>
 
-<div id="screen-dictionary-list" class="screen">
-  <div class="header"><div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div></div>
-  <h1 style="font-size: 1.8rem; margin-bottom: 8px;">📖 Словари</h1>
-  <p style="color: var(--text-light); margin-bottom: 24px;">Выбери предмет для изучения</p>
-  <div class="dictionary-grid">
-    <div class="dictionary-card" onclick="openDictionary('russian')"><div class="dict-emoji">🇷🇺</div><div class="dict-title">Русский язык</div><div class="dict-count">Орфография</div></div>
-    <div class="dictionary-card" onclick="openDictionary('english')"><div class="dict-emoji">🇬🇧</div><div class="dict-title">Английский</div><div class="dict-count">Слова и фразы</div></div>
-    <div class="dictionary-card" onclick="openDictionary('chemistry')"><div class="dict-emoji">⚗️</div><div class="dict-title">Химия</div><div class="dict-count">Элементы</div></div>
-    <div class="dictionary-card" onclick="openDictionary('physics')"><div class="dict-emoji">⚛️</div><div class="dict-title">Физика</div><div class="dict-count">Законы</div></div>
-  </div>
-  <button class="btn btn-grey" style="margin-top: 32px; max-width: 500px; margin-left: auto; margin-right: auto;" onclick="showScreen('screen-role')">← На главную</button>
-</div>
-
-<div id="screen-dictionary-topics" class="screen">
-  <div class="header"><div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div></div>
-  <h1 style="font-size: 1.8rem; margin-bottom: 8px;" id="dict-subject-title">Предмет</h1>
-  <p style="color: var(--text-light); margin-bottom: 24px;">Выбери тему для изучения</p>
-  <div class="topic-list" id="topic-list"></div>
-  <button class="btn btn-grey" style="margin-top: 24px; max-width: 500px; margin-left: auto; margin-right: auto;" onclick="showScreen('screen-dictionary-list')">← К словарям</button>
-</div>
-
-<div id="screen-dictionary-cards" class="screen">
-  <div class="header"><div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div></div>
-  <h1 style="font-size: 1.5rem; margin-bottom: 8px;" id="cards-topic-title">Тема</h1>
-  <p style="color: var(--text-light); margin-bottom: 16px; font-size: 0.95rem;">Нажми на карточку, чтобы увидеть ответ</p>
-  <div class="flashcard-container">
-    <div class="flashcard" id="flashcard" onclick="flipCard()">
-      <div class="card-term" id="card-term">Термин</div>
-      <div class="card-hint">👆 Нажми, чтобы увидеть ответ</div>
-      <div class="card-definition" id="card-definition" style="display: none;"></div>
-      <div class="card-example" id="card-example" style="display: none;"></div>
-    </div>
-    <div class="flashcard-counter" id="flashcard-counter">1 / 10</div>
-    <div class="flashcard-nav">
-      <button class="btn btn-grey" onclick="prevCard()">← Назад</button>
-      <button class="btn btn-orange" onclick="nextCard()">Далее →</button>
-    </div>
-  </div>
-  <button class="btn btn-grey" style="margin-top: 24px; max-width: 500px; margin-left: auto; margin-right: auto;" onclick="showScreen('screen-dictionary-topics')">← К темам</button>
-</div>
-
-<div id="screen-topic-selector" class="screen">
-  <div class="header"><div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div></div>
-  <h1 style="font-size: 1.8rem; margin-bottom: 8px;"> Выбор темы урока</h1>
-  <p style="color: var(--text-light); margin-bottom: 24px;">Выбери предмет и класс</p>
-  <div class="topic-selector">
-    <div class="selector-filters">
-      <select id="subject-select" onchange="updateTopics()">
-        <option value="math">🔢 Математика</option>
-        <option value="russian">📖 Русский язык</option>
-        <option value="english">🇬🇧 Английский</option>
-        <option value="chemistry">⚗️ Химия</option>
-        <option value="physics">⚛️ Физика</option>
-      </select>
-      <select id="grade-select" onchange="updateTopics()">
-        <option value="1">1 класс</option><option value="2">2 класс</option><option value="3" selected>3 класс</option>
-        <option value="4">4 класс</option><option value="5">5 класс</option><option value="6">6 класс</option>
-        <option value="7">7 класс</option><option value="8">8 класс</option><option value="9">9 класс</option>
-        <option value="10">10 класс</option><option value="11">11 класс</option>
-      </select>
-    </div>
-    <div class="topic-grid" id="topic-grid"></div>
-  </div>
-  <button class="btn btn-grey" style="margin-top: 32px; max-width: 500px; margin-left: auto; margin-right: auto;" onclick="showScreen('screen-role')">← На главную</button>
-</div>
-
-<div id="screen-lesson" class="screen">
-  <div class="header"><div class="logo"><span class="logo-icon"></span> Лисёнок Пифагор</div></div>
-  <h1 style="font-size: 1.5rem; margin-bottom: 8px;" id="lesson-title">Тема урока</h1>
-  <p style="color: var(--text-light); margin-bottom: 20px;" id="lesson-subtitle">3 класс • Математика</p>
-  <div class="lesson-tabs">
-    <div class="lesson-tab active" onclick="switchLessonTab('theory', this)"> Теория</div>
-    <div class="lesson-tab" onclick="switchLessonTab('practice', this)">✏️ Практика</div>
-  </div>
-  <div id="lesson-theory">
-    <div class="video-filter">
-      <div class="filter-btn active" onclick="setVideoFilter(5, this)">5 мин</div>
-      <div class="filter-btn" onclick="setVideoFilter(15, this)">15 мин</div>
-      <div class="filter-btn" onclick="setVideoFilter(20, this)">20 мин</div>
-      <div class="filter-btn" onclick="setVideoFilter(25, this)">25 мин</div>
-      <div class="filter-btn" onclick="setVideoFilter(30, this)">30 мин</div>
-      <div class="filter-btn" onclick="setVideoFilter(35, this)">35 мин</div>
-    </div>
-    <div class="video-list" id="video-list"></div>
-  </div>
-  <div id="lesson-practice" style="display: none;">
-    <div class="card">
-      <div class="card-title">✏️ Практика</div>
-      <p style="color: var(--text-light); margin-bottom: 20px;">Реши задачи по теме</p>
-      <button class="btn btn-orange" onclick="startLessonPractice()">▶ Начать решение задач</button>
-    </div>
-  </div>
-  <button class="btn btn-grey" style="margin-top: 24px;" onclick="showScreen('screen-topic-selector')">← К темам</button>
-</div>
-
 <div id="toast" class="toast"></div>
+
 <script>
-// ===== СОСТОЯНИЕ =====
-const state = { 
-  grade: 1, round: 0, maxRounds: 10, score: 0, streak: 0, 
-  nickname: '', classCode: '', joinClass: null, 
-  currentProblem: null, currentRoundHistory: [], 
-  subject: 'math', currentUser: null, currentRole: null,
-  currentDictionary: null, currentTopic: null, currentCards: [],
-  currentCardIndex: 0, cardFlipped: false,
-  currentLessonTopic: null, currentLessonSubject: null, currentLessonGrade: null,
-  videoFilter: 15, currentLessonTab: 'theory'
-};
-let selectedRole = 'teacher';
+const state = { currentUser: null, currentRole: null, joinClass: null, videoFilter: 15, currentLessonTopic: null, currentLessonSubject: null, currentLessonGrade: null };
+const lessonTopics = { math: { 1: ['Сложение до 10'], 3: ['Таблица умножения на 7'], 5: ['Дроби'] }, russian: { 1: ['Алфавит'], 3: ['Безударные гласные'] }, english: { 1: ['Алфавит'], 3: ['Семья'] } };
 
-const lessonTopics = {
-  math: { 1: ['Сложение до 10', 'Вычитание до 10'], 2: ['Сложение до 100', 'Вычитание до 100'], 3: ['Таблица умножения на 4', 'Таблица умножения на 5', 'Таблица умножения на 6', 'Таблица умножения на 7', 'Деление'], 4: ['Многозначные числа', 'Порядок действий'], 5: ['Дроби', 'Проценты'], 6: ['Отрицательные числа', 'Пропорции'], 7: ['Линейные уравнения'], 8: ['Квадратные уравнения'], 9: ['Функции', 'Неравенства'], 10: ['Тригонометрия'], 11: ['Интегралы'] },
-  russian: { 1: ['Алфавит'], 2: ['Слоги', 'Ударение'], 3: ['Безударные гласные', 'Парные согласные'], 4: ['Части речи', 'Падежи'], 5: ['Синтаксис', 'Пунктуация'], 6: ['Морфология'], 7: ['Сложные предложения'], 8: ['Деепричастия'], 9: ['Сложноподчинённые'], 10: ['Стилистика'], 11: ['ЕГЭ подготовка'] },
-  english: { 1: ['Алфавит', 'Числа'], 2: ['Цвета', 'Животные'], 3: ['Семья', 'Еда'], 4: ['Время', 'Погода'], 5: ['Present Simple'], 6: ['Past Simple'], 7: ['Present Continuous'], 8: ['Future Simple'], 9: ['Passive Voice'], 10: ['Reported speech'], 11: ['IELTS подготовка'] },
-  chemistry: { 8: ['Атомы и молекулы', 'Периодическая таблица'], 9: ['Химические реакции'], 10: ['Органическая химия'], 11: ['ЕГЭ химия'] },
-  physics: { 7: ['Механика', 'Силы'], 8: ['Электричество'], 9: ['Оптика', 'Волны'], 10: ['Термодинамика'], 11: ['ЕГЭ физика'] }
-};
+function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0, 0); document.getElementById('user-dropdown').classList.remove('show'); }
+function showAuth(role) { 
+  document.getElementById('auth-title').textContent = { director: 'Вход директора', deputy: 'Вход завуча', teacher: 'Вход учителя' }[role]; 
+  const show = role === 'deputy' || role === 'teacher' || role === 'director';
+  document.getElementById('reg-org-group').style.display = show ? 'block' : 'none';
+  document.getElementById('reg-org-details').style.display = show ? 'block' : 'none';
+  showScreen('screen-auth'); 
+}
+function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
+function toggleDropdown() { document.getElementById('user-dropdown').classList.toggle('show'); }
+function handleLogout() { if(confirm('Выйти?')) { auth.signOut().then(() => { state.currentUser = null; showScreen('screen-role'); showToast('Вы вышли'); }); } }
 
-const dictionaries = {
-  russian: { title: 'Русский язык', emoji: '🇷🇺', topics: [{ name: 'Безударные гласные', cards: [{ term: 'В_да', definition: 'Вода', example: 'Проверочное: вóды' }, { term: 'Л_сной', definition: 'Лесной', example: 'Проверочное: лéс' }] }] },
-  english: { title: 'Английский язык', emoji: '🇬', topics: [{ name: 'Базовые слова', cards: [{ term: 'Hello', definition: 'Привет', example: 'Hello, how are you?' }] }] },
-  chemistry: { title: 'Химия', emoji: '⚗️', topics: [{ name: 'Элементы', cards: [{ term: 'H', definition: 'Водород', example: 'Самый лёгкий элемент' }] }] },
-  physics: { title: 'Физика', emoji: '⚛️', topics: [{ name: 'Величины', cards: [{ term: 'Скорость (v)', definition: 'м/с', example: 'v = S / t' }] }] }
-};
-
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo(0, 0);
-  const menu = document.getElementById('user-dropdown');
-  if (menu) menu.classList.remove('show');
+function loginWithVK() {
+  const authUrl = `https://oauth.vk.com/authorize?client_id=${VK_APP_ID}&display=page&response_type=token&scope=video&redirect_uri=https://oauth.vk.com/blank.html&v=5.131`;
+  window.open(authUrl, '_blank', 'width=600,height=600');
+  setTimeout(checkVKAuth, 2000);
 }
 
-function showAuth(role) {
-  selectedRole = role;
-  document.getElementById('auth-title').textContent = { director: 'Вход директора', deputy: 'Вход завуча', teacher: 'Вход учителя' }[role] || 'Вход';
-  const schoolGroup = document.getElementById('reg-school-group');
-  if (role === 'deputy' || role === 'teacher') { schoolGroup.style.display = 'block'; } 
-  else { schoolGroup.style.display = 'none'; }
-  showScreen('screen-auth');
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(t._to);
-  t._to = setTimeout(() => t.classList.remove('show'), 3000);
-}
-
-function toggleDropdown() {
-  const menu = document.getElementById('user-dropdown');
-  menu.classList.toggle('show');
-  document.onclick = function(event) {
-    if (!event.target.matches('.avatar') && !event.target.closest('.dropdown-menu')) menu.classList.remove('show');
+function checkVKAuth() {
+  const hash = window.location.hash;
+  if (hash && hash.includes('access_token=')) {
+    const token = new URLSearchParams(hash.substring(1)).get('access_token');
+    if (token) {
+      localStorage.setItem('vk_user_token', token);
+      showToast('✅ Вход через VK успешен!');
+      loadVKUserData();
+    }
   }
 }
 
-function handleLogout() {
-  if (confirm('Выйти из аккаунта?')) {
-    auth.signOut().then(() => {
-      showToast('Вы вышли из аккаунта');
-      state.currentUser = null; state.currentRole = null;
-      showScreen('screen-role');
-    });
-  }
-}
-
-function showSupport() { window.location.href = 'mailto:iosif.marketing@yandex.ru?subject=Вопрос по Лисёнку Пифагору'; document.getElementById('user-dropdown').classList.remove('show'); }
-function showMyStats() { showToast(' Статистика в разработке'); document.getElementById('user-dropdown').classList.remove('show'); }
-function showMyClasses() { showToast('🏫 Классы в разработке'); document.getElementById('user-dropdown').classList.remove('show'); }
-function showMyAssignments() { showToast('📝 Задания в разработке'); document.getElementById('user-dropdown').classList.remove('show'); }
-function showNotifications() { showToast('🔔 Нет новых уведомлений'); }
-
-function openDictionary(subjectKey) {
-  const dict = dictionaries[subjectKey];
-  state.currentDictionary = subjectKey;
-  document.getElementById('dict-subject-title').textContent = dict.emoji + ' ' + dict.title;
-  const list = document.getElementById('topic-list');
-  list.innerHTML = '';
-  dict.topics.forEach((topic, index) => {
-    const item = document.createElement('div');
-    item.className = 'topic-item';
-    item.onclick = () => openTopic(subjectKey, index);
-    item.innerHTML = '<div class="topic-name">' + topic.name + '</div><div class="topic-count">' + topic.cards.length + ' карточек</div>';
-    list.appendChild(item);
-  });
-  showScreen('screen-dictionary-topics');
-}
-
-function openTopic(subjectKey, topicIndex) {
-  const topic = dictionaries[subjectKey].topics[topicIndex];
-  state.currentTopic = topic;
-  state.currentCards = topic.cards;
-  state.currentCardIndex = 0;
-  state.cardFlipped = false;
-  document.getElementById('cards-topic-title').textContent = topic.name;
-  showCard();
-  showScreen('screen-dictionary-cards');
-}
-
-function showCard() {
-  const card = state.currentCards[state.currentCardIndex];
-  const flashcard = document.getElementById('flashcard');
-  flashcard.classList.remove('flipped');
-  document.getElementById('card-definition').style.display = 'none';
-  document.getElementById('card-example').style.display = 'none';
-  state.cardFlipped = false;
-  document.getElementById('card-term').textContent = card.term;
-  document.getElementById('card-definition').textContent = card.definition;
-  document.getElementById('card-example').textContent = card.example ? '📝 ' + card.example : '';
-  document.getElementById('flashcard-counter').textContent = (state.currentCardIndex + 1) + ' / ' + state.currentCards.length;
-}
-
-function flipCard() {
-  state.cardFlipped = !state.cardFlipped;
-  const flashcard = document.getElementById('flashcard');
-  if (state.cardFlipped) {
-    flashcard.classList.add('flipped');
-    document.getElementById('card-definition').style.display = 'block';
-    if (state.currentCards[state.currentCardIndex].example) document.getElementById('card-example').style.display = 'block';
-  } else {
-    flashcard.classList.remove('flipped');
-    document.getElementById('card-definition').style.display = 'none';
-    document.getElementById('card-example').style.display = 'none';
-  }
-}
-
-function nextCard() {
-  if (state.currentCardIndex < state.currentCards.length - 1) { state.currentCardIndex++; showCard(); } 
-  else { showToast('🎉 Ты прошёл все карточки!'); }
-}
-
-function prevCard() {
-  if (state.currentCardIndex > 0) { state.currentCardIndex--; showCard(); }
-}
-
-function updateTopics() {
-  const subject = document.getElementById('subject-select').value;
-  const grade = document.getElementById('grade-select').value;
-  const topics = lessonTopics[subject] && lessonTopics[subject][grade] ? lessonTopics[subject][grade] : ['Тема 1', 'Тема 2'];
-  const grid = document.getElementById('topic-grid');
-  grid.innerHTML = '';
-  const icons = { math: '🔢', russian: '📖', english: '🇬', chemistry: '⚗️', physics: '⚛️' };
-  topics.forEach(topic => {
-    const card = document.createElement('div');
-    card.className = 'topic-card';
-    card.onclick = () => openLesson(subject, grade, topic);
-    card.innerHTML = '<div class="topic-icon">' + (icons[subject] || '') + '</div><div class="topic-name">' + topic + '</div>';
-    grid.appendChild(card);
-  });
-}
-
-function openLesson(subject, grade, topic) {
-  state.currentLessonSubject = subject;
-  state.currentLessonGrade = grade;
-  state.currentLessonTopic = topic;
-  const subjectNames = { math: 'Математика', russian: 'Русский язык', english: 'Английский', chemistry: 'Химия', physics: 'Физика' };
-  document.getElementById('lesson-title').textContent = topic;
-  document.getElementById('lesson-subtitle').textContent = grade + ' класс • ' + subjectNames[subject];
-  loadVideos();
-  showScreen('screen-lesson');
-}
-
-function switchLessonTab(tab, el) {
-  state.currentLessonTab = tab;
-  document.querySelectorAll('.lesson-tab').forEach(t => t.classList.remove('active'));
-  if (el) el.classList.add('active');
-  document.getElementById('lesson-theory').style.display = tab === 'theory' ? 'block' : 'none';
-  document.getElementById('lesson-practice').style.display = tab === 'practice' ? 'block' : 'none';
-}
-
-function setVideoFilter(minutes, el) {
-  state.videoFilter = minutes;
-  document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-  if (el) el.classList.add('active');
-  loadVideos();
-}
-
-// ===== ЗАПРОС К VK API ЧЕРЕЗ JSONP =====
-function loadVideos() {
-  const videoList = document.getElementById('video-list');
-  videoList.innerHTML = '<p style="text-align: center; color: var(--text-light);">🔍 Ищем видео ВКонтакте...</p>';
-
-  const query = state.currentLessonTopic + ' ' + state.currentLessonGrade + ' класс';
-  const callbackName = 'vkCallback_' + Date.now();
-  
+function loadVKUserData() {
+  const token = localStorage.getItem('vk_user_token');
+  if (!token) return;
   const script = document.createElement('script');
-  const url = 'https://api.vk.com/method/video.search?q=' + encodeURIComponent(query) + '&access_token=' + VK_API_TOKEN + '&v=5.131&count=10&safe=1&callback=' + callbackName;
-  
-  window[callbackName] = function(data) {
-    videoList.innerHTML = '';
-    
-    if (data.error) {
-      videoList.innerHTML = '<p style="text-align: center; color: var(--red);">Ошибка VK API: ' + data.error.error_msg + '</p>';
-      console.error('VK API Error:', data.error);
-      delete window[callbackName];
-      if (script.parentNode) document.body.removeChild(script);
-      return;
+  const cb = 'vkCb_' + Date.now();
+  script.src = `https://api.vk.com/method/users.get?fields=photo_100&access_token=${token}&v=5.131&callback=${cb}`;
+  window[cb] = function(data) {
+    if (data.response && data.response[0]) {
+      const u = data.response[0];
+      state.currentUser = { uid: 'vk_' + u.id, fio: u.first_name + ' ' + u.last_name, photo: u.photo_100, authMethod: 'vk' };
+      document.getElementById('dropdown-user-name').textContent = u.first_name + ' ' + u.last_name;
+      document.getElementById('user-avatar').innerHTML = `<img src="${u.photo_100}">`;
+      db.collection('users').doc('vk_' + u.id).get().then(doc => {
+        if (!doc.exists) {
+          db.collection('users').doc('vk_' + u.id).set({ fio: u.first_name + ' ' + u.last_name, photo: u.photo_100, vkId: u.id, role: 'parent', createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        }
+        state.currentRole = 'parent';
+        updateDashboard({ role: 'parent', fio: u.first_name + ' ' + u.last_name });
+        showScreen('screen-dashboard');
+      });
     }
-
-    const videos = data.response && data.response.items ? data.response.items : [];
-    if (videos.length === 0) {
-      videoList.innerHTML = '<p style="text-align: center; color: var(--text-light);">Видео не найдены. Попробуй увеличить фильтр времени.</p>';
-      delete window[callbackName];
-      if (script.parentNode) document.body.removeChild(script);
-      return;
-    }
-
-    videos.forEach(video => {
-      if (video.duration > state.videoFilter * 60) return;
-
-      const card = document.createElement('div');
-      card.className = 'video-card';
-      
-      const thumbUrl = video.image && video.image.length > 0 ? video.image[0].url : '';
-      const videoUrl = 'https://vk.com/video' + video.owner_id + '_' + video.id;
-      const mins = Math.floor(video.duration / 60);
-      const secs = String(video.duration % 60).padStart(2, '0');
-
-      card.innerHTML = '<div class="video-thumbnail" style="background-image: url(\'' + thumbUrl + '\');"><div class="play-icon">▶</div></div><div class="video-info"><div class="video-title">' + video.title + '</div><div class="video-meta"><span style="color: var(--vk-blue); font-weight: 600;">📺 VK Видео ✅</span><span>⏱ ' + mins + ':' + secs + '</span><span>👁 ' + (video.views || 0) + '</span></div><div class="video-actions"><button class="btn-watch" onclick="window.open(\'' + videoUrl + '\', \'_blank\')">▶ Смотреть</button><button class="btn-complain" onclick="complainVideo(\'' + video.id + '\')">🚩 Жалоба</button></div></div>';
-      videoList.appendChild(card);
-    });
-
-    delete window[callbackName];
-    if (script.parentNode) document.body.removeChild(script);
+    delete window[cb]; if (script.parentNode) document.body.removeChild(script);
   };
-
-  script.onerror = function() {
-    videoList.innerHTML = '<p style="text-align: center; color: var(--red);">Не удалось загрузить видео. Проверь интернет.</p>';
-    delete window[callbackName];
-    if (script.parentNode) document.body.removeChild(script);
-  };
-
-  script.src = url;
   document.body.appendChild(script);
-  
-  setTimeout(() => {
-    if (window[callbackName]) {
-      videoList.innerHTML = '<p style="text-align: center; color: var(--red);">Таймаут запроса. Попробуй позже.</p>';
-      delete window[callbackName];
-      if (script.parentNode) document.body.removeChild(script);
-    }
-  }, 10000);
 }
 
-function complainVideo(videoId) {
-  showToast('🚩 Жалоба отправлена. Видео будет проверено.');
-}
-
-function startLessonPractice() {
-  state.subject = state.currentLessonSubject;
-  state.grade = parseInt(state.currentLessonGrade);
-  startGame(state.grade);
-}
-
-// ===== АУТЕНТИФИКАЦИЯ =====
-function handleRegister() {
-  const fio = document.getElementById('reg-fio').value.trim();
-  const email = document.getElementById('reg-email').value.trim();
-  const password = document.getElementById('reg-password').value;
-  const schoolCode = document.getElementById('reg-school-code').value.trim().toUpperCase();
-  const consent = document.getElementById('reg-consent').checked;
-  
-  if (!fio || !email || !password) { showToast('Заполни все поля'); return; }
-  if (!consent) { showToast('Прими соглашение'); return; }
-  if (password.length < 6) { showToast('Пароль мин. 6 символов'); return; }
-
-  showToast('Регистрация...');
-  auth.createUserWithEmailAndPassword(email, password)
-    .then((uc) => {
-      return db.collection('users').doc(uc.user.uid).set({
-        fio: fio, email: email, role: selectedRole, schoolCode: schoolCode || null,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => uc.user);
-    })
-    .then((user) => {
-      showToast('Успешно! Добро пожаловать, ' + fio);
-      user.sendEmailVerification().catch(() => {});
-      loadUserData(user.uid);
-    })
-    .catch((error) => showToast('Ошибка: ' + error.message));
-}
-
-function handleLogin() {
-  const email = document.getElementById('auth-email').value.trim();
-  const password = document.getElementById('auth-password').value;
-  if (!email || !password) { showToast('Введи Email и Пароль'); return; }
-  showToast('Вход...');
-  auth.signInWithEmailAndPassword(email, password)
-    .then((uc) => { showToast('Вы вошли!'); loadUserData(uc.user.uid); })
-    .catch((error) => showToast('Неверный Email или пароль'));
-}
-
-function handleForgot() {
-  const email = document.getElementById('forgot-email').value.trim();
-  if (!email) { showToast('Введи Email'); return; }
-  auth.sendPasswordResetEmail(email)
-    .then(() => { showToast('✅ Ссылка отправлена на ' + email); showScreen('screen-auth'); })
-    .catch((error) => showToast('Ошибка: ' + error.message));
-}
-
-function loadUserData(uid) {
-  db.collection('users').doc(uid).get().then((doc) => {
-    if (doc.exists) {
-      const data = doc.data();
-      state.currentUser = { uid: uid, fio: data.fio, email: data.email, role: data.role };
-      state.currentRole = data.role;
-      
-      document.getElementById('dropdown-user-name').textContent = data.fio || data.email;
-      document.getElementById('user-avatar').textContent = (data.fio || '').charAt(0).toUpperCase();
-      
-      const roleNames = { director: '🏫 Директор', deputy: '📋 Завуч', teacher: '🧑‍ Учитель' };
-      document.getElementById('dropdown-user-role').textContent = roleNames[data.role] || 'Пользователь';
-      
-      const isStaff = ['teacher', 'deputy', 'director'].indexOf(data.role) !== -1;
-      document.getElementById('menu-classes').style.display = isStaff ? 'flex' : 'none';
-      document.getElementById('menu-assignments').style.display = isStaff ? 'flex' : 'none';
-      
-      updateDashboard(data);
-      showScreen('screen-dashboard');
-    }
-  });
-}
-
-function updateDashboard(data) {
-  const config = {
-    director: { welcome: 'Добро пожаловать, директор!', subtitle: 'Управление школой', stat1: 'Учителей', stat2: 'Учеников' },
-    deputy: { welcome: 'Добро пожаловать, завуч!', subtitle: 'Учебный процесс', stat1: 'Классов', stat2: 'Учителей' },
-    teacher: { welcome: 'Привет, ' + (data.fio ? data.fio.split(' ')[0] : 'учитель') + '!', subtitle: 'Личный кабинет', stat1: 'Моих классов', stat2: 'Заданий' }
-  }[data.role] || { welcome: 'Привет!', subtitle: 'Кабинет', stat1: '...', stat2: '...' };
-  
-  document.getElementById('dashboard-welcome').textContent = config.welcome;
-  document.getElementById('dashboard-subtitle').textContent = config.subtitle;
-  document.getElementById('stat-1-label').textContent = config.stat1;
-  document.getElementById('stat-2-label').textContent = config.stat2;
-}
-
-auth.onAuthStateChanged((user) => {
-  if (user && !state.currentUser) loadUserData(user.uid);
-});
-
-// ===== ИГРА =====
 function onStudentCodeInput() {
   const code = document.getElementById('student-code').value.trim().toUpperCase();
   const info = document.getElementById('class-info');
-  const btn = document.getElementById('student-start-btn');
+  const vkSec = document.getElementById('vk-login-section');
+  const vkBtn = document.getElementById('btn-vk-student');
+  const vkConsent = document.getElementById('vk-consent-student');
   if (code.length >= 4) {
     info.textContent = 'Проверка...';
     db.collection('classes').doc(code).get().then(doc => {
       if (doc.exists) {
         const cls = doc.data();
-        info.textContent = '✅ ' + cls.name + ' · ' + cls.grade + ' кл.';
-        info.style.color = 'var(--green)';
-        btn.style.display = 'block';
-        state.joinClass = { code: code, name: cls.name, grade: cls.grade };
-      } else {
-        info.textContent = '❌ Код не найден';
-        info.style.color = 'var(--red)';
-        btn.style.display = 'none';
+        info.textContent = `✅ ${cls.name} • ${cls.grade} кл.`;
+        state.joinClass = { code, ...cls };
+        vkSec.style.display = 'block';
+        vkConsent.onchange = () => { vkBtn.disabled = !vkConsent.checked; };
+      } else { info.textContent = '❌ Код не найден'; vkSec.style.display = 'none'; }
+    });
+  } else { info.textContent = ''; vkSec.style.display = 'none'; }
+}
+
+function studentLoginWithVK() {
+  if (!state.joinClass || !document.getElementById('vk-consent-student').checked) { showToast('❌ Подтвердите согласие'); return; }
+  const authUrl = `https://oauth.vk.com/authorize?client_id=${VK_APP_ID}&display=page&response_type=token&scope=video&redirect_uri=https://oauth.vk.com/blank.html&v=5.131`;
+  window.open(authUrl, '_blank', 'width=600,height=600');
+  setTimeout(() => {
+    const hash = window.location.hash;
+    if (hash && hash.includes('access_token=')) {
+      const token = new URLSearchParams(hash.substring(1)).get('access_token');
+      if (token) {
+        localStorage.setItem('vk_user_token', token);
+        const script = document.createElement('script');
+        const cb = 'vkStCb_' + Date.now();
+        script.src = `https://api.vk.com/method/users.get?fields=photo_100&access_token=${token}&v=5.131&callback=${cb}`;
+        window[cb] = function(data) {
+          if (data.response && data.response[0]) {
+            const u = data.response[0];
+            db.collection('students').where('vkId', '==', u.id).where('classCode', '==', state.joinClass.code).get().then(snap => {
+              if (!snap.empty) {
+                const st = snap.docs[0].data();
+                if (st.vkBlockedByParent) { showToast('🚫 Вход через VK заблокирован родителем'); return; }
+                notifyParent(st.parentId, u.first_name, state.joinClass.name);
+              } else {
+                db.collection('students').add({ vkId: u.id, fio: u.first_name + ' ' + u.last_name, classCode: state.joinClass.code, className: state.joinClass.name, grade: state.joinClass.grade, vkBlockedByParent: false, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+              }
+              showToast('✅ Добро пожаловать!');
+              showScreen('screen-topic-selector');
+            });
+          }
+          delete window[cb]; if (script.parentNode) document.body.removeChild(script);
+        };
+        document.body.appendChild(script);
+      }
+    }
+  }, 3000);
+}
+
+function notifyParent(parentId, studentName, className) {
+  db.collection('notifications').add({ parentId, type: 'vk_login', message: `Ваш ребёнок ${studentName} вошёл через VK ID (класс ${className})`, timestamp: firebase.firestore.FieldValue.serverTimestamp(), read: false });
+}
+
+function parentLoginWithEmail() {
+  const email = document.getElementById('parent-email').value.trim();
+  const password = document.getElementById('parent-password').value;
+  if (!email || !password) { showToast('❌ Введите email и пароль'); return; }
+  auth.signInWithEmailAndPassword(email, password).then(cred => loadParentData(cred.user.uid)).catch(() => showToast('❌ Ошибка входа'));
+}
+
+function loadParentData(uid) {
+  db.collection('users').doc(uid).get().then(doc => {
+    if (doc.exists) {
+      const d = doc.data();
+      state.currentUser = { uid, ...d };
+      state.currentRole = 'parent';
+      document.getElementById('dropdown-user-name').textContent = d.fio;
+      document.getElementById('user-avatar').innerHTML = d.photo ? `<img src="${d.photo}">` : d.fio.charAt(0).toUpperCase();
+      loadParentChildren(uid);
+      updateDashboard(d);
+      showScreen('screen-dashboard');
+    }
+  });
+}
+
+function loadParentChildren(parentId) {
+  db.collection('students').where('parentId', '==', parentId).get().then(snap => {
+    const cont = document.getElementById('children-container');
+    cont.innerHTML = '';
+    if (snap.empty) { cont.innerHTML = '<p style="text-align:center; color:var(--text-light);">Нет привязанных детей</p>'; }
+    else {
+      snap.forEach(doc => {
+        const ch = doc.data();
+        const div = document.createElement('div');
+        div.className = 'child-card' + (ch.vkBlockedByParent ? ' vk-blocked' : '');
+        div.innerHTML = `<div class="child-card-header"><div><div style="font-weight:bold;">${ch.fio}</div><div style="font-size:0.9rem; color:var(--text-light);">${ch.className || ''} • ${ch.grade || ''} кл.</div></div><button class="btn btn-small ${ch.vkBlockedByParent ? 'btn-orange' : 'btn-grey'}" onclick="toggleVKAccess('${doc.id}', ${!ch.vkBlockedByParent})">${ch.vkBlockedByParent ? '🚫 Заблокирован' : '✅ Разрешён'}</button></div>`;
+        cont.appendChild(div);
+      });
+    }
+    document.getElementById('parent-children-list').style.display = 'block';
+  });
+}
+
+function toggleVKAccess(studentId, block) {
+  db.collection('students').doc(studentId).update({ vkBlockedByParent: block }).then(() => { showToast(block ? '🚫 Заблокировано' : '✅ Разрешено'); loadParentChildren(state.currentUser.uid); });
+}
+
+function addChild() {
+  const code = prompt('Введите код ребёнка (выдал учитель):');
+  if (code) {
+    db.collection('classes').doc(code.toUpperCase()).get().then(doc => {
+      if (doc.exists) {
+        db.collection('students').where('classCode', '==', code.toUpperCase()).get().then(snap => {
+          if (!snap.empty) { snap.docs[0].ref.update({ parentId: state.currentUser.uid }).then(() => { showToast('✅ Ребёнок привязан!'); loadParentChildren(state.currentUser.uid); }); }
+          else { showToast('❌ Ребёнок не найден'); }
+        });
+      } else { showToast('❌ Код класса не найден'); }
+    });
+  }
+}
+
+function showMyChildren() {
+  if (state.currentRole === 'parent') { loadParentChildren(state.currentUser.uid); showScreen('screen-parent'); }
+  else { showToast('ℹ️ Только для родителей'); }
+}
+
+function updateOrgPreview() {
+  const type = document.getElementById('reg-org-type').value;
+  const num = document.getElementById('reg-org-number').value.trim();
+  const name = document.getElementById('reg-org-name').value.trim();
+  const types = { school: 'Школа', gymnasium: 'Гимназия', lyceum: 'Лицей', other: 'Учреждение' };
+  let full = types[type] || 'Школа';
+  if (num) full += ' №' + num;
+  if (name) full += ' "' + name + '"';
+  const prev = document.getElementById('org-preview');
+  prev.textContent = full;
+  prev.style.display = 'block';
+}
+
+function handleRegister() {
+  const fio = document.getElementById('reg-fio').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-password').value;
+  const consent = document.getElementById('reg-consent').checked;
+  if (!fio || !email || !pass || !consent) { showToast('❌ Заполните всё и примите соглашение'); return; }
+  const orgType = document.getElementById('reg-org-type').value;
+  const orgNum = document.getElementById('reg-org-number').value.trim();
+  const orgName = document.getElementById('reg-org-name').value.trim();
+  const types = { school: 'Школа', gymnasium: 'Гимназия', lyceum: 'Лицей', other: 'Учреждение' };
+  let orgFull = types[orgType] || 'Школа';
+  if (orgNum) orgFull += ' №' + orgNum;
+  if (orgName) orgFull += ' "' + orgName + '"';
+  auth.createUserWithEmailAndPassword(email, pass).then(cred => {
+    return db.collection('users').doc(cred.user.uid).set({ fio, email, orgType, orgNum, orgName, orgFullName: orgFull, role: document.getElementById('auth-title').textContent.includes('директор') ? 'director' : 'teacher', createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+  }).then(() => { showToast('✅ Успешно!'); showScreen('screen-auth'); }).catch(e => showToast('❌ ' + e.message));
+}
+
+function handleLogin() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass = document.getElementById('auth-password').value;
+  if (!email || !pass) { showToast('❌ Введите email и пароль'); return; }
+  auth.signInWithEmailAndPassword(email, pass).then(cred => {
+    db.collection('users').doc(cred.user.uid).get().then(doc => {
+      if (doc.exists) {
+        const d = doc.data();
+        state.currentUser = { uid: cred.user.uid, ...d };
+        state.currentRole = d.role;
+        document.getElementById('dropdown-user-name').textContent = d.fio;
+        document.getElementById('user-avatar').textContent = d.fio.charAt(0).toUpperCase();
+        updateDashboard(d);
+        showScreen('screen-dashboard');
       }
     });
-  } else { info.textContent = ''; btn.style.display = 'none'; }
+  }).catch(() => showToast('❌ Ошибка входа'));
 }
 
-function startClassGame() {
-  const nick = document.getElementById('nickname-input').value.trim();
-  if (!nick) { showToast('Напиши имя'); return; }
-  state.nickname = nick;
-  state.classCode = state.joinClass.code;
-  startGame(state.joinClass.grade);
+function updateDashboard(d) {
+  const welcomes = { director: 'Добро пожаловать, директор!', deputy: 'Добро пожаловать, завуч!', teacher: `Привет, ${d.fio.split(' ')[0]}!`, parent: `Здравствуйте, ${d.fio}!` };
+  document.getElementById('dashboard-welcome').textContent = welcomes[d.role] || 'Добро пожаловать!';
+  document.getElementById('dashboard-content').innerHTML = d.role === 'parent' ? `<div class="card"><h3>Мои дети</h3><button class="btn btn-blue" onclick="loadParentChildren('${state.currentUser.uid}')">Обновить список</button></div>` : `<div class="card"><p>Роль: ${d.role}</p><p>Организация: ${d.orgFullName || 'Не указана'}</p></div>`;
 }
 
-function startSoloGame(subject) {
-  state.nickname = document.getElementById('nickname-input').value.trim() || 'Игрок';
-  state.classCode = '';
-  state.subject = subject;
-  startGame(1);
+function updateTopics() {
+  const subj = document.getElementById('subject-select').value;
+  const grade = document.getElementById('grade-select').value;
+  const topics = lessonTopics[subj]?.[grade] || ['Тема 1'];
+  const grid = document.getElementById('topic-grid');
+  grid.innerHTML = '';
+  topics.forEach(t => {
+    const card = document.createElement('div');
+    card.className = 'role-btn';
+    card.innerHTML = `<div style="font-size: 2.5rem; margin-bottom: 8px;">📚</div><div style="font-weight: 600;">${t}</div>`;
+    card.onclick = () => openLesson(subj, grade, t);
+    grid.appendChild(card);
+  });
 }
 
-function startGame(grade) {
-  state.grade = grade; state.round = 0; state.score = 0; state.streak = 0; state.currentRoundHistory = [];
-  showScreen('screen-game');
-  nextProblem();
+function openLesson(subj, grade, topic) {
+  state.currentLessonSubject = subj;
+  state.currentLessonGrade = grade;
+  state.currentLessonTopic = topic;
+  const names = { math: 'Математика', russian: 'Русский язык', english: 'Английский' };
+  document.getElementById('lesson-title').textContent = topic;
+  document.getElementById('lesson-subtitle').textContent = `${grade} класс • ${names[subj]}`;
+  loadVideos();
+  showScreen('screen-lesson');
 }
 
-function nextProblem() {
-  if (state.round >= state.maxRounds) { endGame(); return; }
-  state.round++;
-  const diff = state.round < 3 ? 0 : state.round < 7 ? 1 : 2;
-  state.currentProblem = generateProblem(state.grade, diff);
-  
-  document.getElementById('question-text').textContent = state.currentProblem.q;
-  document.getElementById('score-display').textContent = state.score;
-  document.getElementById('streak-count').textContent = state.streak;
-  document.getElementById('progress-fill').style.width = (state.round / state.maxRounds * 100) + '%';
-  document.getElementById('feedback-text').textContent = '';
-  document.getElementById('game-mascot').textContent = '🦊';
-  
-  const area = document.getElementById('input-area');
-  area.innerHTML = '';
-  
-  if (state.grade <= 4 && state.subject === 'math') {
-    const opts = mkOptions(state.currentProblem.a, [state.currentProblem.a-1, state.currentProblem.a+1, state.currentProblem.a+2, state.currentProblem.a-2].filter(x => x > 0), 4);
-    const colors = ['#FFD54F', '#FF8A65', '#81C784', '#64B5F6'];
-    opts.forEach((opt, i) => {
-      const b = document.createElement('button');
-      b.className = 'btn'; b.style.background = colors[i]; b.style.color = 'white'; b.style.fontSize = '1.8rem'; b.style.padding = '30px';
-      b.textContent = opt;
-      b.onclick = () => checkAnswer(opt);
-      area.appendChild(b);
-    });
-  } else {
-    const inp = document.createElement('input');
-    inp.type = 'text'; inp.placeholder = 'Твой ответ';
-    inp.style.cssText = 'grid-column: 1/-1; padding: 20px; font-size: 1.3rem; border: 2px solid var(--border); border-radius: 14px; text-align: center;';
-    inp.onkeydown = e => { if (e.key === 'Enter') checkAnswer(inp.value); };
-    area.appendChild(inp);
-    setTimeout(() => inp.focus(), 100);
-    const b = document.createElement('button');
-    b.className = 'btn btn-orange'; b.style.gridColumn = '1/-1'; b.textContent = 'Ответить';
-    b.onclick = () => checkAnswer(inp.value);
-    area.appendChild(b);
-  }
+function setVideoFilter(min, btn) {
+  state.videoFilter = min;
+  document.querySelectorAll('#screen-lesson .btn-small').forEach(b => { b.className = 'btn btn-small btn-grey'; });
+  btn.className = 'btn btn-small btn-orange';
+  loadVideos();
 }
 
-function checkAnswer(userVal) {
-  if (!userVal) return;
-  const correct = state.currentProblem.a;
-  const isCorrect = compareAnswer(userVal, correct);
-  state.currentRoundHistory.push({ question: state.currentProblem.q, user: userVal, correct: correct, isCorrect: isCorrect });
-  
-  if (isCorrect) {
-    state.score++; state.streak++;
-    document.getElementById('feedback-text').textContent = '✅ Правильно!';
-    document.getElementById('feedback-text').style.color = 'var(--green)';
-    document.getElementById('game-mascot').textContent = '🎉';
-  } else {
-    state.streak = 0;
-    document.getElementById('feedback-text').textContent = '❌ Правильно: ' + correct;
-    document.getElementById('feedback-text').style.color = 'var(--red)';
-    document.getElementById('game-mascot').textContent = '😢';
-  }
-  document.getElementById('score-display').textContent = state.score;
-  document.getElementById('streak-count').textContent = state.streak;
-  setTimeout(nextProblem, isCorrect ? 1000 : 1800);
-}
-
-function endGame() {
-  document.getElementById('result-name').textContent = state.nickname || 'Игрок';
-  document.getElementById('final-score').textContent = state.score;
-  document.getElementById('result-total').textContent = state.maxRounds;
-  document.getElementById('result-comment').textContent = state.score >= 9 ? 'Великолепно! ' : state.score >= 7 ? 'Отлично! 👍' : 'Попробуй ещё! 💪';
-  saveResultToFirebase(state.nickname, state.score, state.grade, state.classCode, state.currentRoundHistory, state.maxRounds);
-  showScreen('screen-result');
-}
-
-function restartRound() {
-  state.round = 0; state.score = 0; state.streak = 0; state.currentRoundHistory = [];
-  showScreen('screen-game'); nextProblem();
-}
-
-function parentLogin() { showToast('Поиск ребёнка по коду (в разработке)'); }
-
-function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
-function pick(arr) { return arr[rand(0, arr.length - 1)]; }
-function shuffle(arr) { for (let i = arr.length - 1; i > 0; i--) { let j = rand(0, i); let tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp; } return arr; }
-function compareAnswer(u, c) {
-  let us = String(u).trim().toLowerCase().replace(',', '.');
-  let cs = String(c).trim().toLowerCase().replace(',', '.');
-  if (us === cs) return true;
-  let un = parseFloat(us), cn = parseFloat(cs);
-  return !isNaN(un) && !isNaN(cn) && Math.abs(un - cn) < 0.0001;
-}
-function mkOptions(correct, distractors, count) {
-  let set = [correct];
-  let pool = shuffle(distractors.filter(d => d !== correct));
-  for (let d of pool) { if (set.length >= count) break; if (set.indexOf(d) === -1) set.push(d); }
-  return shuffle(set);
-}
-
-function generateProblem(grade, diff) {
-  let q = '', a = 0;
-  if (grade === 1) { let max = [10, 15, 20][diff]; if (Math.random() > 0.5) { let x = rand(1, Math.floor(max/2)), y = rand(1, Math.floor(max/2)); q = x + ' + ' + y; a = x + y; } else { a = rand(2, max); let b = rand(1, a - 1); q = a + ' - ' + b; a = a - b; } }
-  else if (grade === 2) { let max = [40, 70, 100][diff]; if (Math.random() > 0.5) { let x = rand(5, max-10), y = rand(5, 20); q = x + ' + ' + y; a = x + y; } else { let x = rand(20, max), y = rand(5, 19); q = x + ' - ' + y; a = x - y; } }
-  else if (grade === 3) { let m = [5, 7, 9][diff]; if (Math.random() > 0.5) { let x = rand(2, m), y = rand(2, m); q = x + ' × ' + y; a = x * y; } else { let y = rand(2, m), r = rand(2, m); q = (y*r) + ' ÷ ' + y; a = r; } }
-  else if (grade === 4) { if (diff === 0) { let x = rand(10, 99), y = rand(10, 99), op = Math.random() > 0.5 ? '+' : '-'; if (op === '-' && x < y) { let t = x; x = y; y = t; } q = x + ' ' + op + ' ' + y; a = op === '+' ? x + y : x - y; } else { let b = rand(2, 9), c = rand(2, 9), base = rand(10, 50); q = base + ' + ' + b + ' × ' + c; a = base + b * c; } }
-  else if (grade === 5) { let den = rand(3, [6, 8, 10][diff]); let n1 = rand(1, den-2), n2 = rand(1, den-n1-1); q = n1 + '/' + den + ' + ' + n2 + '/' + den; a = (n1+n2) + '/' + den; }
-  else if (grade === 6) { let base = rand(2, 20) * 10, perc = [10, 20, 25, 50][rand(0, 3)]; q = perc + '% от ' + base; a = base * perc / 100; }
-  else if (grade === 7) { let x = rand(1, 10), c = rand(2, 9); q = c + 'x = ' + (c*x) + '. Найди x.'; a = x; }
-  else if (grade === 8) { let r = rand(2, 9); q = 'x² = ' + (r*r) + '. Найди x.'; a = r; }
-  else if (grade === 9) { let k = rand(2, 5), arg = rand(1, 5); q = 'f(x) = ' + k + 'x. Найди f(' + arg + ')'; a = k * arg; }
-  else if (grade === 10) { const tv = [{q:'sin 30°',a:0.5},{q:'cos 60°',a:0.5},{q:'sin 90°',a:1},{q:'tg 45°',a:1}]; let it = pick(tv); q = it.q; a = it.a; }
-  else if (grade === 11) { let n = rand(2, 4); q = 'Производная y = x^' + n + ' в точке x=1'; a = n; }
-  if (typeof a === 'number') a = parseFloat(a.toFixed(2));
-  return { q: q, a: a };
-}
-
-async function saveResultToFirebase(name, score, grade, classCode, history, total) {
-  try {
-    const attempt = { score: score, total: total || 10, history: history || [], time: firebase.firestore.FieldValue.serverTimestamp() };
-    const snapshot = await db.collection('leaders').where('name', '==', name).where('classCode', '==', classCode || '').get();
-    if (!snapshot.empty) {
-      const doc = snapshot.docs[0]; const data = doc.data();
-      let attempts = data.attempts || []; attempts.push(attempt);
-      if (attempts.length > 20) attempts = attempts.slice(-20);
-      const newScore = score > data.score ? score : data.score;
-      await doc.ref.update({ score: newScore, grade: grade, attempts: attempts });
-    } else {
-      await db.collection('leaders').add({ name: name, score: score, grade: grade, classCode: classCode || '', total: total || 10, attempts: [attempt] });
-    }
-  } catch (e) { console.error(e); }
-}
-
-async function showLeaderboard(classCode) {
-  showScreen('screen-leaderboard');
-  const list = document.getElementById('leaderboard-list');
-  list.innerHTML = '<p style="text-align: center; color: var(--text-light);">Загрузка...</p>';
-  try {
-    let query = db.collection('leaders');
-    if (classCode) query = query.where('classCode', '==', classCode);
-    const snapshot = await query.orderBy('score', 'desc').get();
-    const leaders = snapshot.docs.map(doc => ({ id: doc.id, name: doc.data().name, score: doc.data().score, grade: doc.data().grade, total: doc.data().total }));
-    document.getElementById('leaderboard-sub').textContent = classCode ? 'Лучшие результаты класса' : 'Лучшие из всех';
-    if (leaders.length === 0) { list.innerHTML = '<p style="text-align: center; color: var(--text-light);">Пока никто не играл. Стань первым! 🚀</p>'; return; }
+function loadVideos() {
+  const list = document.getElementById('video-list');
+  list.innerHTML = '<p style="text-align: center; color: var(--text-light);">🔍 Ищем видео...</p>';
+  const token = localStorage.getItem('vk_user_token');
+  if (!token) { list.innerHTML = '<p style="text-align: center; color: var(--red);">⚠️ Войдите через VK для поиска видео</p>'; return; }
+  const query = `${state.currentLessonTopic} ${state.currentLessonGrade} класс`;
+  const script = document.createElement('script');
+  const cb = 'vkVidCb_' + Date.now();
+  script.src = `https://api.vk.com/method/video.search?q=${encodeURIComponent(query)}&access_token=${token}&v=5.131&count=10&safe=1&callback=${cb}`;
+  window[cb] = function(data) {
     list.innerHTML = '';
-    leaders.slice(0, 20).forEach((l, i) => {
-      const row = document.createElement('div');
-      row.className = 'card'; row.style.display = 'flex'; row.style.alignItems = 'center'; row.style.gap = '14px';
-      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
-      row.innerHTML = '<div style="width: 40px; height: 40px; border-radius: 50%; background: ' + (i < 3 ? '#FFD54F' : '#E8EDF2') + '; display: flex; align-items: center; justify-content: center; font-size: ' + (i < 3 ? '1.2rem' : '1rem') + ';">' + medal + '</div><div style="flex: 1;"><div style="font-weight: bold; font-size: 1.05rem;">' + l.name + '</div><div style="color: var(--text-light); font-size: 0.85rem;">' + l.grade + ' класс</div></div><div style="font-weight: bold; color: var(--orange); font-size: 1.2rem;">' + l.score + '/' + (l.total || 10) + '</div>';
-      list.appendChild(row);
+    if (data.error) { list.innerHTML = `<p style="text-align: center; color: var(--red);">Ошибка: ${data.error.error_msg}</p>`; delete window[cb]; if(script.parentNode) document.body.removeChild(script); return; }
+    const vids = data.response?.items || [];
+    if (vids.length === 0) { list.innerHTML = '<p style="text-align: center; color: var(--text-light);">Видео не найдены</p>'; delete window[cb]; if(script.parentNode) document.body.removeChild(script); return; }
+    vids.forEach(v => {
+      if (v.duration > state.videoFilter * 60) return;
+      const card = document.createElement('div');
+      card.className = 'video-card';
+      const mins = Math.floor(v.duration / 60);
+      const secs = String(v.duration % 60).padStart(2, '0');
+      card.innerHTML = `<div style="font-weight: bold; margin-bottom: 8px;">${v.title}</div><div style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 12px;">⏱ ${mins}:${secs} • 👁 ${v.views || 0}</div><button class="btn btn-orange" onclick="window.open('https://vk.com/video${v.owner_id}_${v.id}', '_blank')">▶ Смотреть</button>`;
+      list.appendChild(card);
     });
-  } catch (e) { list.innerHTML = '<p style="text-align: center; color: var(--red);">Ошибка загрузки</p>'; }
+    delete window[cb]; if(script.parentNode) document.body.removeChild(script);
+  };
+  script.onerror = () => { list.innerHTML = '<p style="text-align: center; color: var(--red);">Не удалось загрузить</p>'; delete window[cb]; if(script.parentNode) document.body.removeChild(script); };
+  document.body.appendChild(script);
+  setTimeout(() => { if(window[cb]) { list.innerHTML = '<p style="text-align: center; color: var(--red);">Таймаут</p>'; delete window[cb]; if(script.parentNode) document.body.removeChild(script); } }, 10000);
 }
 
-updateTopics();
+function showLeaderboard() { showToast('🏆 Таблица успеха в разработке'); }
 </script>
 </body>
-</html>
+    </html>                                                                                                                       </html>
