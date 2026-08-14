@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -19,12 +19,16 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
+
+// ===== VK API КЛЮЧ (ВСТАВЛЕН!) =====
+const VK_API_TOKEN = "fbcfaf20fbcfaf20fbcfaf20e8f88d5929ffbcffbcfaf2091b10ad3c9cf0f1bd6cdb9f7"; 
 </script>
 <style>
 :root {
   --orange: #FF7043; --orange-dark: #E64A19; --blue: #2196F3; --blue-dark: #1565C0;
   --green: #4CAF50; --red: #F44336; --bg: #F5F7FA; --card: #FFFFFF;
   --text: #1A2332; --text-light: #6B7A8D; --border: #E0E6ED;
+  --vk-blue: #4C75A3; --rutube-red: #00A0E3;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
@@ -83,123 +87,75 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .consent-label input[type="checkbox"] { width: 20px; height: 20px; margin-top: 2px; cursor: pointer; accent-color: var(--orange); }
 .consent-label a { color: var(--blue); text-decoration: underline; }
 
-/* Выпадающее меню */
-.dropdown-menu { 
-  display: none; 
-  position: absolute; 
-  right: 0; 
-  top: 55px; 
-  background: white; 
-  border-radius: 12px; 
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
-  z-index: 1000; 
-  min-width: 220px; 
-  overflow: hidden; 
-  animation: fadeIn 0.2s;
-}
+.dropdown-menu { display: none; position: absolute; right: 0; top: 55px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 1000; min-width: 220px; overflow: hidden; animation: fadeIn 0.2s; }
 .dropdown-menu.show { display: block; }
-.dropdown-header { 
-  padding: 14px 16px; 
-  font-weight: bold; 
-  color: var(--text); 
-  font-size: 0.95rem; 
-  border-bottom: 1px solid var(--border); 
-  background: #f8f9fa;
-}
-.dropdown-role {
-  padding: 4px 16px 12px;
-  font-size: 0.8rem;
-  color: var(--text-light);
-  border-bottom: 1px solid var(--border);
-  background: #f8f9fa;
-}
-.dropdown-item { 
-  padding: 14px 16px; 
-  cursor: pointer; 
-  border-bottom: 1px solid #f0f0f0; 
-  transition: background 0.2s; 
-  font-size: 0.95rem;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+.dropdown-header { padding: 14px 16px; font-weight: bold; color: var(--text); font-size: 0.95rem; border-bottom: 1px solid var(--border); background: #f8f9fa; }
+.dropdown-role { padding: 4px 16px 12px; font-size: 0.8rem; color: var(--text-light); border-bottom: 1px solid var(--border); background: #f8f9fa; }
+.dropdown-item { padding: 14px 16px; cursor: pointer; border-bottom: 1px solid #f0f0f0; transition: background 0.2s; font-size: 0.95rem; display: flex; align-items: center; gap: 10px; }
 .dropdown-item:hover { background: #f8f9fa; }
 .dropdown-item:last-child { border-bottom: none; }
 .dropdown-item.logout { color: var(--red); font-weight: 600; }
-.dropdown-item .badge { 
-  background: var(--red); 
-  color: white; 
-  font-size: 0.7rem; 
-  padding: 2px 6px; 
-  border-radius: 10px; 
-  margin-left: auto; 
-  font-weight: bold;
-}
 
-/* Словари */
 .dictionary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 500px; margin: 0 auto; }
-.dictionary-card { 
-  background: white; 
-  border-radius: 20px; 
-  padding: 30px 20px; 
-  text-align: center; 
-  cursor: pointer; 
-  transition: all 0.2s;
-  border: 2px solid var(--border);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-}
+.dictionary-card { background: white; border-radius: 20px; padding: 30px 20px; text-align: center; cursor: pointer; transition: all 0.2s; border: 2px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
 .dictionary-card:active { transform: scale(0.95); }
 .dictionary-card:hover { border-color: var(--orange); box-shadow: 0 4px 16px rgba(255,112,67,0.15); }
 .dictionary-card .dict-emoji { font-size: 3.5rem; margin-bottom: 12px; }
 .dictionary-card .dict-title { font-size: 1.1rem; font-weight: bold; color: var(--text); }
 .dictionary-card .dict-count { font-size: 0.85rem; color: var(--text-light); margin-top: 4px; }
 
-/* Темы словаря */
 .topic-list { max-width: 600px; margin: 0 auto; }
-.topic-item { 
-  background: white; 
-  border-radius: 14px; 
-  padding: 18px 20px; 
-  margin-bottom: 12px; 
-  cursor: pointer; 
-  transition: all 0.2s;
-  border: 2px solid var(--border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+.topic-item { background: white; border-radius: 14px; padding: 18px 20px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s; border: 2px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
 .topic-item:active { transform: scale(0.98); }
 .topic-item:hover { border-color: var(--orange); }
 .topic-item .topic-name { font-weight: 600; font-size: 1.05rem; }
 .topic-item .topic-count { color: var(--text-light); font-size: 0.9rem; }
 
-/* Карточка слова */
 .flashcard-container { max-width: 500px; margin: 0 auto; padding: 20px 0; }
-.flashcard { 
-  background: white; 
-  border-radius: 24px; 
-  padding: 40px 30px; 
-  min-height: 280px; 
-  display: flex; 
-  flex-direction: column; 
-  align-items: center; 
-  justify-content: center; 
-  text-align: center; 
-  cursor: pointer; 
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-  transition: all 0.3s;
-  border: 3px solid var(--border);
-  position: relative;
-}
+.flashcard { background: white; border-radius: 24px; padding: 40px 30px; min-height: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: all 0.3s; border: 3px solid var(--border); position: relative; }
 .flashcard.flipped { border-color: var(--orange); background: #FFF8F5; }
 .flashcard .card-term { font-size: 2rem; font-weight: bold; color: var(--text); margin-bottom: 12px; }
 .flashcard .card-hint { font-size: 0.9rem; color: var(--text-light); }
 .flashcard .card-definition { font-size: 1.3rem; color: var(--orange-dark); margin-top: 16px; font-weight: 600; }
 .flashcard .card-example { font-size: 1rem; color: var(--text-light); margin-top: 12px; font-style: italic; }
-
 .flashcard-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; gap: 12px; }
 .flashcard-nav .btn { flex: 1; }
 .flashcard-counter { text-align: center; color: var(--text-light); font-size: 0.95rem; margin-top: 16px; }
+
+.topic-selector { max-width: 600px; margin: 0 auto; }
+.selector-filters { display: flex; gap: 12px; margin-bottom: 24px; }
+.selector-filters select { flex: 1; padding: 14px; border: 2px solid var(--border); border-radius: 12px; font-size: 1rem; background: white; cursor: pointer; }
+.selector-filters select:focus { border-color: var(--orange); outline: none; }
+
+.topic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.topic-card { background: white; border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.2s; border: 2px solid var(--border); text-align: center; }
+.topic-card:active { transform: scale(0.95); }
+.topic-card:hover { border-color: var(--orange); box-shadow: 0 4px 12px rgba(255,112,67,0.15); }
+.topic-card .topic-icon { font-size: 2.5rem; margin-bottom: 8px; }
+.topic-card .topic-name { font-weight: 600; font-size: 0.95rem; color: var(--text); }
+
+.lesson-tabs { display: flex; gap: 0; margin-bottom: 20px; border-bottom: 2px solid var(--border); }
+.lesson-tab { flex: 1; padding: 14px; text-align: center; cursor: pointer; font-weight: 600; color: var(--text-light); transition: all 0.2s; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+.lesson-tab.active { color: var(--orange); border-bottom-color: var(--orange); }
+.lesson-tab:hover { background: #f8f9fa; }
+
+.video-filter { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.filter-btn { padding: 8px 14px; border: 2px solid var(--border); border-radius: 20px; background: white; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
+.filter-btn.active { background: var(--orange); color: white; border-color: var(--orange); }
+.filter-btn:hover { border-color: var(--orange); }
+
+.video-list { display: flex; flex-direction: column; gap: 12px; }
+.video-card { background: white; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.video-thumbnail { width: 100%; height: 180px; background: #222; display: flex; align-items: center; justify-content: center; font-size: 3rem; cursor: pointer; position: relative; background-size: cover; background-position: center; }
+.video-thumbnail .play-icon { position: absolute; width: 60px; height: 60px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+.video-info { padding: 14px; }
+.video-title { font-weight: 600; font-size: 1rem; margin-bottom: 8px; }
+.video-meta { display: flex; gap: 12px; font-size: 0.85rem; color: var(--text-light); margin-bottom: 10px; flex-wrap: wrap; }
+.video-meta span { display: flex; align-items: center; gap: 4px; }
+.video-actions { display: flex; gap: 8px; }
+.video-actions button { flex: 1; padding: 8px; border: none; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+.btn-watch { background: var(--orange); color: white; }
+.btn-complain { background: #f0f0f0; color: var(--text); }
 
 .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--text); color: white; padding: 12px 20px; border-radius: 24px; font-size: 0.95rem; opacity: 0; transition: opacity 0.3s; z-index: 2000; max-width: 90%; text-align: center; }
 .toast.show { opacity: 0.95; }
@@ -213,6 +169,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 
 @media (min-width: 768px) {
   .role-grid { grid-template-columns: repeat(3, 1fr); max-width: 600px; }
+  .topic-grid { grid-template-columns: repeat(3, 1fr); }
 }
 </style>
 </head>
@@ -225,15 +182,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <div class="subtitle-main">Кто ты?</div>
   
   <div class="role-grid">
-    <div class="role-btn" onclick="showAuth('director')"><div class="emoji">👔</div><div class="label">Я директор</div></div>
+    <div class="role-btn" onclick="showAuth('director')"><div class="emoji">🏫</div><div class="label">Я директор</div></div>
     <div class="role-btn" onclick="showAuth('deputy')"><div class="emoji">📋</div><div class="label">Я завуч</div></div>
-    <div class="role-btn" onclick="showAuth('teacher')"><div class="emoji">👨‍</div><div class="label">Я учитель</div></div>
+    <div class="role-btn" onclick="showAuth('teacher')"><div class="emoji">👨‍🏫</div><div class="label">Я учитель</div></div>
     <div class="role-btn" onclick="showScreen('screen-student')"><div class="emoji">🎒</div><div class="label">Я ученик</div></div>
-    <div class="role-btn full" onclick="showScreen('screen-parent')"><div class="emoji">👨‍👩‍</div><div class="label">Я родитель</div></div>
+    <div class="role-btn full" onclick="showScreen('screen-parent')"><div class="emoji">👨‍👩‍👧</div><div class="label">Я родитель</div></div>
   </div>
 
   <div style="margin-top: 24px; width: 100%; max-width: 400px;">
-    <button class="btn btn-grey" onclick="showScreen('screen-dictionary-list')" style="margin-bottom: 8px;"> Словари</button>
+    <button class="btn btn-grey" onclick="showScreen('screen-dictionary-list')" style="margin-bottom: 8px;">📖 Словари</button>
+    <button class="btn btn-grey" onclick="showScreen('screen-topic-selector')" style="margin-bottom: 8px;">📚 Уроки</button>
     <button class="btn btn-grey" onclick="showLeaderboard(null)">🏆 Таблица успеха</button>
   </div>
 
@@ -247,24 +205,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 <div id="screen-auth" class="screen auth-screen">
   <div class="auth-mascot">🦊</div>
   <div class="auth-title" id="auth-title">Вход</div>
-  
-  <div class="input-group">
-    <span class="input-icon">✉️</span>
-    <input type="email" id="auth-email" placeholder="Email" autocomplete="email">
-  </div>
-  <div class="input-group">
-    <span class="input-icon">🔒</span>
-    <input type="password" id="auth-password" placeholder="Пароль" autocomplete="current-password">
-  </div>
-
-  <div class="auth-links">
-    <a href="#" onclick="showScreen('screen-forgot'); return false;">Забыли пароль?</a>
-  </div>
-
+  <div class="input-group"><span class="input-icon">✉️</span><input type="email" id="auth-email" placeholder="Email"></div>
+  <div class="input-group"><span class="input-icon">🔒</span><input type="password" id="auth-password" placeholder="Пароль"></div>
+  <div class="auth-links"><a href="#" onclick="showScreen('screen-forgot'); return false;">Забыли пароль?</a></div>
   <button class="btn btn-orange" style="margin-top: 24px;" onclick="handleLogin()">Войти</button>
-  <div class="auth-links" style="margin-top: 16px;">
-    Нет аккаунта? <a href="#" onclick="showScreen('screen-register'); return false;">Зарегистрироваться</a>
-  </div>
+  <div class="auth-links" style="margin-top: 16px;">Нет аккаунта? <a href="#" onclick="showScreen('screen-register'); return false;">Зарегистрироваться</a></div>
   <button class="btn btn-grey" style="margin-top: 24px;" onclick="showScreen('screen-role')">← На главную</button>
 </div>
 
@@ -272,33 +217,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 <div id="screen-register" class="screen auth-screen">
   <div class="auth-mascot">🦊</div>
   <div class="auth-title">Регистрация</div>
-  
-  <div class="input-group">
-    <span class="input-icon">👤</span>
-    <input type="text" id="reg-fio" placeholder="ФИО" autocomplete="name">
-  </div>
-  <div class="input-group">
-    <span class="input-icon">✉️</span>
-    <input type="email" id="reg-email" placeholder="Email" autocomplete="email">
-  </div>
-  <div class="input-group">
-    <span class="input-icon">🔒</span>
-    <input type="password" id="reg-password" placeholder="Пароль (мин. 6 символов)" autocomplete="new-password">
-  </div>
-  <div class="input-group" id="reg-school-group" style="display: none;">
-    <span class="input-icon">🏫</span>
-    <input type="text" id="reg-school-code" placeholder="Код школы" style="text-transform: uppercase;">
-  </div>
-
-  <label class="consent-label">
-    <input type="checkbox" id="reg-consent">
-    <span>Я согласен с <a href="#" onclick="showScreen('screen-agreement'); return false;">Пользовательским соглашением</a> и <a href="#" onclick="showScreen('screen-privacy'); return false;">Политикой конфиденциальности</a></span>
-  </label>
-
+  <div class="input-group"><span class="input-icon">👤</span><input type="text" id="reg-fio" placeholder="ФИО"></div>
+  <div class="input-group"><span class="input-icon">✉️</span><input type="email" id="reg-email" placeholder="Email"></div>
+  <div class="input-group"><span class="input-icon">🔒</span><input type="password" id="reg-password" placeholder="Пароль (мин. 6 символов)"></div>
+  <div class="input-group" id="reg-school-group" style="display: none;"><span class="input-icon">🏫</span><input type="text" id="reg-school-code" placeholder="Код школы" style="text-transform: uppercase;"></div>
+  <label class="consent-label"><input type="checkbox" id="reg-consent"><span>Я согласен с <a href="#" onclick="showScreen('screen-agreement'); return false;">соглашением</a> и <a href="#" onclick="showScreen('screen-privacy'); return false;">политикой</a></span></label>
   <button class="btn btn-orange" onclick="handleRegister()">Зарегистрироваться</button>
-  <div class="auth-links" style="margin-top: 16px;">
-    Уже есть аккаунт? <a href="#" onclick="showScreen('screen-auth'); return false;">Войти</a>
-  </div>
   <button class="btn btn-grey" style="margin-top: 24px;" onclick="showScreen('screen-role')">← На главную</button>
 </div>
 
@@ -306,17 +230,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 <div id="screen-forgot" class="screen auth-screen">
   <div class="auth-mascot">❓</div>
   <div class="auth-title">Забыли пароль?</div>
-  <p style="text-align: center; color: var(--text-light); margin-bottom: 24px;">Введите email, указанный при регистрации. Мы отправим ссылку для сброса.</p>
-  
-  <div class="input-group">
-    <span class="input-icon">✉️</span>
-    <input type="email" id="forgot-email" placeholder="Email" autocomplete="email">
-  </div>
-
+  <p style="text-align: center; color: var(--text-light); margin-bottom: 24px;">Введите email для сброса.</p>
+  <div class="input-group"><span class="input-icon">✉️</span><input type="email" id="forgot-email" placeholder="Email"></div>
   <button class="btn btn-orange" onclick="handleForgot()">Отправить ссылку</button>
-  <div class="auth-links" style="margin-top: 16px;">
-    <a href="#" onclick="showScreen('screen-auth'); return false;">Вспомнили пароль? Войти</a>
-  </div>
   <button class="btn btn-grey" style="margin-top: 24px;" onclick="showScreen('screen-role')">← На главную</button>
 </div>
 
@@ -325,11 +241,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
   <div class="header">
     <div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div>
     <div class="header-actions">
-      <div class="notification-bell" onclick="showNotifications()">
-        🔔
-        <span class="notification-badge" id="notif-badge" style="display: none;">0</span>
-      </div>
-      <div class="avatar" onclick="toggleDropdown()" id="user-avatar"></div>
+      <div class="notification-bell" onclick="showNotifications()">🔔<span class="notification-badge" id="notif-badge" style="display: none;">0</span></div>
+      <div class="avatar" onclick="toggleDropdown()" id="user-avatar">👤</div>
       <div class="dropdown-menu" id="user-dropdown">
         <div class="dropdown-header" id="dropdown-user-name">Гость</div>
         <div class="dropdown-role" id="dropdown-user-role">Роль не указана</div>
@@ -337,86 +250,52 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
         <div class="dropdown-item" id="menu-classes" style="display: none;" onclick="showMyClasses()">🏫 Мои классы</div>
         <div class="dropdown-item" id="menu-assignments" style="display: none;" onclick="showMyAssignments()">📝 Мои задания</div>
         <div class="dropdown-item" onclick="showSupport()">💬 Поддержка</div>
-        <div class="dropdown-item logout" onclick="handleLogout()">🚪 Выйти из аккаунта</div>
+        <div class="dropdown-item logout" onclick="handleLogout()">🚪 Выйти</div>
       </div>
     </div>
   </div>
-  
   <div class="dashboard-welcome" id="dashboard-welcome">Добро пожаловать!</div>
   <div class="dashboard-subtitle" id="dashboard-subtitle">Ваш личный кабинет</div>
-
-  <div class="dashboard-stats" id="dashboard-stats">
-    <div class="stat-card">
-      <div class="stat-value" id="stat-1">0</div>
-      <div class="stat-label" id="stat-1-label">Загрузка...</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-value" id="stat-2">0</div>
-      <div class="stat-label" id="stat-2-label">Загрузка...</div>
-    </div>
+  <div class="dashboard-stats">
+    <div class="stat-card"><div class="stat-value" id="stat-1">0</div><div class="stat-label" id="stat-1-label">Загрузка...</div></div>
+    <div class="stat-card"><div class="stat-value" id="stat-2">0</div><div class="stat-label" id="stat-2-label">Загрузка...</div></div>
   </div>
-
   <div id="dashboard-content"></div>
 </div>
 
 <!-- ЭКРАН УЧЕНИКА -->
 <div id="screen-student" class="screen">
-  <div class="header">
-    <div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div>
-  </div>
+  <div class="header"><div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div></div>
   <h1 style="font-size: 1.8rem; margin-bottom: 8px;">Привет, ученик! 🎒</h1>
   <p style="color: var(--text-light); margin-bottom: 24px;">Введи код класса от учителя</p>
-
-  <div class="input-group">
-    <span class="input-icon">🏫</span>
-    <input type="text" id="student-code" placeholder="КОД КЛАССА" maxlength="6" style="text-transform: uppercase; text-align: center; font-size: 1.3rem; letter-spacing: 2px;" oninput="onStudentCodeInput()">
-  </div>
-  
+  <div class="input-group"><span class="input-icon">🏫</span><input type="text" id="student-code" placeholder="КОД КЛАССА" maxlength="6" style="text-transform: uppercase; text-align: center; font-size: 1.3rem; letter-spacing: 2px;" oninput="onStudentCodeInput()"></div>
   <div id="class-info" style="text-align: center; font-weight: bold; color: var(--green); margin-bottom: 16px; min-height: 24px;"></div>
   <button class="btn btn-orange" id="student-start-btn" style="display: none;" onclick="startClassGame()">▶ Начать!</button>
-
   <div style="margin-top: 32px;">
-    <p style="color: var(--text-light); margin-bottom: 16px;">Нет кода? Играй сам </p>
+    <p style="color: var(--text-light); margin-bottom: 16px;">Нет кода? Играй сам 🎮</p>
     <div class="role-grid" style="max-width: 100%;">
-      <div class="role-btn" onclick="startSoloGame('math')"><div class="emoji"></div><div class="label">Математика</div></div>
+      <div class="role-btn" onclick="startSoloGame('math')"><div class="emoji">🔢</div><div class="label">Математика</div></div>
       <div class="role-btn" onclick="startSoloGame('russian')"><div class="emoji">📖</div><div class="label">Русский</div></div>
       <div class="role-btn" onclick="startSoloGame('english')"><div class="emoji">🇬🇧</div><div class="label">Английский</div></div>
     </div>
   </div>
-
   <div style="margin-top: 24px;">
     <p style="color: var(--text-light); margin-bottom: 12px;">Как тебя зовут?</p>
-    <div class="input-group">
-      <span class="input-icon"></span>
-      <input type="text" id="nickname-input" placeholder="Твоё имя..." maxlength="20">
-    </div>
+    <div class="input-group"><span class="input-icon">👤</span><input type="text" id="nickname-input" placeholder="Твоё имя..." maxlength="20"></div>
   </div>
   <button class="btn btn-grey" style="margin-top: 16px;" onclick="showScreen('screen-role')">← На главную</button>
 </div>
 
 <!-- ЭКРАН РОДИТЕЛЯ -->
 <div id="screen-parent" class="screen">
-  <div class="header">
-    <div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div>
-  </div>
+  <div class="header"><div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div></div>
   <div class="auth-mascot" style="margin-top: 20px;">🦊👓</div>
   <h1 style="font-size: 1.8rem; margin-bottom: 8px; text-align: center;">Вход родителя</h1>
-  <p style="color: var(--text-light); margin-bottom: 24px; text-align: center;">Введи персональный код от учителя</p>
-
-  <div class="input-group">
-    <span class="input-icon">🏫</span>
-    <input type="text" id="parent-school-code" placeholder="Код школы (необязательно)" style="text-transform: uppercase;">
-  </div>
-  <div class="input-group">
-    <span class="input-icon">🔑</span>
-    <input type="text" id="parent-code-input" placeholder="Код родителя (P-XXXX)" maxlength="8" style="text-transform: uppercase; text-align: center; font-size: 1.2rem; letter-spacing: 2px;">
-  </div>
-
+  <p style="color: var(--text-light); margin-bottom: 24px; text-align: center;">Введи персональный код</p>
+  <div class="input-group"><span class="input-icon">🏫</span><input type="text" id="parent-school-code" placeholder="Код школы (необязательно)" style="text-transform: uppercase;"></div>
+  <div class="input-group"><span class="input-icon">🔑</span><input type="text" id="parent-code-input" placeholder="Код родителя (P-XXXX)" maxlength="8" style="text-transform: uppercase; text-align: center; font-size: 1.2rem; letter-spacing: 2px;"></div>
   <div id="parent-error" style="text-align: center; color: var(--red); font-weight: bold; margin-bottom: 16px; display: none;"></div>
   <button class="btn btn-orange" onclick="parentLogin()">🔍 Найти ребёнка</button>
-  <div class="auth-links" style="margin-top: 16px;">
-    <a href="#" onclick="showToast('Узнай код у учителя'); return false;">Нет кода? Узнать у учителя</a>
-  </div>
   <button class="btn btn-grey" style="margin-top: 24px;" onclick="showScreen('screen-role')">← На главную</button>
 </div>
 
@@ -424,11 +303,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 <div id="screen-game" class="screen" style="padding-bottom: 100px;">
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
     <span style="font-size: 1.2rem; font-weight: bold;">⭐ <span id="score-display">0</span></span>
-    <span style="font-size: 1.1rem;"> <span id="streak-count">0</span></span>
+    <span style="font-size: 1.1rem;">🔥 <span id="streak-count">0</span></span>
   </div>
-  <div style="background: #E8EDF2; border-radius: 8px; height: 10px; margin-bottom: 24px; overflow: hidden;">
-    <div id="progress-fill" style="background: var(--orange); height: 100%; width: 0%; transition: width 0.5s;"></div>
-  </div>
+  <div style="background: #E8EDF2; border-radius: 8px; height: 10px; margin-bottom: 24px; overflow: hidden;"><div id="progress-fill" style="background: var(--orange); height: 100%; width: 0%; transition: width 0.5s;"></div></div>
   <div style="text-align: center; font-size: 4rem; margin-bottom: 16px;" id="game-mascot">🦊</div>
   <div id="question-text" style="font-size: 1.8rem; font-weight: bold; text-align: center; margin-bottom: 32px; min-height: 60px;"></div>
   <div id="input-area" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 500px; margin: 0 auto;"></div>
@@ -448,9 +325,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 
 <!-- ЭКРАН ТАБЛИЦЫ ЛИДЕРОВ -->
 <div id="screen-leaderboard" class="screen">
-  <div class="header">
-    <div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div>
-  </div>
+  <div class="header"><div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div></div>
   <h1 style="font-size: 1.8rem; margin-bottom: 8px;">🏆 Таблица успеха</h1>
   <p id="leaderboard-sub" style="color: var(--text-light); margin-bottom: 24px;">Лучшие результаты</p>
   <div id="leaderboard-list" style="margin-bottom: 80px;"></div>
@@ -459,10 +334,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 
 <!-- ЭКРАН СОГЛАШЕНИЯ -->
 <div id="screen-agreement" class="screen" style="background: white; padding: 20px;">
-  <h2 style="margin-bottom: 16px;">📄 Пользовательское соглашение</h2>
+  <h2 style="margin-bottom: 16px;">📜 Пользовательское соглашение</h2>
   <div style="line-height: 1.6; color: var(--text); margin-bottom: 24px;">
-    <p>1. Игра "Лисёнок Пифагор" предоставляется бесплатно и носит информационно-развлекательный характер.</p>
-    <p>2. Оператор не несёт ответственности за успеваемость пользователей.</p>
+    <p>1. Игра "Лисёнок Пифагор" предоставляется бесплатно.</p>
+    <p>2. Оператор не несёт ответственности за успеваемость.</p>
     <p>3. Контакты: iosif.marketing@yandex.ru</p>
   </div>
   <button class="btn btn-orange" onclick="showScreen('screen-role')">Закрыть</button>
@@ -472,68 +347,41 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 <div id="screen-privacy" class="screen" style="background: white; padding: 20px;">
   <h2 style="margin-bottom: 16px;">🔒 Политика конфиденциальности</h2>
   <div style="line-height: 1.6; color: var(--text); margin-bottom: 24px;">
-    <p>1. Мы собираем только имя (никнейм) и результаты игры для отображения прогресса.</p>
+    <p>1. Мы собираем только имя и результаты игры.</p>
     <p>2. Данные хранятся в защищённой базе Firebase.</p>
     <p>3. Контакты: iosif.marketing@yandex.ru</p>
   </div>
   <button class="btn btn-orange" onclick="showScreen('screen-role')">Закрыть</button>
 </div>
 
-<!-- ЭКРАН ВЫБОРА СЛОВАРЯ -->
+<!-- ЭКРАН СЛОВАРЕЙ -->
 <div id="screen-dictionary-list" class="screen">
-  <div class="header">
-    <div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div>
-  </div>
+  <div class="header"><div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div></div>
   <h1 style="font-size: 1.8rem; margin-bottom: 8px;">📖 Словари</h1>
   <p style="color: var(--text-light); margin-bottom: 24px;">Выбери предмет для изучения</p>
-
   <div class="dictionary-grid">
-    <div class="dictionary-card" onclick="openDictionary('russian')">
-      <div class="dict-emoji">🇷</div>
-      <div class="dict-title">Русский язык</div>
-      <div class="dict-count">Орфография и пунктуация</div>
-    </div>
-    <div class="dictionary-card" onclick="openDictionary('english')">
-      <div class="dict-emoji">🇬🇧</div>
-      <div class="dict-title">Английский</div>
-      <div class="dict-count">Слова и фразы</div>
-    </div>
-    <div class="dictionary-card" onclick="openDictionary('chemistry')">
-      <div class="dict-emoji">⚗️</div>
-      <div class="dict-title">Химия</div>
-      <div class="dict-count">Элементы и формулы</div>
-    </div>
-    <div class="dictionary-card" onclick="openDictionary('physics')">
-      <div class="dict-emoji">⚛️</div>
-      <div class="dict-title">Физика</div>
-      <div class="dict-count">Законы и величины</div>
-    </div>
+    <div class="dictionary-card" onclick="openDictionary('russian')"><div class="dict-emoji">🇷🇺</div><div class="dict-title">Русский язык</div><div class="dict-count">Орфография</div></div>
+    <div class="dictionary-card" onclick="openDictionary('english')"><div class="dict-emoji">🇬🇧</div><div class="dict-title">Английский</div><div class="dict-count">Слова и фразы</div></div>
+    <div class="dictionary-card" onclick="openDictionary('chemistry')"><div class="dict-emoji">⚗️</div><div class="dict-title">Химия</div><div class="dict-count">Элементы</div></div>
+    <div class="dictionary-card" onclick="openDictionary('physics')"><div class="dict-emoji">⚛️</div><div class="dict-title">Физика</div><div class="dict-count">Законы</div></div>
   </div>
-
   <button class="btn btn-grey" style="margin-top: 32px; max-width: 500px; margin-left: auto; margin-right: auto;" onclick="showScreen('screen-role')">← На главную</button>
 </div>
 
 <!-- ЭКРАН ТЕМ СЛОВАРЯ -->
 <div id="screen-dictionary-topics" class="screen">
-  <div class="header">
-    <div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div>
-  </div>
+  <div class="header"><div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div></div>
   <h1 style="font-size: 1.8rem; margin-bottom: 8px;" id="dict-subject-title">Предмет</h1>
   <p style="color: var(--text-light); margin-bottom: 24px;">Выбери тему для изучения</p>
-
   <div class="topic-list" id="topic-list"></div>
-
   <button class="btn btn-grey" style="margin-top: 24px; max-width: 500px; margin-left: auto; margin-right: auto;" onclick="showScreen('screen-dictionary-list')">← К словарям</button>
 </div>
 
 <!-- ЭКРАН КАРТОЧЕК -->
 <div id="screen-dictionary-cards" class="screen">
-  <div class="header">
-    <div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div>
-  </div>
+  <div class="header"><div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div></div>
   <h1 style="font-size: 1.5rem; margin-bottom: 8px;" id="cards-topic-title">Тема</h1>
   <p style="color: var(--text-light); margin-bottom: 16px; font-size: 0.95rem;">Нажми на карточку, чтобы увидеть ответ</p>
-
   <div class="flashcard-container">
     <div class="flashcard" id="flashcard" onclick="flipCard()">
       <div class="card-term" id="card-term">Термин</div>
@@ -541,16 +389,69 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
       <div class="card-definition" id="card-definition" style="display: none;"></div>
       <div class="card-example" id="card-example" style="display: none;"></div>
     </div>
-    
     <div class="flashcard-counter" id="flashcard-counter">1 / 10</div>
-    
     <div class="flashcard-nav">
       <button class="btn btn-grey" onclick="prevCard()">← Назад</button>
       <button class="btn btn-orange" onclick="nextCard()">Далее →</button>
     </div>
   </div>
-
   <button class="btn btn-grey" style="margin-top: 24px; max-width: 500px; margin-left: auto; margin-right: auto;" onclick="showScreen('screen-dictionary-topics')">← К темам</button>
+</div>
+
+<!-- ЭКРАН ВЫБОРА ТЕМЫ УРОКА -->
+<div id="screen-topic-selector" class="screen">
+  <div class="header"><div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div></div>
+  <h1 style="font-size: 1.8rem; margin-bottom: 8px;">📚 Выбор темы урока</h1>
+  <p style="color: var(--text-light); margin-bottom: 24px;">Выбери предмет и класс</p>
+  <div class="topic-selector">
+    <div class="selector-filters">
+      <select id="subject-select" onchange="updateTopics()">
+        <option value="math">🔢 Математика</option>
+        <option value="russian">📖 Русский язык</option>
+        <option value="english">🇬🇧 Английский</option>
+        <option value="chemistry">⚗️ Химия</option>
+        <option value="physics">⚛️ Физика</option>
+      </select>
+      <select id="grade-select" onchange="updateTopics()">
+        <option value="1">1 класс</option><option value="2">2 класс</option><option value="3" selected>3 класс</option>
+        <option value="4">4 класс</option><option value="5">5 класс</option><option value="6">6 класс</option>
+        <option value="7">7 класс</option><option value="8">8 класс</option><option value="9">9 класс</option>
+        <option value="10">10 класс</option><option value="11">11 класс</option>
+      </select>
+    </div>
+    <div class="topic-grid" id="topic-grid"></div>
+  </div>
+  <button class="btn btn-grey" style="margin-top: 32px; max-width: 500px; margin-left: auto; margin-right: auto;" onclick="showScreen('screen-role')">← На главную</button>
+</div>
+
+<!-- ЭКРАН УРОКА -->
+<div id="screen-lesson" class="screen">
+  <div class="header"><div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div></div>
+  <h1 style="font-size: 1.5rem; margin-bottom: 8px;" id="lesson-title">Тема урока</h1>
+  <p style="color: var(--text-light); margin-bottom: 20px;" id="lesson-subtitle">3 класс • Математика</p>
+  <div class="lesson-tabs">
+    <div class="lesson-tab active" onclick="switchLessonTab('theory')">🎥 Теория</div>
+    <div class="lesson-tab" onclick="switchLessonTab('practice')">✏️ Практика</div>
+  </div>
+  <div id="lesson-theory">
+    <div class="video-filter">
+      <div class="filter-btn active" onclick="setVideoFilter(5)">5 мин</div>
+      <div class="filter-btn" onclick="setVideoFilter(15)">15 мин</div>
+      <div class="filter-btn" onclick="setVideoFilter(20)">20 мин</div>
+      <div class="filter-btn" onclick="setVideoFilter(25)">25 мин</div>
+      <div class="filter-btn" onclick="setVideoFilter(30)">30 мин</div>
+      <div class="filter-btn" onclick="setVideoFilter(35)">35 мин</div>
+    </div>
+    <div class="video-list" id="video-list"></div>
+  </div>
+  <div id="lesson-practice" style="display: none;">
+    <div class="card">
+      <div class="card-title">✏️ Практика</div>
+      <p style="color: var(--text-light); margin-bottom: 20px;">Реши задачи по теме</p>
+      <button class="btn btn-orange" onclick="startLessonPractice()">▶ Начать решение задач</button>
+    </div>
+  </div>
+  <button class="btn btn-grey" style="margin-top: 24px;" onclick="showScreen('screen-topic-selector')">← К темам</button>
 </div>
 
 <div id="toast" class="toast"></div>
@@ -561,138 +462,29 @@ const state = {
   grade: 1, round: 0, maxRounds: 10, score: 0, streak: 0, 
   nickname: '', classCode: '', joinClass: null, 
   currentProblem: null, currentRoundHistory: [], 
-  subject: 'math',
-  currentUser: null,
-  currentRole: null,
-  // Для словарей
-  currentDictionary: null,
-  currentTopic: null,
-  currentCards: [],
-  currentCardIndex: 0,
-  cardFlipped: false
+  subject: 'math', currentUser: null, currentRole: null,
+  currentDictionary: null, currentTopic: null, currentCards: [],
+  currentCardIndex: 0, cardFlipped: false,
+  currentLessonTopic: null, currentLessonSubject: null, currentLessonGrade: null,
+  videoFilter: 15, currentLessonTab: 'theory'
 };
 let selectedRole = 'teacher';
 
-// ===== БАЗА СЛОВАРЕЙ =====
-const dictionaries = {
-  russian: {
-    title: 'Русский язык',
-    emoji: '🇷',
-    topics: [
-      {
-        name: 'Безударные гласные в корне',
-        cards: [
-          { term: 'В_да', definition: 'Вода', example: 'Проверочное слово: вóды' },
-          { term: 'Л_сной', definition: 'Лесной', example: 'Проверочное слово: лéс' },
-          { term: 'Тр_па', definition: 'Тропа', example: 'Проверочное слово: трóпы' },
-          { term: 'Сн_га', definition: 'Снега', example: 'Проверочное слово: снéг' },
-          { term: 'Цв_ты', definition: 'Цветы', example: 'Проверочное слово: цвéт' }
-        ]
-      },
-      {
-        name: 'Парные согласные',
-        cards: [
-          { term: 'Ду_', definition: 'Дуб', example: 'Проверочное слово: ду́бы' },
-          { term: 'Гла_', definition: 'Глаз', example: 'Проверочное слово: гла́за' },
-          { term: 'Моро_', definition: 'Мороз', example: 'Проверочное слово: моро́зы' },
-          { term: 'Сне_', definition: 'Снег', example: 'Проверочное слово: снега́' }
-        ]
-      },
-      {
-        name: 'Непроизносимые согласные',
-        cards: [
-          { term: 'Со_нце', definition: 'Солнце', example: 'Проверочное слово: со́лнышко' },
-          { term: 'Сер_це', definition: 'Сердце', example: 'Проверочное слово: серде́чко' },
-          { term: 'Мес_ный', definition: 'Местный', example: 'Проверочное слово: ме́сто' }
-        ]
-      }
-    ]
-  },
-  english: {
-    title: 'Английский язык',
-    emoji: '🇬🇧',
-    topics: [
-      {
-        name: 'Базовые слова (A1)',
-        cards: [
-          { term: 'Hello', definition: 'Привет', example: 'Hello, how are you?' },
-          { term: 'Goodbye', definition: 'До свидания', example: 'Goodbye, see you tomorrow!' },
-          { term: 'Thank you', definition: 'Спасибо', example: 'Thank you very much!' },
-          { term: 'Please', definition: 'Пожалуйста', example: 'Please, help me.' },
-          { term: 'Sorry', definition: 'Извини', example: 'Sorry, I am late.' }
-        ]
-      },
-      {
-        name: 'Семья (Family)',
-        cards: [
-          { term: 'Mother', definition: 'Мама', example: 'My mother is a teacher.' },
-          { term: 'Father', definition: 'Папа', example: 'My father works in an office.' },
-          { term: 'Sister', definition: 'Сестра', example: 'I have one sister.' },
-          { term: 'Brother', definition: 'Брат', example: 'My brother is older than me.' }
-        ]
-      },
-      {
-        name: 'Цвета (Colors)',
-        cards: [
-          { term: 'Red', definition: 'Красный', example: 'The apple is red.' },
-          { term: 'Blue', definition: 'Синий', example: 'The sky is blue.' },
-          { term: 'Green', definition: 'Зелёный', example: 'The grass is green.' },
-          { term: 'Yellow', definition: 'Жёлтый', example: 'The sun is yellow.' }
-        ]
-      }
-    ]
-  },
-  chemistry: {
-    title: 'Химия',
-    emoji: '⚗️',
-    topics: [
-      {
-        name: 'Химические элементы',
-        cards: [
-          { term: 'H', definition: 'Водород (Hydrogen)', example: 'Самый лёгкий элемент' },
-          { term: 'O', definition: 'Кислород (Oxygen)', example: 'Необходим для дыхания' },
-          { term: 'C', definition: 'Углерод (Carbon)', example: 'Основа органической химии' },
-          { term: 'N', definition: 'Азот (Nitrogen)', example: '78% атмосферы' },
-          { term: 'Fe', definition: 'Железо (Ferrum)', example: 'Металл, основа стали' }
-        ]
-      },
-      {
-        name: 'Формулы веществ',
-        cards: [
-          { term: 'H₂O', definition: 'Вода', example: 'Универсальный растворитель' },
-          { term: 'CO₂', definition: 'Углекислый газ', example: 'Продукт дыхания' },
-          { term: 'NaCl', definition: 'Поваренная соль', example: 'Хлорид натрия' },
-          { term: 'H₂SO₄', definition: 'Серная кислота', example: 'Сильная кислота' }
-        ]
-      }
-    ]
-  },
-  physics: {
-    title: 'Физика',
-    emoji: '⚛️',
-    topics: [
-      {
-        name: 'Физические величины',
-        cards: [
-          { term: 'Скорость (v)', definition: 'м/с', example: 'v = S / t' },
-          { term: 'Масса (m)', definition: 'кг', example: 'Мера инертности тела' },
-          { term: 'Сила (F)', definition: 'Н (Ньютон)', example: 'F = m × a' },
-          { term: 'Энергия (E)', definition: 'Дж (Джоуль)', example: 'E = m × c²' }
-        ]
-      },
-      {
-        name: 'Законы Ньютона',
-        cards: [
-          { term: '1-й закон Ньютона', definition: 'Закон инерции', example: 'Тело сохраняет покой или равномерное движение, если на него не действуют силы' },
-          { term: '2-й закон Ньютона', definition: 'F = m × a', example: 'Сила равна произведению массы на ускорение' },
-          { term: '3-й закон Ньютона', definition: 'Действие = Противодействие', example: 'Силы всегда парны и равны по модулю' }
-        ]
-      }
-    ]
-  }
+const lessonTopics = {
+  math: { 1: ['Сложение до 10', 'Вычитание до 10'], 2: ['Сложение до 100', 'Вычитание до 100'], 3: ['Таблица умножения на 4', 'Таблица умножения на 5', 'Таблица умножения на 6', 'Таблица умножения на 7', 'Деление'], 4: ['Многозначные числа', 'Порядок действий'], 5: ['Дроби', 'Проценты'], 6: ['Отрицательные числа', 'Пропорции'], 7: ['Линейные уравнения'], 8: ['Квадратные уравнения'], 9: ['Функции', 'Неравенства'], 10: ['Тригонометрия'], 11: ['Интегралы'] },
+  russian: { 1: ['Алфавит'], 2: ['Слоги', 'Ударение'], 3: ['Безударные гласные', 'Парные согласные'], 4: ['Части речи', 'Падежи'], 5: ['Синтаксис', 'Пунктуация'], 6: ['Морфология'], 7: ['Сложные предложения'], 8: ['Деепричастия'], 9: ['Сложноподчинённые'], 10: ['Стилистика'], 11: ['ЕГЭ подготовка'] },
+  english: { 1: ['Алфавит', 'Числа'], 2: ['Цвета', 'Животные'], 3: ['Семья', 'Еда'], 4: ['Время', 'Погода'], 5: ['Present Simple'], 6: ['Past Simple'], 7: ['Present Continuous'], 8: ['Future Simple'], 9: ['Passive Voice'], 10: ['Reported speech'], 11: ['IELTS подготовка'] },
+  chemistry: { 8: ['Атомы и молекулы', 'Периодическая таблица'], 9: ['Химические реакции'], 10: ['Органическая химия'], 11: ['ЕГЭ химия'] },
+  physics: { 7: ['Механика', 'Силы'], 8: ['Электричество'], 9: ['Оптика', 'Волны'], 10: ['Термодинамика'], 11: ['ЕГЭ физика'] }
 };
 
-// ===== НАВИГАЦИЯ =====
+const dictionaries = {
+  russian: { title: 'Русский язык', emoji: '🇷🇺', topics: [{ name: 'Безударные гласные', cards: [{ term: 'В_да', definition: 'Вода', example: 'Проверочное: вóды' }, { term: 'Л_сной', definition: 'Лесной', example: 'Проверочное: лéс' }] }] },
+  english: { title: 'Английский язык', emoji: '🇬🇧', topics: [{ name: 'Базовые слова', cards: [{ term: 'Hello', definition: 'Привет', example: 'Hello, how are you?' }] }] },
+  chemistry: { title: 'Химия', emoji: '⚗️', topics: [{ name: 'Элементы', cards: [{ term: 'H', definition: 'Водород', example: 'Самый лёгкий элемент' }] }] },
+  physics: { title: 'Физика', emoji: '⚛️', topics: [{ name: 'Величины', cards: [{ term: 'Скорость (v)', definition: 'м/с', example: 'v = S / t' }] }] }
+};
+
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -703,20 +495,10 @@ function showScreen(id) {
 
 function showAuth(role) {
   selectedRole = role;
-  const titles = { director: 'Вход директора', deputy: 'Вход завуча', teacher: 'Вход учителя' };
-  document.getElementById('auth-title').textContent = titles[role] || 'Вход';
-  
+  document.getElementById('auth-title').textContent = { director: 'Вход директора', deputy: 'Вход завуча', teacher: 'Вход учителя' }[role] || 'Вход';
   const schoolGroup = document.getElementById('reg-school-group');
-  const schoolInput = document.getElementById('reg-school-code');
-  if (role === 'deputy') {
-    schoolInput.placeholder = 'Код школы (ОБЯЗАТЕЛЬНО)';
-    schoolGroup.style.display = 'block';
-  } else if (role === 'teacher') {
-    schoolInput.placeholder = 'Код школы (необязательно)';
-    schoolGroup.style.display = 'block';
-  } else {
-    schoolGroup.style.display = 'none';
-  }
+  if (role === 'deputy' || role === 'teacher') { schoolGroup.style.display = 'block'; } 
+  else { schoolGroup.style.display = 'none'; }
   showScreen('screen-auth');
 }
 
@@ -728,96 +510,53 @@ function showToast(msg) {
   t._to = setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-// ===== ВЫПАДАЮЩЕЕ МЕНЮ =====
 function toggleDropdown() {
   const menu = document.getElementById('user-dropdown');
   menu.classList.toggle('show');
   document.onclick = function(event) {
-    if (!event.target.matches('.avatar') && !event.target.closest('.dropdown-menu')) {
-      menu.classList.remove('show');
-    }
+    if (!event.target.matches('.avatar') && !event.target.closest('.dropdown-menu')) menu.classList.remove('show');
   }
 }
 
 function handleLogout() {
-  if (confirm('Вы точно хотите выйти из аккаунта?')) {
+  if (confirm('Выйти из аккаунта?')) {
     auth.signOut().then(() => {
-      showToast('Вы успешно вышли из аккаунта');
-      document.getElementById('user-dropdown').classList.remove('show');
-      state.currentUser = null;
-      state.currentRole = null;
+      showToast('Вы вышли из аккаунта');
+      state.currentUser = null; state.currentRole = null;
       showScreen('screen-role');
-    }).catch((error) => {
-      showToast('Ошибка при выходе: ' + error.message);
     });
   }
 }
 
-function showSupport() {
-  const subject = encodeURIComponent('Вопрос по Лисёнку Пифагору');
-  const body = encodeURIComponent('Здравствуйте! У меня вопрос: ');
-  window.location.href = `mailto:iosif.marketing@yandex.ru?subject=${subject}&body=${body}`;
-  document.getElementById('user-dropdown').classList.remove('show');
-}
+function showSupport() { window.location.href = `mailto:iosif.marketing@yandex.ru?subject=Вопрос по Лисёнку Пифагору`; document.getElementById('user-dropdown').classList.remove('show'); }
+function showMyStats() { showToast('📊 Статистика в разработке'); document.getElementById('user-dropdown').classList.remove('show'); }
+function showMyClasses() { showToast('🏫 Классы в разработке'); document.getElementById('user-dropdown').classList.remove('show'); }
+function showMyAssignments() { showToast('📝 Задания в разработке'); document.getElementById('user-dropdown').classList.remove('show'); }
+function showNotifications() { showToast('🔔 Нет новых уведомлений'); }
 
-function showMyStats() {
-  showToast('📊 Раздел статистики в разработке');
-  document.getElementById('user-dropdown').classList.remove('show');
-}
-
-function showMyClasses() {
-  showToast('🏫 Раздел "Мои классы" в разработке');
-  document.getElementById('user-dropdown').classList.remove('show');
-}
-
-function showMyAssignments() {
-  showToast('📝 Раздел "Мои задания" в разработке');
-  document.getElementById('user-dropdown').classList.remove('show');
-}
-
-function showNotifications() {
-  showToast('🔔 У вас нет новых уведомлений');
-}
-
-// ===== СЛОВАРИ =====
 function openDictionary(subjectKey) {
   const dict = dictionaries[subjectKey];
-  if (!dict) {
-    showToast('Словарь не найден');
-    return;
-  }
-  
   state.currentDictionary = subjectKey;
   document.getElementById('dict-subject-title').textContent = dict.emoji + ' ' + dict.title;
-  
   const list = document.getElementById('topic-list');
   list.innerHTML = '';
-  
   dict.topics.forEach((topic, index) => {
     const item = document.createElement('div');
     item.className = 'topic-item';
     item.onclick = () => openTopic(subjectKey, index);
-    item.innerHTML = `
-      <div class="topic-name">${topic.name}</div>
-      <div class="topic-count">${topic.cards.length} карточек</div>
-    `;
+    item.innerHTML = `<div class="topic-name">${topic.name}</div><div class="topic-count">${topic.cards.length} карточек</div>`;
     list.appendChild(item);
   });
-  
   showScreen('screen-dictionary-topics');
 }
 
 function openTopic(subjectKey, topicIndex) {
-  const dict = dictionaries[subjectKey];
-  const topic = dict.topics[topicIndex];
-  
+  const topic = dictionaries[subjectKey].topics[topicIndex];
   state.currentTopic = topic;
   state.currentCards = topic.cards;
   state.currentCardIndex = 0;
   state.cardFlipped = false;
-  
   document.getElementById('cards-topic-title').textContent = topic.name;
-  
   showCard();
   showScreen('screen-dictionary-cards');
 }
@@ -825,57 +564,154 @@ function openTopic(subjectKey, topicIndex) {
 function showCard() {
   const card = state.currentCards[state.currentCardIndex];
   const flashcard = document.getElementById('flashcard');
-  const termEl = document.getElementById('card-term');
-  const defEl = document.getElementById('card-definition');
-  const exEl = document.getElementById('card-example');
-  const counterEl = document.getElementById('flashcard-counter');
-  
-  // Сброс состояния
   flashcard.classList.remove('flipped');
-  defEl.style.display = 'none';
-  exEl.style.display = 'none';
+  document.getElementById('card-definition').style.display = 'none';
+  document.getElementById('card-example').style.display = 'none';
   state.cardFlipped = false;
-  
-  termEl.textContent = card.term;
-  defEl.textContent = card.definition;
-  exEl.textContent = card.example ? '📝 ' + card.example : '';
-  counterEl.textContent = `${state.currentCardIndex + 1} / ${state.currentCards.length}`;
+  document.getElementById('card-term').textContent = card.term;
+  document.getElementById('card-definition').textContent = card.definition;
+  document.getElementById('card-example').textContent = card.example ? '📝 ' + card.example : '';
+  document.getElementById('flashcard-counter').textContent = `${state.currentCardIndex + 1} / ${state.currentCards.length}`;
 }
 
 function flipCard() {
-  const flashcard = document.getElementById('flashcard');
-  const defEl = document.getElementById('card-definition');
-  const exEl = document.getElementById('card-example');
-  
   state.cardFlipped = !state.cardFlipped;
-  
+  const flashcard = document.getElementById('flashcard');
   if (state.cardFlipped) {
     flashcard.classList.add('flipped');
-    defEl.style.display = 'block';
-    if (state.currentCards[state.currentCardIndex].example) {
-      exEl.style.display = 'block';
-    }
+    document.getElementById('card-definition').style.display = 'block';
+    if (state.currentCards[state.currentCardIndex].example) document.getElementById('card-example').style.display = 'block';
   } else {
     flashcard.classList.remove('flipped');
-    defEl.style.display = 'none';
-    exEl.style.display = 'none';
+    document.getElementById('card-definition').style.display = 'none';
+    document.getElementById('card-example').style.display = 'none';
   }
 }
 
 function nextCard() {
-  if (state.currentCardIndex < state.currentCards.length - 1) {
-    state.currentCardIndex++;
-    showCard();
-  } else {
-    showToast('🎉 Ты прошёл все карточки!');
-  }
+  if (state.currentCardIndex < state.currentCards.length - 1) { state.currentCardIndex++; showCard(); } 
+  else { showToast('🎉 Ты прошёл все карточки!'); }
 }
 
 function prevCard() {
-  if (state.currentCardIndex > 0) {
-    state.currentCardIndex--;
-    showCard();
+  if (state.currentCardIndex > 0) { state.currentCardIndex--; showCard(); }
+}
+
+function updateTopics() {
+  const subject = document.getElementById('subject-select').value;
+  const grade = document.getElementById('grade-select').value;
+  const topics = lessonTopics[subject]?.[grade] || ['Тема 1', 'Тема 2'];
+  const grid = document.getElementById('topic-grid');
+  grid.innerHTML = '';
+  const icons = { math: '🔢', russian: '📖', english: '🇬🇧', chemistry: '⚗️', physics: '⚛️' };
+  topics.forEach(topic => {
+    const card = document.createElement('div');
+    card.className = 'topic-card';
+    card.onclick = () => openLesson(subject, grade, topic);
+    card.innerHTML = `<div class="topic-icon">${icons[subject] || '📚'}</div><div class="topic-name">${topic}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+function openLesson(subject, grade, topic) {
+  state.currentLessonSubject = subject;
+  state.currentLessonGrade = grade;
+  state.currentLessonTopic = topic;
+  const subjectNames = { math: 'Математика', russian: 'Русский язык', english: 'Английский', chemistry: 'Химия', physics: 'Физика' };
+  document.getElementById('lesson-title').textContent = topic;
+  document.getElementById('lesson-subtitle').textContent = `${grade} класс • ${subjectNames[subject]}`;
+  loadVideos();
+  showScreen('screen-lesson');
+}
+
+function switchLessonTab(tab) {
+  state.currentLessonTab = tab;
+  document.querySelectorAll('.lesson-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('lesson-theory').style.display = tab === 'theory' ? 'block' : 'none';
+  document.getElementById('lesson-practice').style.display = tab === 'practice' ? 'block' : 'none';
+}
+
+function setVideoFilter(minutes) {
+  state.videoFilter = minutes;
+  document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+  loadVideos();
+}
+
+// ===== РЕАЛЬНЫЙ ЗАПРОС К VK API =====
+async function loadVideos() {
+  const videoList = document.getElementById('video-list');
+  videoList.innerHTML = '<p style="text-align: center; color: var(--text-light);">🔍 Ищем видео ВКонтакте...</p>';
+
+  const query = `${state.currentLessonTopic} ${state.currentLessonGrade} класс`;
+  
+  try {
+    // Запрос к API ВКонтакте
+    const url = `https://api.vk.com/method/video.search?q=${encodeURIComponent(query)}&access_token=${VK_API_TOKEN}&v=5.131&count=10&safe=1`;
+    const response = await fetch(url);
+    const data = await response.json();
+
+    videoList.innerHTML = '';
+
+    if (data.error) {
+      videoList.innerHTML = `<p style="text-align: center; color: var(--red);">Ошибка API: ${data.error.error_msg}</p>`;
+      return;
+    }
+
+    const videos = data.response.items;
+    if (!videos || videos.length === 0) {
+      videoList.innerHTML = '<p style="text-align: center; color: var(--text-light);">Видео не найдены. Попробуй увеличить фильтр времени.</p>';
+      return;
+    }
+
+    videos.forEach(video => {
+      // Фильтр по времени (длительность в секундах)
+      if (video.duration > state.videoFilter * 60) return;
+
+      const card = document.createElement('div');
+      card.className = 'video-card';
+      
+      // Берем первую доступную обложку
+      const thumbUrl = video.image && video.image.length > 0 ? video.image[0].url : '';
+      const videoUrl = `https://vk.com/video${video.owner_id}_${video.id}`;
+      const mins = Math.floor(video.duration / 60);
+      const secs = String(video.duration % 60).padStart(2, '0');
+
+      card.innerHTML = `
+        <div class="video-thumbnail" style="background-image: url('${thumbUrl}');">
+          <div class="play-icon">▶</div>
+        </div>
+        <div class="video-info">
+          <div class="video-title">${video.title}</div>
+          <div class="video-meta">
+            <span style="color: var(--vk-blue); font-weight: 600;">📺 VK Видео ✅</span>
+            <span>⏱ ${mins}:${secs}</span>
+            <span>👁️ ${video.views || 0}</span>
+          </div>
+          <div class="video-actions">
+            <button class="btn-watch" onclick="window.open('${videoUrl}', '_blank')">▶ Смотреть</button>
+            <button class="btn-complain" onclick="complainVideo('${video.id}')">🚩 Жалоба</button>
+          </div>
+        </div>
+      `;
+      videoList.appendChild(card);
+    });
+
+  } catch (error) {
+    console.error('VK API Error:', error);
+    videoList.innerHTML = '<p style="text-align: center; color: var(--red);">Не удалось загрузить видео. Проверь интернет.</p>';
   }
+}
+
+function complainVideo(videoId) {
+  showToast('🚩 Жалоба отправлена. Видео будет проверено.');
+}
+
+function startLessonPractice() {
+  state.subject = state.currentLessonSubject;
+  state.grade = parseInt(state.currentLessonGrade);
+  startGame(state.grade);
 }
 
 // ===== АУТЕНТИФИКАЦИЯ =====
@@ -886,78 +722,42 @@ function handleRegister() {
   const schoolCode = document.getElementById('reg-school-code').value.trim().toUpperCase();
   const consent = document.getElementById('reg-consent').checked;
   
-  if (!fio || !email || !password) { showToast('Заполни ФИО, Email и Пароль'); return; }
-  if (!consent) { showToast('Поставь галочку согласия с документами'); return; }
-  if (selectedRole === 'deputy' && !schoolCode) { showToast('Для завуча код школы ОБЯЗАТЕЛЕН'); return; }
-  if (password.length < 6) { showToast('Пароль должен быть не менее 6 символов'); return; }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('Неверный формат Email'); return; }
+  if (!fio || !email || !password) { showToast('Заполни все поля'); return; }
+  if (!consent) { showToast('Прими соглашение'); return; }
+  if (password.length < 6) { showToast('Пароль мин. 6 символов'); return; }
 
   showToast('Регистрация...');
-  
   auth.createUserWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-      const user = userCredential.user;
-      return db.collection('users').doc(user.uid).set({
-        fio: fio, email: email, role: selectedRole,
-        schoolCode: schoolCode || null,
+    .then((uc) => {
+      return db.collection('users').doc(uc.user.uid).set({
+        fio, email, role: selectedRole, schoolCode: schoolCode || null,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => user);
+      }).then(() => uc.user);
     })
     .then((user) => {
-      showToast('Регистрация успешна! Добро пожаловать, ' + fio);
+      showToast('Успешно! Добро пожаловать, ' + fio);
       user.sendEmailVerification().catch(() => {});
       loadUserData(user.uid);
     })
-    .catch((error) => {
-      console.error(error);
-      if (error.code === 'auth/email-already-in-use') showToast('Этот Email уже зарегистрирован');
-      else if (error.code === 'auth/invalid-email') showToast('Неверный формат Email');
-      else if (error.code === 'auth/weak-password') showToast('Пароль слишком слабый');
-      else showToast('Ошибка: ' + error.message);
-    });
+    .catch((error) => showToast('Ошибка: ' + error.message));
 }
 
 function handleLogin() {
   const email = document.getElementById('auth-email').value.trim();
   const password = document.getElementById('auth-password').value;
-  
   if (!email || !password) { showToast('Введи Email и Пароль'); return; }
-
   showToast('Вход...');
-  
   auth.signInWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-      showToast('Вы успешно вошли!');
-      loadUserData(userCredential.user.uid);
-    })
-    .catch((error) => {
-      console.error(error);
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-        showToast('Неверный Email или пароль');
-      } else if (error.code === 'auth/too-many-requests') {
-        showToast('Слишком много попыток. Попробуй позже');
-      } else {
-        showToast('Ошибка входа: ' + error.message);
-      }
-    });
+    .then((uc) => { showToast('Вы вошли!'); loadUserData(uc.user.uid); })
+    .catch((error) => showToast('Неверный Email или пароль'));
 }
 
 function handleForgot() {
   const email = document.getElementById('forgot-email').value.trim();
   if (!email) { showToast('Введи Email'); return; }
-
-  showToast('Отправляем письмо...');
-  
   auth.sendPasswordResetEmail(email)
-    .then(() => {
-      showToast('✅ Ссылка для сброса пароля отправлена на ' + email);
-      showScreen('screen-auth');
-    })
-    .catch((error) => {
-      console.error(error);
-      if (error.code === 'auth/user-not-found') showToast('Пользователь с таким Email не найден');
-      else showToast('Ошибка: ' + error.message);
-    });
+    .then(() => { showToast('✅ Ссылка отправлена на ' + email); showScreen('screen-auth'); })
+    .catch((error) => showToast('Ошибка: ' + error.message));
 }
 
 function loadUserData(uid) {
@@ -967,77 +767,46 @@ function loadUserData(uid) {
       state.currentUser = { uid, ...data };
       state.currentRole = data.role;
       
-      const nameEl = document.getElementById('dropdown-user-name');
-      const roleEl = document.getElementById('dropdown-user-role');
-      const avatarEl = document.getElementById('user-avatar');
+      document.getElementById('dropdown-user-name').textContent = data.fio || data.email;
+      document.getElementById('user-avatar').textContent = (data.fio || '').charAt(0).toUpperCase();
       
-      if (nameEl) nameEl.textContent = data.fio || data.email;
-      if (avatarEl) avatarEl.textContent = (data.fio || '').charAt(0).toUpperCase();
+      const roleNames = { director: '🏫 Директор', deputy: '📋 Завуч', teacher: '👨‍🏫 Учитель' };
+      document.getElementById('dropdown-user-role').textContent = roleNames[data.role] || 'Пользователь';
       
-      const roleNames = { director: '👔 Директор', deputy: '📋 Завуч', teacher: '👨‍🏫 Учитель' };
-      if (roleEl) roleEl.textContent = roleNames[data.role] || 'Пользователь';
-      
-      const menuClasses = document.getElementById('menu-classes');
-      const menuAssignments = document.getElementById('menu-assignments');
-      
-      if (data.role === 'teacher' || data.role === 'deputy' || data.role === 'director') {
-        if (menuClasses) menuClasses.style.display = 'flex';
-        if (menuAssignments) menuAssignments.style.display = 'flex';
-      } else {
-        if (menuClasses) menuClasses.style.display = 'none';
-        if (menuAssignments) menuAssignments.style.display = 'none';
-      }
+      const isStaff = ['teacher', 'deputy', 'director'].includes(data.role);
+      document.getElementById('menu-classes').style.display = isStaff ? 'flex' : 'none';
+      document.getElementById('menu-assignments').style.display = isStaff ? 'flex' : 'none';
       
       updateDashboard(data);
       showScreen('screen-dashboard');
-    } else {
-      showToast('Ошибка: данные пользователя не найдены');
-      showScreen('screen-role');
     }
-  }).catch((error) => {
-    console.error(error);
-    showToast('Ошибка загрузки данных');
   });
 }
 
 function updateDashboard(data) {
-  const welcomeEl = document.getElementById('dashboard-welcome');
-  const subtitleEl = document.getElementById('dashboard-subtitle');
-  const stat1Label = document.getElementById('stat-1-label');
-  const stat2Label = document.getElementById('stat-2-label');
+  const config = {
+    director: { welcome: 'Добро пожаловать, директор!', subtitle: 'Управление школой', stat1: 'Учителей', stat2: 'Учеников' },
+    deputy: { welcome: 'Добро пожаловать, завуч!', subtitle: 'Учебный процесс', stat1: 'Классов', stat2: 'Учителей' },
+    teacher: { welcome: 'Привет, ' + (data.fio ? data.fio.split(' ')[0] : 'учитель') + '!', subtitle: 'Личный кабинет', stat1: 'Моих классов', stat2: 'Заданий' }
+  }[data.role] || { welcome: 'Привет!', subtitle: 'Кабин', stat1: '...', stat2: '...' };
   
-  const roleConfig = {
-    director: { welcome: 'Добро пожаловать, директор!', subtitle: 'Управление школой', stat1Label: 'Учителей', stat2Label: 'Учеников' },
-    deputy: { welcome: 'Добро пожаловать, завуч!', subtitle: 'Управление учебным процессом', stat1Label: 'Классов', stat2Label: 'Учителей' },
-    teacher: { welcome: 'Добро пожаловать, ' + (data.fio ? data.fio.split(' ')[0] : 'учитель') + '!', subtitle: 'Ваш личный кабинет', stat1Label: 'Моих классов', stat2Label: 'Заданий' }
-  };
-  
-  const config = roleConfig[data.role] || roleConfig.teacher;
-  if (welcomeEl) welcomeEl.textContent = config.welcome;
-  if (subtitleEl) subtitleEl.textContent = config.subtitle;
-  if (stat1Label) stat1Label.textContent = config.stat1Label;
-  if (stat2Label) stat2Label.textContent = config.stat2Label;
+  document.getElementById('dashboard-welcome').textContent = config.welcome;
+  document.getElementById('dashboard-subtitle').textContent = config.subtitle;
+  document.getElementById('stat-1-label').textContent = config.stat1;
+  document.getElementById('stat-2-label').textContent = config.stat2;
 }
 
 auth.onAuthStateChanged((user) => {
-  if (user) {
-    console.log("Пользователь залогинен:", user.email);
-    if (!state.currentUser) loadUserData(user.uid);
-  } else {
-    console.log("Пользователь не залогинен");
-    state.currentUser = null;
-    state.currentRole = null;
-  }
+  if (user && !state.currentUser) loadUserData(user.uid);
 });
 
-// ===== УЧЕНИК И ИГРА =====
+// ===== ИГРА =====
 function onStudentCodeInput() {
   const code = document.getElementById('student-code').value.trim().toUpperCase();
   const info = document.getElementById('class-info');
   const btn = document.getElementById('student-start-btn');
-  
   if (code.length >= 4) {
-    info.textContent = 'Проверка кода...';
+    info.textContent = 'Проверка...';
     db.collection('classes').doc(code).get().then(doc => {
       if (doc.exists) {
         const cls = doc.data();
@@ -1051,34 +820,26 @@ function onStudentCodeInput() {
         btn.style.display = 'none';
       }
     });
-  } else {
-    info.textContent = '';
-    btn.style.display = 'none';
-  }
+  } else { info.textContent = ''; btn.style.display = 'none'; }
 }
 
 function startClassGame() {
   const nick = document.getElementById('nickname-input').value.trim();
-  if (!nick) { showToast('Напиши своё имя'); return; }
+  if (!nick) { showToast('Напиши имя'); return; }
   state.nickname = nick;
   state.classCode = state.joinClass.code;
   startGame(state.joinClass.grade);
 }
 
 function startSoloGame(subject) {
-  const nick = document.getElementById('nickname-input').value.trim() || 'Игрок';
-  state.nickname = nick;
+  state.nickname = document.getElementById('nickname-input').value.trim() || 'Игрок';
   state.classCode = '';
   state.subject = subject;
   startGame(1);
 }
 
 function startGame(grade) {
-  state.grade = grade;
-  state.round = 0;
-  state.score = 0;
-  state.streak = 0;
-  state.currentRoundHistory = [];
+  state.grade = grade; state.round = 0; state.score = 0; state.streak = 0; state.currentRoundHistory = [];
   showScreen('screen-game');
   nextProblem();
 }
@@ -1086,12 +847,10 @@ function startGame(grade) {
 function nextProblem() {
   if (state.round >= state.maxRounds) { endGame(); return; }
   state.round++;
-  
   const diff = state.round < 3 ? 0 : state.round < 7 ? 1 : 2;
-  const problem = generateProblem(state.grade, diff);
-  state.currentProblem = problem;
+  state.currentProblem = generateProblem(state.grade, diff);
   
-  document.getElementById('question-text').textContent = problem.q;
+  document.getElementById('question-text').textContent = state.currentProblem.q;
   document.getElementById('score-display').textContent = state.score;
   document.getElementById('streak-count').textContent = state.streak;
   document.getElementById('progress-fill').style.width = (state.round / state.maxRounds * 100) + '%';
@@ -1102,32 +861,24 @@ function nextProblem() {
   area.innerHTML = '';
   
   if (state.grade <= 4 && state.subject === 'math') {
-    const opts = mkOptions(problem.a, [problem.a-1, problem.a+1, problem.a+2, problem.a-2].filter(x => x > 0), 4);
+    const opts = mkOptions(state.currentProblem.a, [state.currentProblem.a-1, state.currentProblem.a+1, state.currentProblem.a+2, state.currentProblem.a-2].filter(x => x > 0), 4);
     const colors = ['#FFD54F', '#FF8A65', '#81C784', '#64B5F6'];
     opts.forEach((opt, i) => {
       const b = document.createElement('button');
-      b.className = 'btn';
-      b.style.background = colors[i];
-      b.style.color = 'white';
-      b.style.fontSize = '1.8rem';
-      b.style.padding = '30px';
+      b.className = 'btn'; b.style.background = colors[i]; b.style.color = 'white'; b.style.fontSize = '1.8rem'; b.style.padding = '30px';
       b.textContent = opt;
       b.onclick = () => checkAnswer(opt);
       area.appendChild(b);
     });
   } else {
     const inp = document.createElement('input');
-    inp.type = 'text';
-    inp.placeholder = 'Твой ответ';
+    inp.type = 'text'; inp.placeholder = 'Твой ответ';
     inp.style.cssText = 'grid-column: 1/-1; padding: 20px; font-size: 1.3rem; border: 2px solid var(--border); border-radius: 14px; text-align: center;';
     inp.onkeydown = e => { if (e.key === 'Enter') checkAnswer(inp.value); };
     area.appendChild(inp);
     setTimeout(() => inp.focus(), 100);
-    
     const b = document.createElement('button');
-    b.className = 'btn btn-orange';
-    b.style.gridColumn = '1/-1';
-    b.textContent = 'Ответить';
+    b.className = 'btn btn-orange'; b.style.gridColumn = '1/-1'; b.textContent = 'Ответить';
     b.onclick = () => checkAnswer(inp.value);
     area.appendChild(b);
   }
@@ -1137,67 +888,51 @@ function checkAnswer(userVal) {
   if (!userVal) return;
   const correct = state.currentProblem.a;
   const isCorrect = compareAnswer(userVal, correct);
-  
   state.currentRoundHistory.push({ question: state.currentProblem.q, user: userVal, correct, isCorrect });
   
   if (isCorrect) {
-    state.score++;
-    state.streak++;
-    document.getElementById('feedback-text').textContent = '✅ Правильно! Молодец!';
+    state.score++; state.streak++;
+    document.getElementById('feedback-text').textContent = '✅ Правильно!';
     document.getElementById('feedback-text').style.color = 'var(--green)';
     document.getElementById('game-mascot').textContent = '🎉';
   } else {
     state.streak = 0;
     document.getElementById('feedback-text').textContent = `❌ Правильно: ${correct}`;
     document.getElementById('feedback-text').style.color = 'var(--red)';
-    document.getElementById('game-mascot').textContent = '';
+    document.getElementById('game-mascot').textContent = '😢';
   }
-  
   document.getElementById('score-display').textContent = state.score;
   document.getElementById('streak-count').textContent = state.streak;
   setTimeout(nextProblem, isCorrect ? 1000 : 1800);
 }
 
 function endGame() {
-  const name = state.nickname || 'Игрок';
-  document.getElementById('result-name').textContent = name;
+  document.getElementById('result-name').textContent = state.nickname || 'Игрок';
   document.getElementById('final-score').textContent = state.score;
   document.getElementById('result-total').textContent = state.maxRounds;
-  
-  const comment = state.score >= 9 ? 'Великолепно! 🏆' : state.score >= 7 ? 'Отлично! 👍' : state.score >= 5 ? 'Неплохо! 💪' : 'Попробуй ещё! 🦊';
-  document.getElementById('result-comment').textContent = comment;
-  
-  saveResultToFirebase(name, state.score, state.grade, state.classCode, state.currentRoundHistory, state.maxRounds);
+  document.getElementById('result-comment').textContent = state.score >= 9 ? 'Великолепно! 🏆' : state.score >= 7 ? 'Отлично! 👍' : 'Попробуй ещё! 💪';
+  saveResultToFirebase(state.nickname, state.score, state.grade, state.classCode, state.currentRoundHistory, state.maxRounds);
   showScreen('screen-result');
 }
 
 function restartRound() {
-  state.round = 0; state.score = 0; state.streak = 0;
-  state.currentRoundHistory = [];
-  showScreen('screen-game');
-  nextProblem();
+  state.round = 0; state.score = 0; state.streak = 0; state.currentRoundHistory = [];
+  showScreen('screen-game'); nextProblem();
 }
 
-function parentLogin() {
-  showToast('Функция поиска ребёнка по коду родителя (в разработке)');
-}
+function parentLogin() { showToast('Поиск ребёнка по коду (в разработке)'); }
 
-// ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
 function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 function pick(arr) { return arr[rand(0, arr.length - 1)]; }
 function shuffle(arr) { for (let i = arr.length - 1; i > 0; i--) { let j = rand(0, i); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; }
-
-function compareAnswer(userVal, correct) {
-  let u = String(userVal).trim().toLowerCase().replace(',', '.');
-  let c = String(correct).trim().toLowerCase().replace(',', '.');
-  if (u === c) return true;
-  let un = parseFloat(u), cn = parseFloat(c);
-  if (!isNaN(un) && !isNaN(cn) && Math.abs(un - cn) < 0.0001) return true;
-  return false;
+function compareAnswer(u, c) {
+  let us = String(u).trim().toLowerCase().replace(',', '.');
+  let cs = String(c).trim().toLowerCase().replace(',', '.');
+  if (us === cs) return true;
+  let un = parseFloat(us), cn = parseFloat(cs);
+  return !isNaN(un) && !isNaN(cn) && Math.abs(un - cn) < 0.0001;
 }
-
 function mkOptions(correct, distractors, count) {
-  count = count || 4;
   let set = [correct];
   let pool = shuffle(distractors.filter(d => d !== correct));
   for (let d of pool) { if (set.length >= count) break; if (!set.includes(d)) set.push(d); }
@@ -1243,42 +978,29 @@ async function showLeaderboard(classCode) {
   showScreen('screen-leaderboard');
   const list = document.getElementById('leaderboard-list');
   list.innerHTML = '<p style="text-align: center; color: var(--text-light);">Загрузка...</p>';
-  
   try {
     let query = db.collection('leaders');
     if (classCode) query = query.where('classCode', '==', classCode);
     const snapshot = await query.orderBy('score', 'desc').get();
     const leaders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    
     document.getElementById('leaderboard-sub').textContent = classCode ? 'Лучшие результаты класса' : 'Лучшие из всех';
-    
-    if (!leaders.length) {
-      list.innerHTML = '<p style="text-align: center; color: var(--text-light);">Пока никто не играл. Стань первым! 🦊</p>';
-      return;
-    }
-    
+    if (!leaders.length) { list.innerHTML = '<p style="text-align: center; color: var(--text-light);">Пока никто не играл. Стань первым! 🚀</p>'; return; }
     list.innerHTML = '';
     leaders.slice(0, 20).forEach((l, i) => {
       const row = document.createElement('div');
-      row.className = 'card';
-      row.style.display = 'flex';
-      row.style.alignItems = 'center';
-      row.style.gap = '14px';
+      row.className = 'card'; row.style.display = 'flex'; row.style.alignItems = 'center'; row.style.gap = '14px';
       const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
       row.innerHTML = `
         <div style="width: 40px; height: 40px; border-radius: 50%; background: ${i < 3 ? '#FFD54F' : '#E8EDF2'}; display: flex; align-items: center; justify-content: center; font-size: ${i < 3 ? '1.2rem' : '1rem'};">${medal}</div>
-        <div style="flex: 1;">
-          <div style="font-weight: bold; font-size: 1.05rem;">${l.name}</div>
-          <div style="color: var(--text-light); font-size: 0.85rem;">${l.grade} класс</div>
-        </div>
+        <div style="flex: 1;"><div style="font-weight: bold; font-size: 1.05rem;">${l.name}</div><div style="color: var(--text-light); font-size: 0.85rem;">${l.grade} класс</div></div>
         <div style="font-weight: bold; color: var(--orange); font-size: 1.2rem;">${l.score}/${l.total || 10}</div>
       `;
       list.appendChild(row);
     });
-  } catch (e) {
-    list.innerHTML = '<p style="text-align: center; color: var(--red);">Ошибка загрузки</p>';
-  }
+  } catch (e) { list.innerHTML = '<p style="text-align: center; color: var(--red);">Ошибка загрузки</p>'; }
 }
+
+updateTopics();
 </script>
 </body>
-    </html> 
+</html>
