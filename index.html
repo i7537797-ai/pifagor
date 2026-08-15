@@ -45,7 +45,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .btn-grey { background: #E8EDF2; color: var(--text); }
 .btn-vk { background: var(--vk-blue); color: white; display: flex; align-items: center; justify-content: center; gap: 12px; }
 .vk-icon { width: 28px; height: 28px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
-.vk-icon svg { width: 18px; height: 18px; fill: var(--vk-blue); }
+.vk-icon svg
+ .btn-yandex { background: white; color: var(--text); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; gap: 12px; }
+.btn-yandex:active { transform: scale(0.98); border-color: #FC3F1D; background: #FFF5F3; }
+.yandex-icon { width: 28px; height: 28px; background: #FC3F1D; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px; }{ width: 18px; height: 18px; fill: var(--vk-blue); }
 
 .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 400px; margin: 0 auto 24px; }
 .role-btn { background: white; border: 2px solid var(--border); border-radius: 16px; padding: 24px 12px; cursor: pointer; text-align: center; transition: all 0.2s; }
@@ -101,6 +104,14 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
       <div class="vk-icon"><svg viewBox="0 0 24 24"><path d="M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 8.316 24h7.368c6.724 0 8.316-1.592 8.316-8.316V8.316C24 1.592 22.408 0 15.684 0m3.692 17.123h-1.744c-.66 0-.864-.528-2.056-1.736-1.032-1.032-1.492-1.168-1.744-1.168-.696 0-.896.196-.896.808v2.58c0 .572-.184.912-1.252.912-1.84 0-3.884-1.12-5.324-3.208C4.196 12.124 3 8.644 3 8.284c0-.252.096-.48.696-.48h1.744c.52 0 .716.24.912.808 1.004 2.924 2.692 5.492 3.384 5.492.252 0 .368-.116.368-.808V10.14c-.072-1.44-.848-1.56-.848-2.068 0-.252.216-.508.544-.508h2.74c.284 0 .392.144.392.78v2.108c0 .452.2.608.332.608.252 0 .464-.156.924-.616l1.364-1.54c.592-.668 1.064-.844 1.064-.844.252 0 .348.108.348.808v2.74c0 .572-.252.912-1.252.912-.66 0-.864-.528-2.056-1.736-1.032-1.032-1.492-1.168-1.744-1.168-.696 0-.896.196-.896.808v2.58c0 .572-.184.912-1.252.912-.66 0-.864-.528-2.056-1.736-1.032-1.032-1.492-1.168-1.744-1.168-.696 0-.896.196-.896.808v2.58c0 .572-.184.912-1.252.912z"/></svg></div>
       <span>Войти через VK</span>
     </button>
+   <button class="btn btn-yandex" onclick="loginWithYandex()">
+  <div class="yandex-icon">Я</div>
+  <span>Войти через Яндекс</span>
+   </button>
+   <button class="btn btn-yandex" onclick="loginWithYandex()">
+  <div class="yandex-icon">Я</div>
+  <span>Войти через Яндекс</span>
+   </button>
     
     <button class="btn btn-grey" style="margin-top: 24px;" onclick="navigateTo('screen-role', '#/')">← На главную</button>
   </div>
@@ -128,6 +139,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
       <div class="vk-icon"><svg viewBox="0 0 24 24"><path d="M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 8.316 24h7.368c6.724 0 8.316-1.592 8.316-8.316V8.316C24 1.592 22.408 0 15.684 0m3.692 17.123h-1.744c-.66 0-.864-.528-2.056-1.736-1.032-1.032-1.492-1.168-1.744-1.168-.696 0-.896.196-.896.808v2.58c0 .572-.184.912-1.252.912-1.84 0-3.884-1.12-5.324-3.208C4.196 12.124 3 8.644 3 8.284c0-.252.096-.48.696-.48h1.744c.52 0 .716.24.912.808 1.004 2.924 2.692 5.492 3.384 5.492.252 0 .368-.116.368-.808V10.14c-.072-1.44-.848-1.56-.848-2.068 0-.252.216-.508.544-.508h2.74c.284 0 .392.144.392.78v2.108c0 .452.2.608.332.608.252 0 .464-.156.924-.616l1.364-1.54c.592-.668 1.064-.844 1.064-.844.252 0 .348.108.348.808v2.74c0 .572-.252.912-1.252.912-.66 0-.864-.528-2.056-1.736-1.032-1.032-1.492-1.168-1.744-1.168-.696 0-.896.196-.896.808v2.58c0 .572-.184.912-1.252.912-.66 0-.864-.528-2.056-1.736-1.032-1.032-1.492-1.168-1.744-1.168-.696 0-.896.196-.896.808v2.58c0 .572-.184.912-1.252.912z"/></svg></div>
       <span>Войти через VK</span>
     </button>
+   <button class="btn btn-yandex" onclick="loginWithYandex()">
+  <div class="yandex-icon">Я</div>
+  <span>Войти через Яндекс</span>
+   </button>
     
     <button class="btn btn-grey" style="margin-top: 24px;" onclick="navigateTo('screen-role', '#/')">← На главную</button>
   </div>
@@ -150,6 +165,10 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
     <button class="btn btn-orange">Найти ребёнка</button>
     
     <div class="divider">или</div>
+   <button class="btn btn-yandex" onclick="loginWithYandex()">
+  <div class="yandex-icon">Я</div>
+  <span>Войти через Яндекс</span>
+   </button>
     
     <button class="btn btn-vk">
       <div class="vk-icon"><svg viewBox="0 0 24 24"><path d="M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 8.316 24h7.368c6.724 0 8.316-1.592 8.316-8.316V8.316C24 1.592 22.408 0 15.684 0m3.692 17.123h-1.744c-.66 0-.864-.528-2.056-1.736-1.032-1.032-1.492-1.168-1.744-1.168-.696 0-.896.196-.896.808v2.58c0 .572-.184.912-1.252.912-1.84 0-3.884-1.12-5.324-3.208C4.196 12.124 3 8.644 3 8.284c0-.252.096-.48.696-.48h1.744c.52 0 .716.24.912.808 1.004 2.924 2.692 5.492 3.384 5.492.252 0 .368-.116.368-.808V10.14c-.072-1.44-.848-1.56-.848-2.068 0-.252.216-.508.544-.508h2.74c.284 0 .392.144.392.78v2.108c0 .452.2.608.332.608.252 0 .464-.156.924-.616l1.364-1.54c.592-.668 1.064-.844 1.064-.844.252 0 .348.108.348.808v2.74c0 .572-.252.912-1.252.912-.66 0-.864-.528-2.056-1.736-1.032-1.032-1.492-1.168-1.744-1.168-.696 0-.896.196-.896.808v2.58c0 .572-.184.912-1.252.912-.66 0-.864-.528-2.056-1.736-1.032-1.032-1.492-1.168-1.744-1.168-.696 0-.896.196-.896.808v2.58c0 .572-.184.912-1.252.912z"/></svg></div>
@@ -162,7 +181,19 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 
 <div id="toast" class="toast"></div>
 
-<script>
+function loginWithYandex() {
+  const provider = new firebase.auth.OAuthProvider('oidc.yandex.com');
+  firebase.auth().signInWithPopup(provider)
+    .then((result) => {
+      const user = result.user;
+      showToast('✅ Добро пожаловать, ' + user.displayName + '!');
+    })
+    .catch((error) => {
+      console.error('Ошибка входа через Яндекс:', error);
+      showToast('Ошибка при входе через Яндекс');
+    });
+}
+ <script>
 function navigateTo(screenId, urlHash) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(screenId).classList.add('active');
