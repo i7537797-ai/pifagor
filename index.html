@@ -1,12 +1,14 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Лисёнок Пифагор</title>
+
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyBTF-9SjdEfZRZ5AlPRcNSDXo9uNEjuItI",
@@ -19,523 +21,172 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
+
 const VK_APP_ID = "54720009";
 const VK_USER_TOKEN = "vk1.a.1cqBqoX59ZFLSmzP3poS_ypWyISJkvc2fIyT6uiNR9bhPT8DuC-2dCaNddHop6V3GaZ5muE6bW-ouX5KFXiT9sxAW9FaHnvs2jnaTCL1OZx1hVMOM_S9bycTygVvqk3V_sh8rHEGAWgNEklpwfI7CMS5Pnm9HKenzU6pJJPCSjxSw8wbmfkvdstdF9sf1HB_";
-localStorage.setItem('vk_user_token', VK_USER_TOKEN);
 </script>
+
 <style>
-:root { --orange: #FF7043; --blue: #2196F3; --green: #4CAF50; --red: #F44336; --bg: #F5F7FA; --card: #FFF; --text: #1A2332; --text-light: #6B7A8D; --border: #E0E6ED; --vk-blue: #4C75A3; }
-* { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --orange: #FF7043; --blue: #2196F3; --vk-blue: #0077FF; --bg: #F5F7FA; --text: #1A2332; --text-light: #6B7A8D; --border: #E0E6ED; }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
 .screen { display: none; min-height: 100vh; padding: 20px; animation: fadeIn 0.3s; }
 .screen.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
 .header { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; margin-bottom: 20px; }
 .logo { display: flex; align-items: center; gap: 10px; font-size: 1.3rem; font-weight: bold; }
-.avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--orange); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; overflow: hidden; }
-.avatar img { width: 100%; height: 100%; object-fit: cover; }
-.card { background: var(--card); border-radius: 20px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
-.btn { display: block; width: 100%; padding: 16px; border: none; border-radius: 16px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center; margin-bottom: 8px; }
+.logo-icon { font-size: 2rem; }
+
+.btn { display: block; width: 100%; padding: 16px; border: none; border-radius: 16px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; text-align: center; margin-bottom: 12px; }
 .btn:active { transform: scale(0.98); }
 .btn-orange { background: var(--orange); color: white; }
-.btn-blue { background: var(--blue); color: white; }
 .btn-grey { background: #E8EDF2; color: var(--text); }
-.btn-vk { background: #4C75A3; color: white; display: flex; align-items: center; justify-content: center; gap: 10px; }
-.btn-small { padding: 8px 16px; font-size: 0.9rem; width: auto; display: inline-block; margin-bottom: 0; margin-right: 8px; }
-.input-group { position: relative; margin-bottom: 16px; }
-.input-group input, .input-group select { width: 100%; padding: 16px 16px 16px 48px; border: 2px solid var(--border); border-radius: 14px; font-size: 1rem; background: white; outline: none; }
-.input-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 1.3rem; color: var(--text-light); }
-.role-screen { display: flex; flex-direction: column; align-items: center; padding-top: 40px; }
-.mascot-big { font-size: 6rem; margin-bottom: 20px; }
-.title-main { font-size: 2rem; font-weight: bold; margin-bottom: 8px; }
-.subtitle-main { font-size: 1.1rem; color: var(--text-light); margin-bottom: 32px; text-align: center; }
-.role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; max-width: 400px; margin-bottom: 16px; }
-.role-btn { background: white; border: 2px solid var(--border); border-radius: 16px; padding: 20px; cursor: pointer; text-align: center; transition: all 0.2s; }
-.role-btn:active { transform: scale(0.95); }
+.btn-vk { background: var(--vk-blue); color: white; display: flex; align-items: center; justify-content: center; gap: 12px; }
+.vk-icon { width: 28px; height: 28px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.vk-icon svg { width: 18px; height: 18px; fill: var(--vk-blue); }
+
+.role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 400px; margin: 0 auto 24px; }
+.role-btn { background: white; border: 2px solid var(--border); border-radius: 16px; padding: 24px 12px; cursor: pointer; text-align: center; transition: all 0.2s; }
+.role-btn:active { transform: scale(0.95); border-color: var(--orange); }
 .role-btn .emoji { font-size: 2.5rem; margin-bottom: 8px; }
 .role-btn.full { grid-column: 1 / -1; }
-.auth-screen { max-width: 420px; margin: 0 auto; padding-top: 40px; }
-.auth-mascot { text-align: center; font-size: 5rem; margin-bottom: 20px; }
-.auth-title { text-align: center; font-size: 1.8rem; font-weight: bold; margin-bottom: 24px; }
-.consent-label { display: flex; align-items: flex-start; gap: 10px; margin: 16px 0; font-size: 0.9rem; color: var(--text-light); cursor: pointer; }
-.consent-label input[type="checkbox"] { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--orange); }
-.consent-label a { color: var(--blue); text-decoration: underline; }
-.divider { text-align: center; margin: 20px 0; color: var(--text-light); font-size: 0.9rem; position: relative; }
+
+.input-group { position: relative; margin-bottom: 16px; max-width: 400px; margin-left: auto; margin-right: auto; }
+.input-group input { width: 100%; padding: 16px; border: 2px solid var(--border); border-radius: 14px; font-size: 1rem; background: white; outline: none; text-align: center; letter-spacing: 2px; text-transform: uppercase; }
+.input-group input:focus { border-color: var(--orange); }
+.input-group input::placeholder { text-transform: none; letter-spacing: normal; color: var(--text-light); }
+
+.toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--text); color: white; padding: 12px 20px; border-radius: 24px; opacity: 0; transition: opacity 0.3s; z-index: 2000; pointer-events: none; }
+.toast.show { opacity: 0.95; }
+
+.auth-container { max-width: 400px; margin: 0 auto; }
+.divider { text-align: center; margin: 20px 0; color: var(--text-light); position: relative; }
 .divider::before, .divider::after { content: ''; position: absolute; top: 50%; width: 40%; height: 1px; background: var(--border); }
 .divider::before { left: 0; } .divider::after { right: 0; }
-.child-card { background: white; border-radius: 14px; padding: 16px; margin-bottom: 12px; border: 2px solid var(--border); }
-.child-card.vk-blocked { border-color: var(--red); background: #FFF5F5; }
-.child-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--text); color: white; padding: 12px 20px; border-radius: 24px; opacity: 0; transition: opacity 0.3s; z-index: 2000; }
-.toast.show { opacity: 0.95; }
-.dropdown-menu { display: none; position: absolute; right: 0; top: 60px; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); min-width: 220px; z-index: 1000; }
-.dropdown-menu.show { display: block; }
-.dropdown-item { padding: 14px 16px; cursor: pointer; border-bottom: 1px solid #f0f0f0; }
-.dropdown-item.logout { color: var(--red); }
-.video-card { background: white; border-radius: 14px; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); }
+
+@media (min-width: 768px) { .role-grid { grid-template-columns: repeat(4, 1fr); max-width: 600px; } }
 </style>
 </head>
 <body>
 
-<div id="screen-role" class="screen role-screen active">
-  <div class="mascot-big">🦊</div>
-  <div class="title-main">Лисёнок Пифагор</div>
-  <div class="subtitle-main">Кто вы?</div>
+<div class="header">
+  <div class="logo"><span class="logo-icon">🦊</span> Лисёнок Пифагор</div>
+</div>
+
+<!-- ЭКРАН 1: Главная -->
+<div id="screen-role" class="screen active">
+  <h1 style="text-align: center; margin-bottom: 24px;">Кто вы?</h1>
   <div class="role-grid">
-    <div class="role-btn" onclick="showAuth('director')"><div class="emoji">🏫</div><div>Я директор</div></div>
-    <div class="role-btn" onclick="showAuth('deputy')"><div class="emoji">📋</div><div>Я завуч</div></div>
-    <div class="role-btn" onclick="showAuth('teacher')"><div class="emoji">👨‍🏫</div><div>Я учитель</div></div>
-    <div class="role-btn" onclick="showScreen('screen-student')"><div class="emoji">🎒</div><div>Я ученик</div></div>
-    <div class="role-btn full" onclick="showScreen('screen-parent')"><div class="emoji">👪</div><div>Я родитель</div></div>
-  </div>
-  <div style="margin-top: 24px; width: 100%; max-width: 400px;">
-    <button class="btn btn-grey" onclick="showScreen('screen-topic-selector')">📚 Уроки</button>
-    <button class="btn btn-grey" onclick="showLeaderboard()">🏆 Таблица успеха</button>
-  </div>
-  <div style="margin-top: 32px; text-align: center; font-size: 0.85rem; color: var(--text-light);">
-    <a href="#" onclick="showScreen('screen-agreement')">Соглашение</a> | <a href="#" onclick="showScreen('screen-privacy')">Конфиденциальность</a>
+    <div class="role-btn" onclick="navigateTo('screen-auth-staff', '#/login/staff?role=director')"><div class="emoji">🏫</div><div>Директор</div></div>
+    <div class="role-btn" onclick="navigateTo('screen-auth-staff', '#/login/staff?role=deputy')"><div class="emoji">📋</div><div>Завуч</div></div>
+    <div class="role-btn" onclick="navigateTo('screen-auth-staff', '#/login/staff?role=teacher')"><div class="emoji">👨‍🏫</div><div>Учитель</div></div>
+    <div class="role-btn" onclick="navigateTo('screen-auth-student', '#/login/student')"><div class="emoji">🎒</div><div>Ученик</div></div>
+    <div class="role-btn full" onclick="navigateTo('screen-auth-parent', '#/login/parent')"><div class="emoji">👪</div><div>Родитель</div></div>
   </div>
 </div>
 
-<div id="screen-auth" class="screen auth-screen">
-  <div class="auth-mascot">🦊</div>
-  <div class="auth-title" id="auth-title">Вход</div>
-  <div class="input-group"><span class="input-icon">✉️</span><input type="email" id="auth-email" placeholder="Email"></div>
-  <div class="input-group"><span class="input-icon">🔒</span><input type="password" id="auth-password" placeholder="Пароль"></div>
-  <button class="btn btn-orange" onclick="handleLogin()">Войти</button>
-  <div class="divider">или</div>
-  <button class="btn btn-vk" onclick="loginWithVK()"><span style="font-size: 1.3rem;">🔵</span> Войти через VK</button>
-  <div style="text-align: center; margin-top: 16px;"><a href="#" onclick="showScreen('screen-register')" style="color: var(--blue);">Зарегистрироваться</a></div>
-  <button class="btn btn-grey" style="margin-top: 24px;" onclick="showScreen('screen-role')">← На главную</button>
+<!-- ЭКРАН 2: Вход для Сотрудников -->
+<div id="screen-auth-staff" class="screen">
+  <div class="auth-container">
+    <h1 style="text-align: center; margin-bottom: 24px;">Вход для сотрудников</h1>
+    <div class="input-group"><input type="email" id="staff-email" placeholder="Email" style="text-transform: none; letter-spacing: normal;"></div>
+    <div class="input-group"><input type="password" id="staff-password" placeholder="Пароль" style="text-transform: none; letter-spacing: normal;"></div>
+    <button class="btn btn-orange">Войти</button>
+    
+    <div class="divider">или</div>
+    
+    <button class="btn btn-vk">
+      <div class="vk-icon"><svg viewBox="0 0 24 24"><path d="M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 8.316 24h7.368c6.724 0 8.316-1.592 8.316-8.316V8.316C24 1.592 22.408 0 15.684 0m3.692 17.123h-1.744c-.66 0-.864-.528-2.056-1.736-1.032-1.032-1.492-1.168-1.744-1.168-.696 0-.896.196-.896.808v2.58c0 .572-.184.912-1.252.912-1.84 0-3.884-1.12-5.324-3.208C4.196 12.124 3 8.644 3 8.284c0-.252.096-.48.696-.48h1.744c.52 0 .716.24.912.808 1.004 2.924 2.692 5.492 3.384 5.492.252 0 .368-.116.368-.808V10.14c-.072-1.44-.848-1.56-.848-2.068 0-.252.216-.508.544-.508h2.74c.284 0 .392.144.392.78v2.108c0 .452.2.608.332.608.252 0 .464-.156.924-.616l1.364-1.54c.592-.668 1.064-.844 1.064-.844.252 0 .348.108.348.808v2.74c0 .572-.252.912-1.252.912-.66 0-.864-.528-2.056-1.736-1.032-1.032-1.492-1.168-1.744-1.168-.696 0-.896.196-.896.808v2.58c0 .572-.184.912-1.252.912-.66 0-.864-.528-2.056-1.736-1.032-1.032-1.492-1.168-1.744-1.168-.696 0-.896.196-.896.808v2.58c0 .572-.184.912-1.252.912z"/></svg></div>
+      <span>Войти через VK</span>
+    </button>
+    
+    <button class="btn btn-grey" style="margin-top: 24px;" onclick="navigateTo('screen-role', '#/')">← На главную</button>
+  </div>
 </div>
 
-<div id="screen-register" class="screen auth-screen">
-  <div class="auth-mascot">🦊</div>
-  <div class="auth-title">Регистрация</div>
-  <div class="input-group"><span class="input-icon">👤</span><input type="text" id="reg-fio" placeholder="ФИО"></div>
-  <div class="input-group"><span class="input-icon">✉️</span><input type="email" id="reg-email" placeholder="Email"></div>
-  <div class="input-group"><span class="input-icon">🔒</span><input type="password" id="reg-password" placeholder="Пароль (мин. 6 символов)"></div>
-  <div class="input-group" id="reg-org-group" style="display: none;">
-    <span class="input-icon">🏫</span>
-    <select id="reg-org-type" onchange="updateOrgPreview()">
-      <option value="school">Школа</option>
-      <option value="gymnasium">Гимназия</option>
-      <option value="lyceum">Лицей</option>
-      <option value="other">Другое</option>
-    </select>
-  </div>
-  <div class="input-group" id="reg-org-details" style="display: none;">
-    <input type="text" id="reg-org-number" placeholder="№ (необязательно)" style="margin-bottom: 8px;">
-    <input type="text" id="reg-org-name" placeholder="Название (например: Форватор)">
-  </div>
-  <div id="org-preview" style="text-align: center; padding: 10px; background: #f0f0f0; border-radius: 8px; margin-bottom: 16px; display: none; font-weight: bold; color: var(--orange);"></div>
-  <label class="consent-label"><input type="checkbox" id="reg-consent"><span>Я согласен с <a href="#" onclick="showScreen('screen-agreement')">соглашением</a> и <a href="#" onclick="showScreen('screen-privacy')">политикой</a></span></label>
-  <button class="btn btn-orange" onclick="handleRegister()">Зарегистрироваться</button>
-  <button class="btn btn-grey" style="margin-top: 24px;" onclick="showScreen('screen-role')">← На главную</button>
-</div>
-
-<div id="screen-student" class="screen">
-  <div class="header"><div class="logo">🦊 Лисёнок Пифагор</div></div>
-  <h1 style="font-size: 1.8rem; margin-bottom: 8px;">Привет, ученик! 🎒</h1>
-  <p style="color: var(--text-light); margin-bottom: 24px;">Введи код класса от учителя</p>
-  <div class="input-group"><span class="input-icon">🏫</span><input type="text" id="student-code" placeholder="КОД КЛАССА" maxlength="6" style="text-transform: uppercase; text-align: center; font-size: 1.3rem;" oninput="onStudentCodeInput()"></div>
-  <div id="class-info" style="text-align: center; font-weight: bold; color: var(--green); margin-bottom: 16px; min-height: 24px;"></div>
-  <div id="vk-login-section" style="display: none; margin-top: 24px;">
-    <div class="card">
-      <h3 style="margin-bottom: 16px;">Вход через VK ID</h3>
-      <label class="consent-label" style="margin-bottom: 16px;">
-        <input type="checkbox" id="vk-consent-student">
-        <span>Мне есть 14 лет, либо у меня есть <b>согласие родителей</b> на использование VK ID. Родитель получит уведомление о моём входе.</span>
-      </label>
-      <button class="btn btn-vk" id="btn-vk-student" onclick="studentLoginWithVK()" disabled><span style="font-size: 1.3rem;">🔵</span> Войти через VK</button>
+<!-- ЭКРАН 3: Вход для Ученика -->
+<div id="screen-auth-student" class="screen">
+  <div class="auth-container">
+    <h1 style="text-align: center; margin-bottom: 24px;">Вход для ученика</h1>
+    <p style="text-align: center; color: var(--text-light); margin-bottom: 24px;">Введите код школы и код класса</p>
+    
+    <div class="input-group">
+      <input type="text" id="student-school-code" placeholder="КОД ШКОЛЫ (необязательно)" maxlength="6">
     </div>
-  </div>
-  <button class="btn btn-grey" style="margin-top: 16px;" onclick="showScreen('screen-role')">← На главную</button>
-</div>
-
-<div id="screen-parent" class="screen">
-  <div class="header"><div class="logo">🦊 Лисёнок Пифагор</div></div>
-  <div class="auth-mascot" style="margin-top: 20px;">🦊</div>
-  <h1 style="font-size: 1.8rem; margin-bottom: 8px; text-align: center;">Вход родителя</h1>
-  <div class="input-group"><span class="input-icon">✉️</span><input type="email" id="parent-email" placeholder="Email"></div>
-  <div class="input-group"><span class="input-icon">🔒</span><input type="password" id="parent-password" placeholder="Пароль"></div>
-  <button class="btn btn-orange" onclick="parentLoginWithEmail()">Войти</button>
-  <div class="divider">или</div>
-  <button class="btn btn-vk" onclick="loginWithVK()"><span style="font-size: 1.3rem;">🔵</span> Войти через VK</button>
-  <div id="parent-children-list" style="margin-top: 24px; display: none;">
-    <h3 style="margin-bottom: 16px;">Мои дети</h3>
-    <div id="children-container"></div>
-    <button class="btn btn-blue" style="margin-top: 16px;" onclick="addChild()">+ Добавить ребёнка по коду</button>
-  </div>
-  <button class="btn btn-grey" style="margin-top: 24px;" onclick="showScreen('screen-role')">← На главную</button>
-</div>
-
-<div id="screen-dashboard" class="screen">
-  <div class="header">
-    <div class="logo">🦊 Лисёнок Пифагор</div>
-    <div style="position: relative;">
-      <div class="avatar" onclick="toggleDropdown()" id="user-avatar">👤</div>
-      <div class="dropdown-menu" id="user-dropdown">
-        <div class="dropdown-item" id="dropdown-user-name" style="font-weight: bold; padding: 14px 16px; border-bottom: 1px solid var(--border);">Гость</div>
-        <div class="dropdown-item" onclick="showMyChildren()">👪 Мои дети</div>
-        <div class="dropdown-item logout" onclick="handleLogout()">🚪 Выйти</div>
-      </div>
+    
+    <div class="input-group">
+      <input type="text" id="student-code" placeholder="КОД КЛАССА" maxlength="6">
     </div>
+    
+    <button class="btn btn-orange">Войти по коду</button>
+    
+    <div class="divider">или</div>
+    
+    <button class="btn btn-vk">
+      <div class="vk-icon"><svg viewBox="0 0 24 24"><path d="M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 8.316 24h7.368c6.724 0 8.316-1.592 8.316-8.316V8.316C24 1.592 22.408 0 15.684 0m3.692 17.123h-1.744c-.66 0-.864-.528-2.056-1.736-1.032-1.032-1.492-1.168-1.744-1.168-.696 0-.896.196-.896.808v2.58c0 .572-.184.912-1.252.912-1.84 0-3.884-1.12-5.324-3.208C4.196 12.124 3 8.644 3 8.284c0-.252.096-.48.696-.48h1.744c.52 0 .716.24.912.808 1.004 2.924 2.692 5.492 3.384 5.492.252 0 .368-.116.368-.808V10.14c-.072-1.44-.848-1.56-.848-2.068 0-.252.216-.508.544-.508h2.74c.284 0 .392.144.392.78v2.108c0 .452.2.608.332.608.252 0 .464-.156.924-.616l1.364-1.54c.592-.668 1.064-.844 1.064-.844.252 0 .348.108.348.808v2.74c0 .572-.252.912-1.252.912-.66 0-.864-.528-2.056-1.736-1.032-1.032-1.492-1.168-1.744-1.168-.696 0-.896.196-.896.808v2.58c0 .572-.184.912-1.252.912-.66 0-.864-.528-2.056-1.736-1.032-1.032-1.492-1.168-1.744-1.168-.696 0-.896.196-.896.808v2.58c0 .572-.184.912-1.252.912z"/></svg></div>
+      <span>Войти через VK</span>
+    </button>
+    
+    <button class="btn btn-grey" style="margin-top: 24px;" onclick="navigateTo('screen-role', '#/')">← На главную</button>
   </div>
-  <h1 id="dashboard-welcome" style="font-size: 1.5rem; font-weight: bold; margin-bottom: 8px;">Добро пожаловать!</h1>
-  <div id="dashboard-content"></div>
 </div>
 
-<div id="screen-topic-selector" class="screen">
-  <div class="header"><div class="logo">🦊 Лисёнок Пифагор</div></div>
-  <h1 style="font-size: 1.8rem; margin-bottom: 8px;">📚 Выбор темы урока</h1>
-  <div style="display: flex; gap: 12px; margin-bottom: 24px;">
-    <select id="subject-select" onchange="updateTopics()" style="flex: 1; padding: 14px; border: 2px solid var(--border); border-radius: 12px;">
-      <option value="math">🔢 Математика</option><option value="russian">📖 Русский язык</option><option value="english">🇬🇧 Английский</option>
-    </select>
-    <select id="grade-select" onchange="updateTopics()" style="flex: 1; padding: 14px; border: 2px solid var(--border); border-radius: 12px;">
-      <option value="1">1 класс</option><option value="2">2 класс</option><option value="3" selected>3 класс</option><option value="4">4 класс</option><option value="5">5 класс</option>
-    </select>
+<!-- ЭКРАН 4: Вход для Родителя -->
+<div id="screen-auth-parent" class="screen">
+  <div class="auth-container">
+    <h1 style="text-align: center; margin-bottom: 24px;">Вход для родителя</h1>
+    <p style="text-align: center; color: var(--text-light); margin-bottom: 24px;">Введите код школы и код ребёнка</p>
+    
+    <div class="input-group">
+      <input type="text" id="parent-school-code" placeholder="КОД ШКОЛЫ (необязательно)" maxlength="6">
+    </div>
+    
+    <div class="input-group">
+      <input type="text" id="parent-code" placeholder="КОД РЕБЁНКА" maxlength="8">
+    </div>
+    
+    <button class="btn btn-orange">Найти ребёнка</button>
+    
+    <div class="divider">или</div>
+    
+    <button class="btn btn-vk">
+      <div class="vk-icon"><svg viewBox="0 0 24 24"><path d="M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 8.316 24h7.368c6.724 0 8.316-1.592 8.316-8.316V8.316C24 1.592 22.408 0 15.684 0m3.692 17.123h-1.744c-.66 0-.864-.528-2.056-1.736-1.032-1.032-1.492-1.168-1.744-1.168-.696 0-.896.196-.896.808v2.58c0 .572-.184.912-1.252.912-1.84 0-3.884-1.12-5.324-3.208C4.196 12.124 3 8.644 3 8.284c0-.252.096-.48.696-.48h1.744c.52 0 .716.24.912.808 1.004 2.924 2.692 5.492 3.384 5.492.252 0 .368-.116.368-.808V10.14c-.072-1.44-.848-1.56-.848-2.068 0-.252.216-.508.544-.508h2.74c.284 0 .392.144.392.78v2.108c0 .452.2.608.332.608.252 0 .464-.156.924-.616l1.364-1.54c.592-.668 1.064-.844 1.064-.844.252 0 .348.108.348.808v2.74c0 .572-.252.912-1.252.912-.66 0-.864-.528-2.056-1.736-1.032-1.032-1.492-1.168-1.744-1.168-.696 0-.896.196-.896.808v2.58c0 .572-.184.912-1.252.912-.66 0-.864-.528-2.056-1.736-1.032-1.032-1.492-1.168-1.744-1.168-.696 0-.896.196-.896.808v2.58c0 .572-.184.912-1.252.912z"/></svg></div>
+      <span>Войти через VK</span>
+    </button>
+    
+    <button class="btn btn-grey" style="margin-top: 24px;" onclick="navigateTo('screen-role', '#/')">← На главную</button>
   </div>
-  <div id="topic-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;"></div>
-  <button class="btn btn-grey" style="margin-top: 32px;" onclick="showScreen('screen-role')">← На главную</button>
-</div>
-
-<div id="screen-lesson" class="screen">
-  <div class="header"><div class="logo">🦊 Лисёнок Пифагор</div></div>
-  <h1 id="lesson-title" style="font-size: 1.5rem; margin-bottom: 8px;">Тема урока</h1>
-  <p id="lesson-subtitle" style="color: var(--text-light); margin-bottom: 20px;">3 класс • Математика</p>
-  <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
-    <button class="btn btn-small btn-orange" onclick="setVideoFilter(5, this)">5 мин</button>
-    <button class="btn btn-small btn-grey" onclick="setVideoFilter(15, this)">15 мин</button>
-    <button class="btn btn-small btn-grey" onclick="setVideoFilter(30, this)">30 мин</button>
-  </div>
-  <div id="video-list"></div>
-  <button class="btn btn-grey" style="margin-top: 24px;" onclick="showScreen('screen-topic-selector')">← К темам</button>
-</div>
-
-<div id="screen-agreement" class="screen" style="background: white; padding: 20px;">
-  <h2 style="margin-bottom: 16px;">📜 Пользовательское соглашение</h2>
-  <p style="line-height: 1.6; margin-bottom: 24px;">1. Игра предоставляется бесплатно.<br>2. Оператор не несёт ответственности за успеваемость.<br>3. Контакты: iosif.marketing@yandex.ru</p>
-  <button class="btn btn-orange" onclick="showScreen('screen-role')">Закрыть</button>
-</div>
-
-<div id="screen-privacy" class="screen" style="background: white; padding: 20px;">
-  <h2 style="margin-bottom: 16px;">🔒 Политика конфиденциальности</h2>
-  <p style="line-height: 1.6; margin-bottom: 24px;">
-    <b>1. Данные:</b> При входе через VK мы получаем имя, ID и аватарку (с разрешения).<br>
-    <b>2. Доступ:</b> Учитель видит своих учеников, родитель — только своего ребёнка.<br>
-    <b>3. VK ID для детей:</b> Требуется согласие родителей. Родитель получает уведомление о входе и может заблокировать этот способ входа.<br>
-    <b>4. Контакты:</b> iosif.marketing@yandex.ru
-  </p>
-  <button class="btn btn-orange" onclick="showScreen('screen-role')">Закрыть</button>
 </div>
 
 <div id="toast" class="toast"></div>
 
 <script>
-const state = { currentUser: null, currentRole: null, joinClass: null, videoFilter: 15, currentLessonTopic: null, currentLessonSubject: null, currentLessonGrade: null };
-const lessonTopics = { math: { 1: ['Сложение до 10'], 3: ['Таблица умножения на 7'], 5: ['Дроби'] }, russian: { 1: ['Алфавит'], 3: ['Безударные гласные'] }, english: { 1: ['Алфавит'], 3: ['Семья'] } };
-
-function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0, 0); document.getElementById('user-dropdown').classList.remove('show'); }
-function showAuth(role) { 
-  document.getElementById('auth-title').textContent = { director: 'Вход директора', deputy: 'Вход завуча', teacher: 'Вход учителя' }[role]; 
-  const show = role === 'deputy' || role === 'teacher' || role === 'director';
-  document.getElementById('reg-org-group').style.display = show ? 'block' : 'none';
-  document.getElementById('reg-org-details').style.display = show ? 'block' : 'none';
-  showScreen('screen-auth'); 
-}
-function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
-function toggleDropdown() { document.getElementById('user-dropdown').classList.toggle('show'); }
-function handleLogout() { if(confirm('Выйти?')) { auth.signOut().then(() => { state.currentUser = null; showScreen('screen-role'); showToast('Вы вышли'); }); } }
-
-function loginWithVK() {
-  const authUrl = `https://oauth.vk.com/authorize?client_id=${VK_APP_ID}&display=page&response_type=token&scope=video&redirect_uri=https://oauth.vk.com/blank.html&v=5.131`;
-  window.open(authUrl, '_blank', 'width=600,height=600');
-  setTimeout(checkVKAuth, 2000);
+function navigateTo(screenId, urlHash) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  window.history.pushState({screen: screenId}, '', urlHash);
+  window.scrollTo(0, 0);
 }
 
-function checkVKAuth() {
-  const hash = window.location.hash;
-  if (hash && hash.includes('access_token=')) {
-    const token = new URLSearchParams(hash.substring(1)).get('access_token');
-    if (token) {
-      localStorage.setItem('vk_user_token', token);
-      showToast('✅ Вход через VK успешен!');
-      loadVKUserData();
-    }
+window.addEventListener('popstate', function(event) {
+  if (event.state && event.state.screen) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(event.state.screen).classList.add('active');
+  } else {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-role').classList.add('active');
   }
-}
+});
 
-function loadVKUserData() {
-  const token = localStorage.getItem('vk_user_token');
-  if (!token) return;
-  const script = document.createElement('script');
-  const cb = 'vkCb_' + Date.now();
-  script.src = `https://api.vk.com/method/users.get?fields=photo_100&access_token=${token}&v=5.131&callback=${cb}`;
-  window[cb] = function(data) {
-    if (data.response && data.response[0]) {
-      const u = data.response[0];
-      state.currentUser = { uid: 'vk_' + u.id, fio: u.first_name + ' ' + u.last_name, photo: u.photo_100, authMethod: 'vk' };
-      document.getElementById('dropdown-user-name').textContent = u.first_name + ' ' + u.last_name;
-      document.getElementById('user-avatar').innerHTML = `<img src="${u.photo_100}">`;
-      db.collection('users').doc('vk_' + u.id).get().then(doc => {
-        if (!doc.exists) {
-          db.collection('users').doc('vk_' + u.id).set({ fio: u.first_name + ' ' + u.last_name, photo: u.photo_100, vkId: u.id, role: 'parent', createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-        }
-        state.currentRole = 'parent';
-        updateDashboard({ role: 'parent', fio: u.first_name + ' ' + u.last_name });
-        showScreen('screen-dashboard');
-      });
-    }
-    delete window[cb]; if (script.parentNode) document.body.removeChild(script);
-  };
-  document.body.appendChild(script);
+function showToast(msg) { 
+  const t = document.getElementById('toast'); 
+  t.textContent = msg; 
+  t.classList.add('show'); 
+  setTimeout(() => t.classList.remove('show'), 3000); 
 }
-
-function onStudentCodeInput() {
-  const code = document.getElementById('student-code').value.trim().toUpperCase();
-  const info = document.getElementById('class-info');
-  const vkSec = document.getElementById('vk-login-section');
-  const vkBtn = document.getElementById('btn-vk-student');
-  const vkConsent = document.getElementById('vk-consent-student');
-  if (code.length >= 4) {
-    info.textContent = 'Проверка...';
-    db.collection('classes').doc(code).get().then(doc => {
-      if (doc.exists) {
-        const cls = doc.data();
-        info.textContent = `✅ ${cls.name} • ${cls.grade} кл.`;
-        state.joinClass = { code, ...cls };
-        vkSec.style.display = 'block';
-        vkConsent.onchange = () => { vkBtn.disabled = !vkConsent.checked; };
-      } else { info.textContent = '❌ Код не найден'; vkSec.style.display = 'none'; }
-    });
-  } else { info.textContent = ''; vkSec.style.display = 'none'; }
-}
-
-function studentLoginWithVK() {
-  if (!state.joinClass || !document.getElementById('vk-consent-student').checked) { showToast('❌ Подтвердите согласие'); return; }
-  const authUrl = `https://oauth.vk.com/authorize?client_id=${VK_APP_ID}&display=page&response_type=token&scope=video&redirect_uri=https://oauth.vk.com/blank.html&v=5.131`;
-  window.open(authUrl, '_blank', 'width=600,height=600');
-  setTimeout(() => {
-    const hash = window.location.hash;
-    if (hash && hash.includes('access_token=')) {
-      const token = new URLSearchParams(hash.substring(1)).get('access_token');
-      if (token) {
-        localStorage.setItem('vk_user_token', token);
-        const script = document.createElement('script');
-        const cb = 'vkStCb_' + Date.now();
-        script.src = `https://api.vk.com/method/users.get?fields=photo_100&access_token=${token}&v=5.131&callback=${cb}`;
-        window[cb] = function(data) {
-          if (data.response && data.response[0]) {
-            const u = data.response[0];
-            db.collection('students').where('vkId', '==', u.id).where('classCode', '==', state.joinClass.code).get().then(snap => {
-              if (!snap.empty) {
-                const st = snap.docs[0].data();
-                if (st.vkBlockedByParent) { showToast('🚫 Вход через VK заблокирован родителем'); return; }
-                notifyParent(st.parentId, u.first_name, state.joinClass.name);
-              } else {
-                db.collection('students').add({ vkId: u.id, fio: u.first_name + ' ' + u.last_name, classCode: state.joinClass.code, className: state.joinClass.name, grade: state.joinClass.grade, vkBlockedByParent: false, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-              }
-              showToast('✅ Добро пожаловать!');
-              showScreen('screen-topic-selector');
-            });
-          }
-          delete window[cb]; if (script.parentNode) document.body.removeChild(script);
-        };
-        document.body.appendChild(script);
-      }
-    }
-  }, 3000);
-}
-
-function notifyParent(parentId, studentName, className) {
-  db.collection('notifications').add({ parentId, type: 'vk_login', message: `Ваш ребёнок ${studentName} вошёл через VK ID (класс ${className})`, timestamp: firebase.firestore.FieldValue.serverTimestamp(), read: false });
-}
-
-function parentLoginWithEmail() {
-  const email = document.getElementById('parent-email').value.trim();
-  const password = document.getElementById('parent-password').value;
-  if (!email || !password) { showToast('❌ Введите email и пароль'); return; }
-  auth.signInWithEmailAndPassword(email, password).then(cred => loadParentData(cred.user.uid)).catch(() => showToast('❌ Ошибка входа'));
-}
-
-function loadParentData(uid) {
-  db.collection('users').doc(uid).get().then(doc => {
-    if (doc.exists) {
-      const d = doc.data();
-      state.currentUser = { uid, ...d };
-      state.currentRole = 'parent';
-      document.getElementById('dropdown-user-name').textContent = d.fio;
-      document.getElementById('user-avatar').innerHTML = d.photo ? `<img src="${d.photo}">` : d.fio.charAt(0).toUpperCase();
-      loadParentChildren(uid);
-      updateDashboard(d);
-      showScreen('screen-dashboard');
-    }
-  });
-}
-
-function loadParentChildren(parentId) {
-  db.collection('students').where('parentId', '==', parentId).get().then(snap => {
-    const cont = document.getElementById('children-container');
-    cont.innerHTML = '';
-    if (snap.empty) { cont.innerHTML = '<p style="text-align:center; color:var(--text-light);">Нет привязанных детей</p>'; }
-    else {
-      snap.forEach(doc => {
-        const ch = doc.data();
-        const div = document.createElement('div');
-        div.className = 'child-card' + (ch.vkBlockedByParent ? ' vk-blocked' : '');
-        div.innerHTML = `<div class="child-card-header"><div><div style="font-weight:bold;">${ch.fio}</div><div style="font-size:0.9rem; color:var(--text-light);">${ch.className || ''} • ${ch.grade || ''} кл.</div></div><button class="btn btn-small ${ch.vkBlockedByParent ? 'btn-orange' : 'btn-grey'}" onclick="toggleVKAccess('${doc.id}', ${!ch.vkBlockedByParent})">${ch.vkBlockedByParent ? '🚫 Заблокирован' : '✅ Разрешён'}</button></div>`;
-        cont.appendChild(div);
-      });
-    }
-    document.getElementById('parent-children-list').style.display = 'block';
-  });
-}
-
-function toggleVKAccess(studentId, block) {
-  db.collection('students').doc(studentId).update({ vkBlockedByParent: block }).then(() => { showToast(block ? '🚫 Заблокировано' : '✅ Разрешено'); loadParentChildren(state.currentUser.uid); });
-}
-
-function addChild() {
-  const code = prompt('Введите код ребёнка (выдал учитель):');
-  if (code) {
-    db.collection('classes').doc(code.toUpperCase()).get().then(doc => {
-      if (doc.exists) {
-        db.collection('students').where('classCode', '==', code.toUpperCase()).get().then(snap => {
-          if (!snap.empty) { snap.docs[0].ref.update({ parentId: state.currentUser.uid }).then(() => { showToast('✅ Ребёнок привязан!'); loadParentChildren(state.currentUser.uid); }); }
-          else { showToast('❌ Ребёнок не найден'); }
-        });
-      } else { showToast('❌ Код класса не найден'); }
-    });
-  }
-}
-
-function showMyChildren() {
-  if (state.currentRole === 'parent') { loadParentChildren(state.currentUser.uid); showScreen('screen-parent'); }
-  else { showToast('ℹ️ Только для родителей'); }
-}
-
-function updateOrgPreview() {
-  const type = document.getElementById('reg-org-type').value;
-  const num = document.getElementById('reg-org-number').value.trim();
-  const name = document.getElementById('reg-org-name').value.trim();
-  const types = { school: 'Школа', gymnasium: 'Гимназия', lyceum: 'Лицей', other: 'Учреждение' };
-  let full = types[type] || 'Школа';
-  if (num) full += ' №' + num;
-  if (name) full += ' "' + name + '"';
-  const prev = document.getElementById('org-preview');
-  prev.textContent = full;
-  prev.style.display = 'block';
-}
-
-function handleRegister() {
-  const fio = document.getElementById('reg-fio').value.trim();
-  const email = document.getElementById('reg-email').value.trim();
-  const pass = document.getElementById('reg-password').value;
-  const consent = document.getElementById('reg-consent').checked;
-  if (!fio || !email || !pass || !consent) { showToast('❌ Заполните всё и примите соглашение'); return; }
-  const orgType = document.getElementById('reg-org-type').value;
-  const orgNum = document.getElementById('reg-org-number').value.trim();
-  const orgName = document.getElementById('reg-org-name').value.trim();
-  const types = { school: 'Школа', gymnasium: 'Гимназия', lyceum: 'Лицей', other: 'Учреждение' };
-  let orgFull = types[orgType] || 'Школа';
-  if (orgNum) orgFull += ' №' + orgNum;
-  if (orgName) orgFull += ' "' + orgName + '"';
-  auth.createUserWithEmailAndPassword(email, pass).then(cred => {
-    return db.collection('users').doc(cred.user.uid).set({ fio, email, orgType, orgNum, orgName, orgFullName: orgFull, role: document.getElementById('auth-title').textContent.includes('директор') ? 'director' : 'teacher', createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-  }).then(() => { showToast('✅ Успешно!'); showScreen('screen-auth'); }).catch(e => showToast('❌ ' + e.message));
-}
-
-function handleLogin() {
-  const email = document.getElementById('auth-email').value.trim();
-  const pass = document.getElementById('auth-password').value;
-  if (!email || !pass) { showToast('❌ Введите email и пароль'); return; }
-  auth.signInWithEmailAndPassword(email, pass).then(cred => {
-    db.collection('users').doc(cred.user.uid).get().then(doc => {
-      if (doc.exists) {
-        const d = doc.data();
-        state.currentUser = { uid: cred.user.uid, ...d };
-        state.currentRole = d.role;
-        document.getElementById('dropdown-user-name').textContent = d.fio;
-        document.getElementById('user-avatar').textContent = d.fio.charAt(0).toUpperCase();
-        updateDashboard(d);
-        showScreen('screen-dashboard');
-      }
-    });
-  }).catch(() => showToast('❌ Ошибка входа'));
-}
-
-function updateDashboard(d) {
-  const welcomes = { director: 'Добро пожаловать, директор!', deputy: 'Добро пожаловать, завуч!', teacher: `Привет, ${d.fio.split(' ')[0]}!`, parent: `Здравствуйте, ${d.fio}!` };
-  document.getElementById('dashboard-welcome').textContent = welcomes[d.role] || 'Добро пожаловать!';
-  document.getElementById('dashboard-content').innerHTML = d.role === 'parent' ? `<div class="card"><h3>Мои дети</h3><button class="btn btn-blue" onclick="loadParentChildren('${state.currentUser.uid}')">Обновить список</button></div>` : `<div class="card"><p>Роль: ${d.role}</p><p>Организация: ${d.orgFullName || 'Не указана'}</p></div>`;
-}
-
-function updateTopics() {
-  const subj = document.getElementById('subject-select').value;
-  const grade = document.getElementById('grade-select').value;
-  const topics = lessonTopics[subj]?.[grade] || ['Тема 1'];
-  const grid = document.getElementById('topic-grid');
-  grid.innerHTML = '';
-  topics.forEach(t => {
-    const card = document.createElement('div');
-    card.className = 'role-btn';
-    card.innerHTML = `<div style="font-size: 2.5rem; margin-bottom: 8px;">📚</div><div style="font-weight: 600;">${t}</div>`;
-    card.onclick = () => openLesson(subj, grade, t);
-    grid.appendChild(card);
-  });
-}
-
-function openLesson(subj, grade, topic) {
-  state.currentLessonSubject = subj;
-  state.currentLessonGrade = grade;
-  state.currentLessonTopic = topic;
-  const names = { math: 'Математика', russian: 'Русский язык', english: 'Английский' };
-  document.getElementById('lesson-title').textContent = topic;
-  document.getElementById('lesson-subtitle').textContent = `${grade} класс • ${names[subj]}`;
-  loadVideos();
-  showScreen('screen-lesson');
-}
-
-function setVideoFilter(min, btn) {
-  state.videoFilter = min;
-  document.querySelectorAll('#screen-lesson .btn-small').forEach(b => { b.className = 'btn btn-small btn-grey'; });
-  btn.className = 'btn btn-small btn-orange';
-  loadVideos();
-}
-
-function loadVideos() {
-  const list = document.getElementById('video-list');
-  list.innerHTML = '<p style="text-align: center; color: var(--text-light);">🔍 Ищем видео...</p>';
-  const token = localStorage.getItem('vk_user_token');
-  if (!token) { list.innerHTML = '<p style="text-align: center; color: var(--red);">⚠️ Войдите через VK для поиска видео</p>'; return; }
-  const query = `${state.currentLessonTopic} ${state.currentLessonGrade} класс`;
-  const script = document.createElement('script');
-  const cb = 'vkVidCb_' + Date.now();
-  script.src = `https://api.vk.com/method/video.search?q=${encodeURIComponent(query)}&access_token=${token}&v=5.131&count=10&safe=1&callback=${cb}`;
-  window[cb] = function(data) {
-    list.innerHTML = '';
-    if (data.error) { list.innerHTML = `<p style="text-align: center; color: var(--red);">Ошибка: ${data.error.error_msg}</p>`; delete window[cb]; if(script.parentNode) document.body.removeChild(script); return; }
-    const vids = data.response?.items || [];
-    if (vids.length === 0) { list.innerHTML = '<p style="text-align: center; color: var(--text-light);">Видео не найдены</p>'; delete window[cb]; if(script.parentNode) document.body.removeChild(script); return; }
-    vids.forEach(v => {
-      if (v.duration > state.videoFilter * 60) return;
-      const card = document.createElement('div');
-      card.className = 'video-card';
-      const mins = Math.floor(v.duration / 60);
-      const secs = String(v.duration % 60).padStart(2, '0');
-      card.innerHTML = `<div style="font-weight: bold; margin-bottom: 8px;">${v.title}</div><div style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 12px;">⏱ ${mins}:${secs} • 👁 ${v.views || 0}</div><button class="btn btn-orange" onclick="window.open('https://vk.com/video${v.owner_id}_${v.id}', '_blank')">▶ Смотреть</button>`;
-      list.appendChild(card);
-    });
-    delete window[cb]; if(script.parentNode) document.body.removeChild(script);
-  };
-  script.onerror = () => { list.innerHTML = '<p style="text-align: center; color: var(--red);">Не удалось загрузить</p>'; delete window[cb]; if(script.parentNode) document.body.removeChild(script); };
-  document.body.appendChild(script);
-  setTimeout(() => { if(window[cb]) { list.innerHTML = '<p style="text-align: center; color: var(--red);">Таймаут</p>'; delete window[cb]; if(script.parentNode) document.body.removeChild(script); } }, 10000);
-}
-
-function showLeaderboard() { showToast('🏆 Таблица успеха в разработке'); }
 </script>
 </body>
-    </html>                                                                                                                       </html>
+</html>   
+     
