@@ -1,468 +1,417 @@
-
+Вот полный, цельный код приложения со всеми его исходными стандартными функциями (фильтрация, счетчики, динамические заголовки, списки календарей, синхронизация с Google Календарем, удаление, добавление) плюс возможность прикреплять файлы с Google Диска и автоматическая авторизация:
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Лисёнок Пифагор — Образовательная платформа</title>
-
-  <!-- Firebase App & Auth SDK (v9 Compat) -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-  <!-- VK Open API SDK -->
-  <script src="https://vk.com/js/api/openapi.js?169" type="text/javascript"></script>
-
+  <title>Daily Spark — Задачи и Календарь</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    :root {
-      --primary: #ff7700;
-      --primary-hover: #e66a00;
-      --bg-color: #f7f9fc;
-      --card-bg: #ffffff;
-      --text-main: #2d3748;
-      --text-muted: #718096;
-      --border: #e2e8f0;
-      --radius: 16px;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    /* Шапка с логотипом */
-    .header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 30px;
-      cursor: pointer;
-    }
-
-    .header span {
-      font-size: 32px;
-    }
-
-    /* Контейнер экрана */
-    .screen {
-      display: none;
-      background: var(--card-bg);
-      border-radius: var(--radius);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-      width: 100%;
-      max-width: 440px;
-      padding: 32px;
-      text-align: center;
-      animation: fadeIn 0.25s ease-in-out;
-    }
-
-    .screen.active {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    h1 {
-      font-size: 24px;
-      margin-bottom: 8px;
-    }
-
-    p.subtitle {
-      color: var(--text-muted);
-      font-size: 14px;
-      margin-bottom: 24px;
-    }
-
-    /* Выбор роли */
-    .role-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-top: 16px;
-    }
-
-    .role-card {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 16px;
-      border: 2px solid var(--border);
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      background: #fafafa;
-    }
-
-    .role-card:hover {
-      border-color: var(--primary);
-      background: #fff8f0;
-      transform: translateY(-2px);
-    }
-
-    .role-icon {
-      font-size: 28px;
-    }
-
-    .role-title {
-      font-size: 16px;
-      font-weight: 600;
-    }
-
-    /* Формы и поля ввода */
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 20px;
-      text-align: left;
-    }
-
-    .input-field {
-      width: 100%;
-      padding: 12px 16px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      font-size: 15px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .input-field:focus {
-      border-color: var(--primary);
-    }
-
-    /* Кнопки */
-    .btn {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    .btn-primary {
-      background-color: var(--primary);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background-color: var(--primary-hover);
-    }
-
-    .btn-back {
-      background: none;
-      color: var(--text-muted);
-      margin-top: 16px;
-      font-weight: 500;
-    }
-
-    .btn-back:hover {
-      color: var(--text-main);
-    }
-
-    /* Разделитель */
-    .divider {
-      display: flex;
-      align-items: center;
-      text-align: center;
-      margin: 18px 0;
-      color: var(--text-muted);
-      font-size: 13px;
-    }
-
-    .divider::before, .divider::after {
-      content: '';
-      flex: 1;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .divider::before { margin-right: 12px; }
-    .divider::after { margin-left: 12px; }
-
-    /* Социальные кнопки */
-    .oauth-group {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .btn-yandex {
-      background: #fc3f1d;
-      color: white;
-    }
-
-    .btn-yandex:hover {
-      background: #e03212;
-    }
-
-    .btn-vk {
-      background: #0077ff;
-      color: white;
-    }
-
-    .btn-vk:hover {
-      background: #0066dc;
-    }
-
-    /* Всплывающие уведомления (Toast) */
-    #toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(33, 37, 41, 0.95);
-      color: #fff;
-      padding: 12px 24px;
-      border-radius: 30px;
-      font-size: 14px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease, transform 0.3s ease;
-      z-index: 1000;
-    }
-
-    #toast.show {
-      opacity: 1;
-      transform: translate(-50%, -8px);
-    }
+    body { background-color: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
+    .custom-scroll::-webkit-scrollbar { width: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
   </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col md:flex-row">
 
-  <!-- Логотип -->
-  <div class="header" onclick="showScreen('screen-role')">
-    <span>🦊</span> Лисёнок Пифагор
-  </div>
-
-  <!-- 1. Экран выбора роли -->
-  <div id="screen-role" class="screen active">
-    <h1>Кто вы?</h1>
-    <p class="subtitle">Выберите вашу роль для входа в систему</p>
-    <div class="role-grid">
-      <div class="role-card" onclick="showScreen('screen-auth-student')">
-        <div class="role-icon">🎒</div>
-        <div class="role-title">Ученик</div>
+  <!-- Сайдбар -->
+  <aside class="w-full md:w-80 bg-slate-900 border-r border-slate-800 p-5 flex flex-col gap-6 custom-scroll overflow-y-auto">
+    <div class="flex items-center gap-3">
+      <div class="bg-amber-400 text-slate-950 p-2 rounded-xl text-xl font-bold flex items-center justify-center w-10 h-10 shadow-lg shadow-amber-400/20">
+        ⚡
       </div>
-      <div class="role-card" onclick="showScreen('screen-auth-parent')">
-        <div class="role-icon">👪</div>
-        <div class="role-title">Родитель</div>
-      </div>
-      <div class="role-card" onclick="showScreen('screen-auth-staff')">
-        <div class="role-icon">👨‍🏫</div>
-        <div class="role-title">Учитель / Сотрудник</div>
+      <div>
+        <h1 class="text-xl font-bold tracking-tight text-white">Daily Spark</h1>
+        <p class="text-xs text-slate-400">Планировщик & Календарь</p>
       </div>
     </div>
-  </div>
 
-  <!-- 2. Вход для ученика -->
-  <div id="screen-auth-student" class="screen">
-    <h1>Вход для ученика</h1>
-    <p class="subtitle">Введите код школы и код класса</p>
-    
-    <div class="form-group">
-      <input type="text" id="student-school-code" class="input-field" placeholder="Код школы (необязательно)">
-      <input type="text" id="student-class-code" class="input-field" placeholder="Код класса">
+    <!-- Фильтры -->
+    <div class="flex flex-col gap-1">
+      <div class="text-xs font-semibold text-slate-500 uppercase px-3 mb-1">Вид</div>
+      <button onclick="setFilter('all')" id="btn-filter-all" class="flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium bg-slate-800 text-cyan-400 transition">
+        <span class="flex items-center gap-3"><i class="fa-solid fa-list-check w-4 text-slate-400"></i> Все задачи</span>
+        <span id="count-all" class="text-xs bg-slate-700/60 px-2 py-0.5 rounded-full text-slate-300">0</span>
+      </button>
+      <button onclick="setFilter('today')" id="btn-filter-today" class="flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800/50 hover:text-white transition">
+        <span class="flex items-center gap-3"><i class="fa-regular fa-calendar-day w-4 text-emerald-400"></i> Сегодня</span>
+        <span id="count-today" class="text-xs bg-slate-800 px-2 py-0.5 rounded-full text-slate-400">0</span>
+      </button>
+      <button onclick="setFilter('nodate')" id="btn-filter-nodate" class="flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800/50 hover:text-white transition">
+        <span class="flex items-center gap-3"><i class="fa-regular fa-clock w-4 text-amber-400"></i> Без срока</span>
+        <span id="count-nodate" class="text-xs bg-slate-800 px-2 py-0.5 rounded-full text-slate-400">0</span>
+      </button>
+      <button onclick="setFilter('recurring')" id="btn-filter-recurring" class="flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800/50 hover:text-white transition">
+        <span class="flex items-center gap-3"><i class="fa-solid fa-arrows-rotate w-4 text-indigo-400"></i> Повторяющиеся</span>
+        <span id="count-recurring" class="text-xs bg-slate-800 px-2 py-0.5 rounded-full text-slate-400">0</span>
+      </button>
     </div>
 
-    <button class="btn btn-primary" onclick="loginByCode('student')">Войти по коду</button>
-
-    <div class="divider">или</div>
-
-    <div class="oauth-group">
-      <button class="btn btn-yandex" onclick="loginWithYandex()">Войти через Яндекс ID</button>
-      <button class="btn btn-vk" onclick="loginWithVK()">Войти через VK</button>
+    <!-- Проекты / Календари -->
+    <div class="flex flex-col gap-1">
+      <div class="text-xs font-semibold text-slate-500 uppercase px-3 mb-1">Проекты / Календари</div>
+      <div id="calendars-list" class="flex flex-col gap-1"></div>
     </div>
 
-    <button class="btn btn-back" onclick="showScreen('screen-role')">← Назад к выбору роли</button>
-  </div>
+    <!-- Авторизация -->
+    <div class="mt-auto pt-4 border-t border-slate-800">
+      <div id="auth-logged-out" class="flex flex-col gap-2">
+        <button id="auth-btn" class="w-full bg-white hover:bg-slate-100 text-slate-900 font-semibold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 text-sm shadow transition">
+          <i class="fa-brands fa-google text-red-500"></i> Войти через Google
+        </button>
+      </div>
 
-  <!-- 3. Вход для родителя -->
-  <div id="screen-auth-parent" class="screen">
-    <h1>Вход для родителя</h1>
-    <p class="subtitle">Введите код школы и код ребёнка</p>
+      <div id="auth-logged-in" class="hidden flex flex-col gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-cyan-600 text-white font-bold flex items-center justify-center text-sm shadow">
+            Г
+          </div>
+          <div class="overflow-hidden">
+            <div class="text-sm font-semibold text-white truncate">Аккаунт подключен</div>
+            <div class="text-xs text-emerald-400 flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Google Calendar & Drive
+            </div>
+          </div>
+        </div>
+        <button id="signout-btn" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium py-2 px-3 rounded-xl text-xs transition border border-slate-700/60">
+          Выйти
+        </button>
+      </div>
+    </div>
+  </aside>
 
-    <div class="form-group">
-      <input type="text" id="parent-school-code" class="input-field" placeholder="Код школы (необязательно)">
-      <input type="text" id="parent-child-code" class="input-field" placeholder="Код ребёнка">
+  <!-- Рабочая зона -->
+  <main class="flex-1 flex flex-col h-screen overflow-hidden bg-slate-950">
+    <header class="p-5 md:px-8 border-b border-slate-800 flex items-center justify-between">
+      <div>
+        <h2 id="view-title" class="text-xl md:text-2xl font-bold text-white">Все задачи</h2>
+        <p id="view-desc" class="text-xs text-slate-400">Полный список ваших задач и планов</p>
+      </div>
+    </header>
+
+    <!-- Форма добавления -->
+    <div class="p-5 md:px-8 pb-3">
+      <form id="new-task-form" class="bg-slate-900 border border-slate-800 focus-within:border-cyan-500/50 rounded-2xl p-3 flex flex-col gap-3 transition">
+        <div class="flex flex-col md:flex-row gap-3">
+          <input type="text" id="task-input" placeholder="Что нужно сделать?" required
+                 class="bg-transparent flex-1 text-sm text-white px-2 py-1 outline-none placeholder-slate-500">
+          <div class="flex items-center gap-2">
+            <input type="date" id="task-date" class="bg-slate-800 text-slate-300 text-xs px-2.5 py-1.5 rounded-lg border border-slate-700/70 outline-none">
+            <button type="submit" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold px-4 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition ml-auto">
+              <i class="fa-solid fa-plus"></i> Добавить
+            </button>
+          </div>
+        </div>
+        
+        <!-- Дополнительное поле для Google Диска -->
+        <div class="flex items-center gap-2 pt-2 border-t border-slate-800 text-xs">
+          <span class="text-slate-500 flex items-center gap-1"><i class="fa-brands fa-google-drive text-amber-400"></i> Файл/Фото:</span>
+          <input type="url" id="task-drive-link" placeholder="Вставьте ссылку на файл с Google Диска..." 
+                 class="bg-slate-800 text-slate-300 text-xs px-2.5 py-1 rounded-lg border border-slate-700/50 flex-1 outline-none placeholder-slate-600">
+        </div>
+      </form>
     </div>
 
-    <button class="btn btn-primary" onclick="loginByCode('parent')">Найти ребёнка</button>
+    <!-- Список задач -->
+    <div id="tasks-container" class="flex-1 overflow-y-auto px-5 md:px-8 py-3 custom-scroll flex flex-col gap-2.5"></div>
+  </main>
 
-    <div class="divider">или</div>
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client"></script>
 
-    <div class="oauth-group">
-      <button class="btn btn-yandex" onclick="loginWithYandex()">Войти через Яндекс ID</button>
-      <button class="btn btn-vk" onclick="loginWithVK()">Войти через VK</button>
-    </div>
-
-    <button class="btn btn-back" onclick="showScreen('screen-role')">← Назад к выбору роли</button>
-  </div>
-
-  <!-- 4. Вход для сотрудников -->
-  <div id="screen-auth-staff" class="screen">
-    <h1>Вход для сотрудников</h1>
-    <p class="subtitle">Учителя, завучи и руководство</p>
-
-    <div class="form-group">
-      <input type="email" id="staff-email" class="input-field" placeholder="Email">
-      <input type="password" id="staff-password" class="input-field" placeholder="Пароль">
-    </div>
-
-    <button class="btn btn-primary" onclick="loginStaffEmail()">Войти</button>
-
-    <div class="divider">или</div>
-
-    <div class="oauth-group">
-      <button class="btn btn-yandex" onclick="loginWithYandex()">Войти через Яндекс ID</button>
-      <button class="btn btn-vk" onclick="loginWithVK()">Войти через VK</button>
-    </div>
-
-    <button class="btn btn-back" onclick="showScreen('screen-role')">← Назад к выбору роли</button>
-  </div>
-
-  <!-- Всплывающее уведомление -->
-  <div id="toast"></div>
-
-  <!-- Скрипты приложения -->
   <script>
-    // --- 1. Инициализация Firebase ---
-    const firebaseConfig = {
-      apiKey: "AIzaSyD-placeholder", // Подставь сюда ключ из своего Firebase Console
-      authDomain: "sample-firebase-ai-app-ef45a.firebaseapp.com",
-      projectId: "sample-firebase-ai-app-ef45a",
-      storageBucket: "sample-firebase-ai-app-ef45a.appspot.com",
-      messagingSenderId: "1061031635789",
-      appId: "1:1061031635789:web:sample"
+    const CLIENT_ID = '33202353069-b5s8l03c15o1flg67i604s428q79t81p.apps.googleusercontent.com';
+    const SCOPES = 'https://www.googleapis.com/auth/calendar.events.readonly https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/drive.readonly';
+
+    let tokenClient;
+    let currentAccessToken = localStorage.getItem('g_token') || null;
+
+    let state = {
+      filter: 'all',
+      calendars: [],
+      tasks: JSON.parse(localStorage.getItem('daily_spark_tasks') || '[]')
     };
 
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // --- 2. Инициализация VK API ---
-    if (window.VK) {
-      VK.init({ apiId: 54720009 });
+    function saveTasks() {
+      localStorage.setItem('daily_spark_tasks', JSON.stringify(state.tasks));
+      render();
     }
 
-    // --- 3. Навигация между экранами ---
-    function showScreen(screenId) {
-      const screens = document.querySelectorAll('.screen');
-      screens.forEach(s => s.classList.remove('active'));
-
-      const target = document.getElementById(screenId);
-      if (target) {
-        target.classList.add('active');
+    function toggleTask(id) {
+      const task = state.tasks.find(t => t.id === id);
+      if (task) {
+        task.completed = !task.completed;
+        saveTasks();
       }
     }
 
-    // --- 4. Всплывающие уведомления (Toast) ---
-    function showToast(message) {
-      const toast = document.getElementById('toast');
-      toast.innerText = message;
-      toast.classList.add('show');
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 3500);
+    function deleteTask(id) {
+      state.tasks = state.tasks.filter(t => t.id !== id);
+      saveTasks();
     }
 
-    // --- 5. Вход через Яндекс ID (OIDC) ---
-    function loginWithYandex() {
-      const provider = new firebase.auth.OAuthProvider('oidc.yandex.com');
-      auth.signInWithPopup(provider)
-        .then((result) => {
-          const user = result.user;
-          const name = user.displayName || 'пользователь';
-          showToast('✅ Добро пожаловать, ' + name + '!');
-        })
-        .catch((error) => {
-          console.error('Ошибка входа через Яндекс:', error);
-          showToast('Ошибка при входе через Яндекс');
-        });
+    function setFilter(name) {
+      state.filter = name;
+
+      // Обновление заголовков рабочей зоны
+      const titleEl = document.getElementById('view-title');
+      const descEl = document.getElementById('view-desc');
+
+      if (name === 'all') {
+        titleEl.innerText = 'Все задачи';
+        descEl.innerText = 'Полный список ваших задач и планов';
+      } else if (name === 'today') {
+        titleEl.innerText = 'Сегодня';
+        descEl.innerText = 'Задачи, запланированные на сегодняшний день';
+      } else if (name === 'nodate') {
+        titleEl.innerText = 'Без срока';
+        descEl.innerText = 'Задачи без конкретной даты выполнения';
+      } else if (name === 'recurring') {
+        titleEl.innerText = 'Повторяющиеся';
+        descEl.innerText = 'Регулярные дела и события';
+      } else if (name.startsWith('cal_')) {
+        const calId = name.replace('cal_', '');
+        const cal = state.calendars.find(c => c.id === calId);
+        titleEl.innerText = cal ? cal.summary : 'Календарь';
+        descEl.innerText = 'События из выбранного календаря';
+      }
+
+      // Обновление подсветки фильтров
+      ['all', 'today', 'nodate', 'recurring'].forEach(f => {
+        const btn = document.getElementById(`btn-filter-${f}`);
+        if (btn) {
+          if (f === name) {
+            btn.className = "flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium bg-slate-800 text-cyan-400 transition";
+          } else {
+            btn.className = "flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800/50 hover:text-white transition";
+          }
+        }
+      });
+
+      render();
     }
 
-    // --- 6. Вход через VK ---
-    function loginWithVK() {
-      if (!window.VK) {
-        showToast('VK SDK не загружен');
+    function render() {
+      const todayStr = new Date().toISOString().split('T')[0];
+
+      // Подсчёт счетчиков
+      const cAll = document.getElementById('count-all');
+      const cToday = document.getElementById('count-today');
+      const cNodate = document.getElementById('count-nodate');
+      const cRec = document.getElementById('count-recurring');
+
+      if (cAll) cAll.innerText = state.tasks.length;
+      if (cToday) cToday.innerText = state.tasks.filter(t => t.date === todayStr).length;
+      if (cNodate) cNodate.innerText = state.tasks.filter(t => !t.date).length;
+      if (cRec) cRec.innerText = state.tasks.filter(t => t.repeat === 'recurring').length;
+
+      const container = document.getElementById('tasks-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      // Фильтрация
+      const filtered = state.tasks.filter(t => {
+        if (state.filter === 'today') return t.date === todayStr;
+        if (state.filter === 'nodate') return !t.date;
+        if (state.filter === 'recurring') return t.repeat === 'recurring';
+        if (state.filter.startsWith('cal_')) return t.projectId === state.filter.replace('cal_', '');
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="h-64 flex flex-col items-center justify-center text-slate-500 text-sm">
+            <i class="fa-regular fa-calendar-check text-3xl mb-2 opacity-40"></i>
+            Нет задач в этом списке
+          </div>`;
         return;
       }
-      VK.Auth.login(function(response) {
-        if (response.session) {
-          const name = response.session.user ? response.session.user.first_name : 'друг';
-          showToast('✅ Добро пожаловать через VK, ' + name + '!');
-        } else {
-          showToast('Вход через VK отменён');
-        }
+
+      // Генерация карточек
+      filtered.forEach(task => {
+        const card = document.createElement('div');
+        card.className = "bg-slate-900 border border-slate-800 hover:border-slate-700/80 rounded-xl p-3 flex items-center justify-between gap-3 transition";
+        card.innerHTML = `
+          <div class="flex items-center gap-3 overflow-hidden flex-1">
+            <button onclick="toggleTask('${task.id}')" class="text-slate-500 hover:text-cyan-400 transition flex-shrink-0">
+              <i class="${task.completed ? 'fa-solid fa-circle-check text-cyan-400' : 'fa-regular fa-circle'} text-base"></i>
+            </button>
+            <div class="flex flex-col truncate">
+              <span onclick="toggleTask('${task.id}')" class="cursor-pointer text-sm font-medium truncate ${task.completed ? 'line-through text-slate-500' : 'text-slate-200'}">
+                ${task.title}
+              </span>
+              <div class="flex items-center gap-2 mt-0.5 flex-wrap">
+                ${task.repeat === 'recurring' ? '<span class="text-[10px] bg-indigo-950 text-indigo-400 border border-indigo-800 px-2 py-0.5 rounded-full flex items-center gap-1">🔁 Повтор</span>' : ''}
+                ${task.date ? `<span class="text-[11px] text-slate-400 flex items-center gap-1"><i class="fa-regular fa-calendar text-[10px]"></i> ${task.date}</span>` : ''}
+                ${task.driveLink ? `
+                  <a href="${task.driveLink}" target="_blank" rel="noopener noreferrer" class="text-[11px] bg-slate-800 text-amber-300 hover:text-amber-200 border border-slate-700/70 px-2 py-0.5 rounded flex items-center gap-1 transition">
+                    <i class="fa-brands fa-google-drive"></i> Файл/Фото
+                  </a>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+          <button onclick="deleteTask('${task.id}')" class="text-slate-500 hover:text-red-400 p-1 transition flex-shrink-0">
+            <i class="fa-regular fa-trash-can text-sm"></i>
+          </button>
+        `;
+        container.appendChild(card);
       });
     }
 
-    // --- 7. Вход по коду (заглушка) ---
-    function loginByCode(role) {
-      if (role === 'student') {
-        const classCode = document.getElementById('student-class-code').value.trim();
-        if (!classCode) {
-          showToast('Пожалуйста, введите код класса');
-          return;
-        }
-        showToast('Вход в класс ' + classCode + '...');
-      } else if (role === 'parent') {
-        const childCode = document.getElementById('parent-child-code').value.trim();
-        if (!childCode) {
-          showToast('Пожалуйста, введите код ребёнка');
-          return;
-        }
-        showToast('Поиск данных по коду ' + childCode + '...');
-      }
-    }
+    const taskForm = document.getElementById('new-task-form');
+    if (taskForm) {
+      taskForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const input = document.getElementById('task-input');
+        const date = document.getElementById('task-date').value;
+        const driveLink = document.getElementById('task-drive-link').value;
+        if (!input.value.trim()) return;
 
-    // --- 8. Вход для сотрудников по email/паролю ---
-    function loginStaffEmail() {
-      const email = document.getElementById('staff-email').value.trim();
-      const pass = document.getElementById('staff-password').value.trim();
-
-      if (!email || !pass) {
-        showToast('Заполните email и пароль');
-        return;
-      }
-
-      auth.signInWithEmailAndPassword(email, pass)
-        .then((userCredential) => {
-          showToast('✅ Успешный вход в систему');
-        })
-        .catch((error) => {
-          console.error(error);
-          showToast('Ошибка: ' + error.message);
+        state.tasks.push({
+          id: 'task_' + Date.now(),
+          projectId: state.filter.startsWith('cal_') ? state.filter.replace('cal_', '') : null,
+          title: input.value.trim(),
+          date: date || '',
+          repeat: 'none',
+          completed: false,
+          driveLink: driveLink.trim() || null
         });
+
+        input.value = '';
+        document.getElementById('task-date').value = '';
+        document.getElementById('task-drive-link').value = '';
+        saveTasks();
+      });
     }
+
+    // Загрузка календарей из Google
+    async function loadGoogleCalendars(token) {
+      try {
+        const calRes = await fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (calRes.status === 401) {
+          localStorage.removeItem('g_token');
+          currentAccessToken = null;
+          showLoggedOut();
+          return;
+        }
+
+        const calData = await calRes.json();
+        const items = calData.items || [];
+        state.calendars = items;
+
+        const calList = document.getElementById('calendars-list');
+        if (calList) {
+          calList.innerHTML = '';
+          items.forEach(cal => {
+            const btn = document.createElement('button');
+            btn.className = "flex items-center justify-between px-3 py-1.5 rounded-xl text-xs text-slate-400 hover:bg-slate-800 transition truncate";
+            btn.innerHTML = `<span class="truncate flex items-center gap-2"><span class="w-2 h-2 rounded-full" style="background:${cal.backgroundColor || '#06b6d4'}"></span> ${cal.summary}</span>`;
+            btn.onclick = () => {
+              setFilter('cal_' + cal.id);
+            };
+            calList.appendChild(btn);
+          });
+        }
+
+        // Загрузка событий
+        for (const cal of items) {
+          const evRes = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?singleEvents=false`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          if (!evRes.ok) continue;
+          const evData = await evRes.json();
+          const evts = evData.items || [];
+
+          evts.forEach(ev => {
+            if (!state.tasks.find(t => t.id === ev.id)) {
+              const isRecurring = Boolean(ev.recurrence && ev.recurrence.length > 0);
+              state.tasks.push({
+                id: ev.id,
+                projectId: cal.id,
+                title: ev.summary || 'Без названия',
+                date: ev.start ? (ev.start.dateTime ? ev.start.dateTime.split('T')[0] : (ev.start.date || '')) : '',
+                repeat: isRecurring ? 'recurring' : 'none',
+                completed: false,
+                isGoogle: true
+              });
+            }
+          });
+        }
+        saveTasks();
+      } catch (err) {
+        console.error("Ошибка загрузки данных Google:", err);
+      }
+    }
+
+    function showLoggedIn() {
+      document.getElementById('auth-logged-out')?.classList.add('hidden');
+      document.getElementById('auth-logged-in')?.classList.remove('hidden');
+    }
+
+    function showLoggedOut() {
+      document.getElementById('auth-logged-in')?.classList.add('hidden');
+      document.getElementById('auth-logged-out')?.classList.remove('hidden');
+    }
+
+    window.onload = () => {
+      // Инициализация Google OAuth
+      tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID,
+        scope: SCOPES,
+        callback: async (resp) => {
+          if (resp.error) {
+            console.warn("Фоновый вход не выполнен:", resp.error);
+            showLoggedOut();
+            return;
+          }
+          currentAccessToken = resp.access_token;
+          localStorage.setItem('g_token', resp.access_token);
+          showLoggedIn();
+          await loadGoogleCalendars(resp.access_token);
+        }
+      });
+
+      // Автоматический вход при повторных открытиях
+      if (currentAccessToken) {
+        showLoggedIn();
+        loadGoogleCalendars(currentAccessToken);
+      } else {
+        tokenClient.requestAccessToken({ prompt: '' });
+      }
+
+      // Кнопка входа
+      const authBtn = document.getElementById('auth-btn');
+      if (authBtn) {
+        authBtn.onclick = () => {
+          tokenClient.requestAccessToken({ prompt: 'select_account' });
+        };
+      }
+
+      // Кнопка выхода
+      const signoutBtn = document.getElementById('signout-btn');
+      if (signoutBtn) {
+        signoutBtn.onclick = () => {
+          localStorage.removeItem('g_token');
+          currentAccessToken = null;
+          state.tasks = state.tasks.filter(t => !t.isGoogle);
+          saveTasks();
+          showLoggedOut();
+          const calList = document.getElementById('calendars-list');
+          if (calList) calList.innerHTML = '';
+        };
+      }
+
+      render();
+    };
   </script>
 </body>
-   </html>
+</html>
+
+
+          .      
